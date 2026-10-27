@@ -1,0 +1,231 @@
+"use client";
+
+import Link from "next/link";
+import { useActionState, useState } from "react";
+import {
+  loginAction,
+  passwordUpdateAction,
+  recoveryAction,
+  signupAction,
+} from "@/app/actions/auth";
+import type { FormState } from "@/lib/validation/auth";
+
+type AuthMode = "login" | "signup" | "recovery" | "reset";
+
+const initialState: FormState = { message: "", success: false };
+const passwordRequirements =
+  "Mínimo de 11 caracteres, incluindo maiúscula, minúscula e caractere especial.";
+
+export function PasswordField({
+  name,
+  label,
+  autoComplete,
+  minLength,
+  description,
+}: {
+  name: string;
+  label: string;
+  autoComplete: string;
+  minLength?: number;
+  description?: string;
+}) {
+  const [visible, setVisible] = useState(false);
+  const descriptionId = `${name}-password-help`;
+
+  return (
+    <label className="field">
+      <span>{label}</span>
+      <span className="password-input-wrap">
+        <input
+          id={name}
+          name={name}
+          type={visible ? "text" : "password"}
+          autoComplete={autoComplete}
+          required
+          minLength={minLength}
+          maxLength={128}
+          aria-describedby={description ? descriptionId : undefined}
+        />
+        <button
+          className="password-visibility-toggle"
+          type="button"
+          aria-label={visible ? "Ocultar senha" : "Mostrar senha"}
+          aria-pressed={visible}
+          onClick={() => setVisible((current) => !current)}
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M2 12s3.5-6.5 10-6.5S22 12 22 12s-3.5 6.5-10 6.5S2 12 2 12Z" />
+            <circle cx="12" cy="12" r="2.7" />
+            {visible && <path d="m4 4 16 16" />}
+          </svg>
+          <span className="password-toggle-tooltip" aria-hidden="true">
+            {visible ? "Ocultar senha" : "Mostrar senha"}
+          </span>
+        </button>
+      </span>
+      {description && <small id={descriptionId}>{description}</small>}
+    </label>
+  );
+}
+
+const content: Record<
+  AuthMode,
+  { title: string; description: string; submit: string }
+> = {
+  login: {
+    title: "Bem-vindo de volta.",
+    description: "Acesse seu espaço Vyrex.",
+    submit: "Entrar",
+  },
+  signup: {
+    title: "Vamos começar.",
+    description: "Crie sua conta de criador em poucos passos.",
+    submit: "Criar minha conta",
+  },
+  recovery: {
+    title: "Recupere seu acesso.",
+    description: "Enviaremos as instruções para o e-mail informado.",
+    submit: "Enviar instruções",
+  },
+  reset: {
+    title: "Escolha uma nova senha.",
+    description: passwordRequirements,
+    submit: "Atualizar senha",
+  },
+};
+
+export function AuthForm({ mode }: { mode: AuthMode }) {
+  const action =
+    mode === "login"
+      ? loginAction
+      : mode === "signup"
+        ? signupAction
+        : mode === "reset"
+          ? passwordUpdateAction
+          : recoveryAction;
+  const [state, formAction, pending] = useActionState(action, initialState);
+  const copy = content[mode];
+
+  return (
+    <form
+      action={formAction}
+      className={mode === "signup" ? "auth-form signup-auth-form" : "auth-form"}
+    >
+      <div className="auth-heading">
+        <p className="eyebrow">
+          <span /> {mode === "signup" ? "CRIADORES" : "VYREX / CRIADORES"}
+        </p>
+        <h1>{copy.title}</h1>
+        <p>{copy.description}</p>
+      </div>
+
+      {mode === "signup" && (
+        <label className="field">
+          <span>Nome completo</span>
+          <input autoComplete="name" name="fullName" required maxLength={120} />
+        </label>
+      )}
+
+      {mode !== "reset" && (
+        <label className="field">
+          <span>E-mail</span>
+          <input
+            autoComplete="email"
+            name="email"
+            type="email"
+            required
+            maxLength={254}
+          />
+        </label>
+      )}
+
+      {mode !== "recovery" && mode !== "reset" && (
+        <PasswordField
+          name="password"
+          label="Senha"
+          autoComplete={mode === "login" ? "current-password" : "new-password"}
+          minLength={mode === "signup" ? 11 : undefined}
+          description={mode === "signup" ? passwordRequirements : undefined}
+        />
+      )}
+
+      {mode === "reset" && (
+        <>
+          <PasswordField
+            name="password"
+            label="Nova senha"
+            autoComplete="new-password"
+            minLength={11}
+            description={passwordRequirements}
+          />
+          <PasswordField
+            name="passwordConfirmation"
+            label="Confirme sua nova senha"
+            autoComplete="new-password"
+            minLength={11}
+          />
+        </>
+      )}
+
+      {mode === "signup" && (
+        <>
+          <PasswordField
+            name="passwordConfirmation"
+            label="Confirme sua senha"
+            autoComplete="new-password"
+            minLength={11}
+          />
+          <label className="check-field">
+            <input name="termsAccepted" type="checkbox" required />
+            <span>
+              Li e aceito os <Link href="/termos">termos de uso</Link> e a
+              <Link href="/privacidade"> política de privacidade</Link>.
+            </span>
+          </label>
+          <p className="fine-print">
+            Cadastro aprovado significa elegibilidade para oportunidades
+            futuras, não contratação ou pagamento.
+          </p>
+        </>
+      )}
+
+      {state.message && (
+        <p
+          className={
+            state.success ? "form-message success" : "form-message error"
+          }
+          role="status"
+          aria-live="polite"
+        >
+          {state.message}
+        </p>
+      )}
+
+      <button
+        className="button button-dark submit-button"
+        type="submit"
+        disabled={pending}
+      >
+        {pending ? "Aguarde..." : copy.submit}
+        <span aria-hidden="true">↗</span>
+      </button>
+
+      {mode !== "signup" && (
+        <div className="auth-links">
+          {mode === "login" && (
+            <Link href="/recuperar-senha">Esqueci minha senha</Link>
+          )}
+          {mode === "login" && (
+            <span>
+              Primeira vez por aqui? <Link href="/cadastro">Criar conta</Link>
+            </span>
+          )}
+          {mode === "recovery" && <Link href="/login">Voltar para entrar</Link>}
+          {mode === "reset" && (
+            <Link href="/recuperar-senha">Solicitar outro link</Link>
+          )}
+        </div>
+      )}
+    </form>
+  );
+}

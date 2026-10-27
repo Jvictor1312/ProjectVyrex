@@ -1,0 +1,51 @@
+import type { Metadata } from "next";
+import Link from "next/link";
+import { AuthForm } from "@/app/components/auth-form";
+
+export const metadata: Metadata = { title: "Entrar" };
+
+export default async function LoginPage({
+  searchParams,
+}: {
+  searchParams: Promise<{
+    configuracao?: string | string[];
+    "conta-desativada"?: string | string[];
+    "senha-atualizada"?: string | string[];
+  }>;
+}) {
+  const params = await searchParams;
+  const configurationMessage =
+    params.configuracao === "supabase"
+      ? "O acesso ainda não está disponível neste ambiente. A equipe precisa configurar o Supabase."
+      : params.configuracao === "banco"
+        ? "O banco da plataforma ainda não está configurado. A equipe precisa aplicar as migrations."
+        : null;
+  const accountDisabled = params["conta-desativada"] === "1";
+  const passwordUpdated = params["senha-atualizada"] === "1";
+
+  return (
+    <main className="auth-page">
+      <Link className="brand auth-brand" href="/">
+        <span className="brand-mark">V</span>
+        <span>VYREX</span>
+      </Link>
+      {configurationMessage && (
+        <p className="form-message error" role="alert">
+          {configurationMessage}
+        </p>
+      )}
+      {accountDisabled && (
+        <p className="form-message error" role="alert">
+          Esta conta está desativada. Entre em contato com a equipe Vyrex.
+        </p>
+      )}
+      {passwordUpdated && (
+        <p className="form-message success" role="status">
+          Sua senha foi atualizada. Entre com a nova senha.
+        </p>
+      )}
+      <AuthForm mode="login" />
+      <p className="auth-footer">Sua presença, novas possibilidades.</p>
+    </main>
+  );
+}

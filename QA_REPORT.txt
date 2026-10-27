@@ -1,0 +1,62 @@
+VYREX - RELATORIO DE QA
+Data: 2026-10-14
+Ambiente: Windows, Node.js 24.20.0, Next.js 16.4.0
+
+RESULTADO GERAL
+- Build de producao: PASSOU.
+- TypeScript (tsc --noEmit): PASSOU.
+- ESLint: PASSOU sem erros ou avisos.
+- Testes automatizados: 22 passaram, 0 falharam.
+- npm audit: 0 vulnerabilidades.
+- Browser de producao: home, cadastro, redirect de rota protegida e viewport movel verificados.
+- Supabase real: NAO CONFIGURADO; Auth, e-mail, Postgres remoto e Storage remoto ainda nao foram exercitados.
+
+TESTES AUTOMATIZADOS
+1. Migration cria as cinco funcoes e criterios iniciais: PASSOU.
+2. Trigger de cadastro cria perfil incompleto e somente permissao de influenciador: PASSOU.
+3. Influenciador nao le cadastro nem evidencia privada de outra pessoa: PASSOU.
+4. Influenciador nao altera status nem atribui funcao interna: PASSOU.
+5. Visibilidade de equipe respeita papel e atribuicoes: PASSOU.
+6. Leitura de evidencias respeita atribuicoes e fila de validacao: PASSOU.
+7. Influenciador nao chama RPC de decisao final: PASSOU.
+8. Cota bloqueia o 11o upload direto ao Storage em 10 minutos: PASSOU.
+9. Gestor atribuido solicita correcao e gera historico/auditoria: PASSOU.
+10. Rejeicao grava responsavel, horario e justificativa: PASSOU.
+11. Aprovacao fica bloqueada ate cinco evidencias aprovadas manualmente e rede verificada: PASSOU.
+12. Submissao exige exatamente cinco Stories em ordem cronologica e dentro da idade maxima: PASSOU.
+13. Conta desativada perde acesso RLS a dados e arquivos, e admin pode reativar: PASSOU.
+14. Somente admin altera funcoes; concessoes e revogacoes geram auditoria: PASSOU.
+15. Somente admin altera criterios; a alteracao gera auditoria: PASSOU.
+16. Cadastro exige senhas correspondentes e aceite dos termos: PASSOU.
+17. Recuperacao valida senha minima e confirmacao: PASSOU.
+18. Perfil social rejeita URL insegura ou dominio enganoso: PASSOU.
+19. Evidencia rejeita posicao/data invalida: PASSOU.
+20. Imagem valida e reencoda para WebP sem metadados: PASSOU.
+21. Upload rejeita conteudo que nao e imagem e arquivo acima do limite: PASSOU.
+22. Callback aceita apenas redirecionamento local: PASSOU.
+
+TESTES DE EXECUCAO E INTERFACE
+- `tsc --noEmit`: PASSOU.
+- ESLint para todo o workspace: PASSOU sem avisos.
+- `node --experimental-strip-types --test ...`: 22 PASSOU / 0 FALHOU.
+- `npm audit`: 0 vulnerabilidades.
+- `next build`: PASSOU; 15 rotas geradas, paginas publicas estaticas e painéis autenticados dinamicos.
+- Home em producao: titulo, chamada de cadastro e identidade renderizados.
+- Viewport 390x844: sem overflow horizontal.
+- Envio de cadastro ficticio sem credenciais: mensagem explicativa exibida, sem erro 500.
+- Acesso sem autenticacao a `/interno/configuracoes`: redirecionado para login com aviso de Supabase nao configurado.
+
+TESTE DE BANCO
+Os testes aplicam a migration em PGlite/PostgreSQL 18.6, com implementacoes locais minimas de `auth` e `storage`. Eles verificam SQL e politicas RLS relevantes, mas nao substituem um teste de integracao no projeto Supabase real.
+
+PENDENCIAS EXTERNAS
+- Criar/preencher `.env.local` com Project URL, anon key e Site URL do projeto Supabase.
+- Aplicar a migration no banco de staging e validar Auth/Storage remoto antes de producao.
+- Configurar Auth URL allowlist, confirmacao de e-mail e SMTP.
+- Configurar `SUPABASE_SERVICE_ROLE_KEY` somente no servidor para habilitar convites e consulta de e-mails internos.
+- Criar o primeiro administrador pelo procedimento privilegiado descrito no README.
+- Revisar juridicamente `/termos` e `/privacidade`; ambos sao rascunhos, nao documentos finais.
+- Nao existem campanhas, marcas ou pagamentos nesta versao.
+
+OBSERVACAO
+O preview de producao permanece em `http://localhost:3000`. Nenhum segredo foi adicionado ao repositorio.

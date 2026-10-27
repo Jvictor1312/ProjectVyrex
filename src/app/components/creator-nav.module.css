@@ -1,0 +1,37 @@
+.nav {
+  border-bottom: 1px solid var(--line);
+  padding: 0 6%;
+  overflow-x: auto;
+}
+
+.nav ul {
+  display: flex;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  white-space: nowrap;
+}
+
+.nav a {
+  display: block;
+  padding: 14px 12px;
+  border-bottom: 2px solid transparent;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.nav a:hover {
+  color: var(--ink);
+}
+
+.nav a:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: -2px;
+}
+
+.nav a.active {
+  border-bottom-color: var(--ink);
+  color: var(--ink);
+}

@@ -1,0 +1,220 @@
+.inviteForm {
+  padding: 20px;
+  border: 1px solid #dce0db;
+  background: #fff;
+}
+.formFields {
+  display: grid;
+  grid-template-columns: 1fr 1fr 190px;
+  align-items: end;
+  gap: 12px;
+}
+.formFields label,
+.activeForm label {
+  display: grid;
+  gap: 6px;
+  color: #555d58;
+  font-size: 10px;
+  font-weight: 700;
+}
+.formFields input,
+.formFields select,
+.inlineForm select,
+.activeForm input:not([type="hidden"]) {
+  height: 38px;
+  min-width: 0;
+  padding: 0 9px;
+  border: 1px solid #cdd2cd;
+  border-radius: 0;
+  background: #fff;
+  color: #151717;
+  font: inherit;
+  font-size: 11px;
+}
+.inviteForm > button,
+.inlineForm button,
+.activeForm button {
+  min-height: 36px;
+  padding: 0 13px;
+  border: 1px solid #111;
+  background: #111;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.inviteForm > button {
+  margin-top: 15px;
+}
+.inviteForm button:disabled,
+.inlineForm button:disabled,
+.activeForm button:disabled {
+  cursor: wait;
+  opacity: 0.6;
+}
+.warning,
+.error,
+.success {
+  padding: 10px 12px;
+  font-size: 11px;
+  line-height: 1.5;
+}
+.warning {
+  border-left: 3px solid #777;
+  background: #f0f1ef;
+  color: #424744;
+}
+.error {
+  border-left: 3px solid #555;
+  background: #eeeeec;
+  color: #292d2b;
+}
+.success {
+  border-left: 3px solid #111;
+  background: #f0f1ef;
+  color: #252927;
+}
+.userList {
+  display: grid;
+  gap: 1px;
+  border: 1px solid #dce0db;
+  background: #dce0db;
+}
+.userRow {
+  display: grid;
+  grid-template-columns: minmax(150px, 1fr) minmax(120px, 0.6fr) minmax(
+      260px,
+      1.2fr
+    ) minmax(180px, 0.8fr);
+  align-items: center;
+  gap: 17px;
+  padding: 16px;
+  background: #fff;
+}
+.userIdentity {
+  display: grid;
+  gap: 4px;
+}
+.userIdentity strong {
+  color: #181a19;
+  font-size: 12px;
+}
+.userIdentity > span {
+  color: #5e6561;
+  font-size: 10px;
+  overflow-wrap: anywhere;
+}
+.userIdentity small {
+  color: #929994;
+  font-size: 9px;
+}
+.roleList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+.roleList span {
+  padding: 4px 6px;
+  border: 1px solid #dce0db;
+  color: #59605c;
+  font-size: 9px;
+}
+.activeLabel,
+.inactiveLabel {
+  font-size: 10px;
+  font-weight: 700;
+}
+.activeLabel {
+  color: #4b514d;
+}
+.inactiveLabel {
+  color: #555;
+}
+.inlineForm {
+  display: grid;
+  grid-template-columns: 1fr 90px auto;
+  gap: 5px;
+}
+.activeForm {
+  display: grid;
+  gap: 7px;
+  justify-items: start;
+}
+.auditList {
+  display: grid;
+  border: 1px solid #dce0db;
+  background: #fff;
+}
+.auditRow {
+  display: grid;
+  grid-template-columns: minmax(180px, 0.8fr) minmax(180px, 1fr) minmax(
+      210px,
+      0.9fr
+    ) minmax(150px, 1fr);
+  gap: 12px;
+  padding: 12px;
+  border-bottom: 1px solid #eceeeb;
+  align-items: start;
+}
+.auditRow:last-child {
+  border-bottom: 0;
+}
+.auditRow strong {
+  color: #1c1f1d;
+  font-size: 10px;
+  overflow-wrap: anywhere;
+}
+.auditRow span,
+.auditRow small {
+  color: #666d69;
+  font-size: 9px;
+  overflow-wrap: anywhere;
+}
+.auditRow code {
+  color: #505753;
+  font-size: 9px;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+.dangerButton {
+  border-color: #555 !important;
+  background: #555 !important;
+}
+.secondaryButton {
+  background: #fff !important;
+  color: #171918 !important;
+}
+@media (max-width: 900px) {
+  .formFields {
+    grid-template-columns: 1fr 1fr;
+  }
+  .userRow {
+    grid-template-columns: 1fr 1fr;
+    align-items: start;
+  }
+  .inlineForm {
+    grid-column: 1 / -1;
+  }
+  .auditRow {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+@media (max-width: 560px) {
+  .inviteForm {
+    padding: 14px;
+  }
+  .formFields {
+    grid-template-columns: 1fr;
+  }
+  .userRow {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    padding: 14px;
+  }
+  .inlineForm {
+    grid-column: auto;
+  }
+  .auditRow {
+    grid-template-columns: 1fr;
+  }
+}
