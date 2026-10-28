@@ -1,55 +1,28 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import styles from "./brand-contact.module.css";
 
 const email = "suportevyrex@gmail.com";
-const subject = "Vyrex para marcas";
+const subject = encodeURIComponent("Vyrex para marcas");
 
 const options = [
   {
     label: "Gmail",
-    href: `https://mail.google.com/mail/?view=cm&fs=1&to=${email}&su=${encodeURIComponent(subject)}`,
-    external: true,
+    href: `https://mail.google.com/mail/?view=cm&fs=1&to=${email}&su=${subject}`,
   },
   {
-    label: "Outlook.com",
-    href: `https://outlook.live.com/mail/0/deeplink/compose?to=${email}&subject=${encodeURIComponent(subject)}`,
-    external: true,
+    label: "Outlook",
+    href: `https://outlook.live.com/mail/0/deeplink/compose?to=${email}&subject=${subject}`,
   },
-  {
-    label: "App de e-mail",
-    href: `mailto:${email}?subject=${encodeURIComponent(subject)}`,
-    external: false,
-  },
+  { label: "Outro app", href: `mailto:${email}?subject=${subject}` },
 ];
 
-// Contato das marcas: cada pessoa escolhe onde escrever, em vez de abrir
-// sempre o programa de e-mail padrão do computador.
+// Contato das marcas: as opções abrem dentro do próprio cartão, sem cobrir a
+// página, e o endereço de e-mail não aparece na tela.
 export function BrandContact({ className }: { className: string }) {
   const [open, setOpen] = useState(false);
   const [copied, setCopied] = useState(false);
-  const wrapper = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!open) return;
-    function close(event: MouseEvent | KeyboardEvent) {
-      if (event instanceof KeyboardEvent && event.key !== "Escape") return;
-      if (
-        event instanceof MouseEvent &&
-        wrapper.current?.contains(event.target as Node)
-      ) {
-        return;
-      }
-      setOpen(false);
-    }
-    document.addEventListener("mousedown", close);
-    document.addEventListener("keydown", close);
-    return () => {
-      document.removeEventListener("mousedown", close);
-      document.removeEventListener("keydown", close);
-    };
-  }, [open]);
 
   async function copy() {
     try {
@@ -61,42 +34,48 @@ export function BrandContact({ className }: { className: string }) {
     }
   }
 
-  return (
-    <div className={styles.wrapper} ref={wrapper}>
+  if (!open) {
+    return (
       <button
         className={className}
         type="button"
-        aria-expanded={open}
-        aria-haspopup="menu"
-        onClick={() => setOpen((value) => !value)}
+        aria-expanded={false}
+        onClick={() => setOpen(true)}
       >
-        Fale com a gente →
+        Quero anunciar com a Vyrex →
       </button>
-      {open && (
-        <div className={styles.menu} role="menu">
-          {options.map((option) => (
-            <a
-              key={option.label}
-              className={styles.item}
-              role="menuitem"
-              href={option.href}
-              target={option.external ? "_blank" : undefined}
-              rel={option.external ? "noopener noreferrer" : undefined}
-              onClick={() => setOpen(false)}
-            >
-              Escrever pelo {option.label}
-            </a>
-          ))}
-          <button
-            className={styles.item}
-            type="button"
-            role="menuitem"
-            onClick={copy}
+    );
+  }
+
+  return (
+    <div className={styles.panel}>
+      <div className={styles.heading}>
+        <span>Escreva para a nossa equipe comercial:</span>
+        <button
+          className={styles.close}
+          type="button"
+          aria-label="Fechar opções de contato"
+          onClick={() => setOpen(false)}
+        >
+          ×
+        </button>
+      </div>
+      <div className={styles.options}>
+        {options.map((option) => (
+          <a
+            key={option.label}
+            className={styles.option}
+            href={option.href}
+            target={option.href.startsWith("http") ? "_blank" : undefined}
+            rel={option.href.startsWith("http") ? "noopener noreferrer" : undefined}
           >
-            {copied ? "Copiado!" : "Copiar e-mail"}
-          </button>
-        </div>
-      )}
+            {option.label}
+          </a>
+        ))}
+        <button className={styles.option} type="button" onClick={copy}>
+          {copied ? "Copiado ✓" : "Copiar e-mail"}
+        </button>
+      </div>
     </div>
   );
 }
