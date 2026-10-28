@@ -1,0 +1,490 @@
+/* Gestão de colaboradores: barra de busca, tabela, janela de gerenciamento
+   e formulários. Usa as cores e tamanhos definidos em internal.module.css. */
+
+/* Formulários */
+.form {
+  display: grid;
+  gap: 14px;
+}
+
+.fieldset {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.fieldset legend {
+  margin-bottom: 10px;
+  padding: 0;
+  font-size: 14px;
+  font-weight: 650;
+}
+
+.fieldset:disabled {
+  opacity: 0.6;
+}
+
+.grid2 {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.grid4 {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.formActions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.hint {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+/* Escolha de função: cada opção mostra o nome e o que a função faz. */
+.roleChoices {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.roleChoice {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  cursor: pointer;
+  transition:
+    border-color 120ms ease,
+    background-color 120ms ease;
+}
+
+.roleChoice:hover {
+  background: var(--hover);
+}
+
+.roleChoice:has(input:checked) {
+  border-color: var(--text);
+}
+
+.roleChoice:has(input:disabled) {
+  cursor: not-allowed;
+}
+
+.roleChoice input {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  margin: 2px 0 0;
+  accent-color: var(--text);
+}
+
+.roleChoice span {
+  display: grid;
+  gap: 2px;
+}
+
+.roleChoice strong {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.roleChoice small {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+/* Barra de busca e filtros */
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 10px;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--line);
+}
+
+.search {
+  flex: 1 1 260px;
+}
+
+.toolbar select {
+  min-width: 190px;
+}
+
+.resultCount {
+  margin-left: auto;
+  align-self: flex-end;
+  padding-bottom: 10px;
+  color: var(--muted);
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+/* Tabela de colaboradores */
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.table th {
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.table td {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--line);
+  font-size: 14px;
+  vertical-align: middle;
+}
+
+.table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.table tbody tr:hover td {
+  background: var(--hover);
+}
+
+.actionsCell {
+  width: 1%;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.person {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.person > div {
+  display: grid;
+  min-width: 0;
+}
+
+.personName {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+}
+
+.personEmail {
+  overflow: hidden;
+  color: var(--muted);
+  font-size: 13px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.you {
+  padding: 0 6px;
+  border-radius: 4px;
+  background: var(--hover);
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.roles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.muted {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.date {
+  color: var(--muted);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* Funções e permissões */
+.roleLegend {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin: 0;
+}
+
+.roleLegend > div {
+  display: grid;
+  align-content: start;
+  gap: 4px;
+  padding: 14px 20px;
+  border-right: 1px solid var(--line);
+}
+
+.roleLegend > div:last-child {
+  border-right: 0;
+}
+
+.roleLegend dt {
+  display: grid;
+  gap: 2px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.roleLegend dt span {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+.roleLegend dd {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+/* Janela (dialog) de convite e de gerenciamento */
+.dialog {
+  /* O reset geral zera margens; a janela precisa de margem automática para
+     ficar centralizada na tela. */
+  margin: auto;
+  width: min(640px, calc(100vw - 32px));
+  max-height: calc(100svh - 48px);
+  padding: 0;
+  overflow: auto;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: 0 24px 64px rgb(15 18 23 / 0.22);
+}
+
+.dialog::backdrop {
+  background: rgb(15 18 23 / 0.45);
+}
+
+.dialog[open] {
+  animation: dialogIn 140ms ease-out;
+}
+
+@keyframes dialogIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dialog[open] {
+    animation: none;
+  }
+}
+
+.dialogHeader {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--line);
+  background: var(--surface);
+}
+
+.dialogHeader h2 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 650;
+}
+
+.dialogHeader p {
+  margin: 2px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.dialogBody {
+  display: grid;
+  gap: 0;
+}
+
+.dialogSection {
+  display: grid;
+  gap: 12px;
+  padding: 18px 20px;
+  border-bottom: 1px solid var(--line);
+}
+
+.dialogSection:last-child {
+  border-bottom: 0;
+}
+
+.dialogSection h3 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 650;
+}
+
+.facts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0;
+}
+
+.facts dt {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.facts dd {
+  margin: 2px 0 0;
+  font-size: 14px;
+}
+
+.closeButton {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  flex: none;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--muted);
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.closeButton:hover {
+  background: var(--hover);
+  color: var(--text);
+}
+
+/* Histórico administrativo */
+.auditTable td:first-child {
+  font-weight: 600;
+}
+
+@media (max-width: 1080px) {
+  .roleLegend {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .roleLegend > div:nth-child(2) {
+    border-right: 0;
+  }
+  .roleLegend > div:nth-child(-n + 2) {
+    border-bottom: 1px solid var(--line);
+  }
+  .grid4 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* Em telas estreitas a tabela vira uma lista de cartões, sem rolagem lateral
+   e sem esconder informação: cada valor ganha o rótulo da coluna. */
+@media (max-width: 760px) {
+  .table thead {
+    display: none;
+  }
+  .table,
+  .table tbody,
+  .table tr,
+  .table td {
+    display: block;
+    width: 100%;
+  }
+  .table tr {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--line);
+  }
+  .table tbody tr:last-child {
+    border-bottom: 0;
+  }
+  .table td {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 4px 0;
+    border: 0;
+    text-align: right;
+  }
+  .table td::before {
+    color: var(--muted);
+    font-size: 12px;
+    content: attr(data-label);
+    text-align: left;
+  }
+  .table td:first-child {
+    padding-bottom: 8px;
+    text-align: left;
+  }
+  .table td:first-child::before {
+    display: none;
+  }
+  .table tbody tr:hover td {
+    background: transparent;
+  }
+  .actionsCell {
+    width: 100%;
+    padding-top: 8px !important;
+  }
+  .actionsCell::before {
+    display: none;
+  }
+  .actionsCell > * {
+    width: 100%;
+  }
+  .roles {
+    justify-content: flex-end;
+  }
+  .toolbar select {
+    flex: 1 1 100%;
+    min-width: 0;
+  }
+  .resultCount {
+    margin-left: 0;
+  }
+  .grid2,
+  .grid4,
+  .roleChoices,
+  .facts,
+  .roleLegend {
+    grid-template-columns: 1fr;
+  }
+  .roleLegend > div {
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .roleLegend > div:last-child {
+    border-bottom: 0;
+  }
+}
