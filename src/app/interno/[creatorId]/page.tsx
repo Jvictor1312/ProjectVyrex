@@ -11,7 +11,7 @@ import {
   SocialAccountReviewForm,
 } from "@/app/components/internal-actions";
 import { InternalShell } from "../internal-shell";
-import { requireUserWithRoles } from "@/lib/auth";
+import { fetchActiveRoleKeys, requireUserFast } from "@/lib/auth";
 import styles from "../internal-detail.module.css";
 
 export const metadata: Metadata = { title: "Ficha do criador" };
@@ -41,31 +41,47 @@ const historyLabels: Record<string, string> = {
   reinstated: "Cadastro reativado",
 };
 
+const roleNames: Record<string, string> = {
+  admin: "Administrador",
+  recruiter: "Recrutamento",
+  relationship_manager: "Relacionamento",
+  validator: "Validação",
+};
+
+function actorName(
+  actor: { full_name: string | null } | { full_name: string | null }[] | null,
+) {
+  const person = Array.isArray(actor) ? actor[0] : actor;
+  return person?.full_name || "Equipe";
+}
+
 export default async function CreatorInternalDetail({
   params,
 }: {
   params: Promise<{ creatorId: string }>;
 }) {
   const { creatorId } = await params;
-  const { supabase, roleKeys, rolesError } =
-    await requireUserWithRoles();
-  if (rolesError) notFound();
+  const { supabase, user, activeCheck, ensureActive } =
+    await requireUserFast();
 
-  const roles = new Set(roleKeys);
-  const isAdmin = roles.has("admin");
-  const canRecruit = isAdmin || roles.has("recruiter");
-  const canRelate = isAdmin || roles.has("relationship_manager");
-  const canValidate = isAdmin || roles.has("validator");
-  if (!canRecruit && !canRelate && !canValidate) notFound();
-
+  // Uma rodada só até o banco: funções, conta ativa, dados do cadastro e
+  // equipe são buscados juntos. Os dados já são protegidos pelas regras do
+  // banco; a checagem de função abaixo decide o que a tela mostra.
   const [
+    rolesResult,
+    activeResult,
     profileResult,
     accountsResult,
     evidenceResult,
     historyResult,
     messagesResult,
     contactsResult,
+    staffResult,
+    recruiterAssignment,
+    managerAssignment,
   ] = await Promise.all([
+    fetchActiveRoleKeys(supabase, user.id),
+    activeCheck,
     supabase
       .from("creator_profiles")
       .select(
@@ -89,7 +105,9 @@ export default async function CreatorInternalDetail({
       .order("position"),
     supabase
       .from("review_history")
-      .select("id, actor_id, action, outcome, reason, created_at")
+      .select(
+        "id, actor_id, action, outcome, reason, created_at, actor:profiles!review_history_actor_id_fkey(full_name)",
+      )
       .eq("creator_id", creatorId)
       .order("created_at", { ascending: false })
       .limit(30),
@@ -105,7 +123,35 @@ export default async function CreatorInternalDetail({
       .eq("creator_id", creatorId)
       .order("created_at", { ascending: false })
       .limit(20),
+    supabase
+      .from("user_roles")
+      .select(
+        "user_id, roles!inner(key), person:profiles!user_roles_user_id_fkey(full_name)",
+      )
+      .is("revoked_at", null)
+      .in("roles.key", ["recruiter", "relationship_manager"]),
+    supabase
+      .from("recruiter_assignments")
+      .select("recruiter_id")
+      .eq("creator_id", creatorId)
+      .is("ended_at", null)
+      .maybeSingle(),
+    supabase
+      .from("relationship_assignments")
+      .select("manager_id")
+      .eq("creator_id", creatorId)
+      .is("ended_at", null)
+      .maybeSingle(),
   ]);
+  await ensureActive(activeResult);
+  if (rolesResult.error) notFound();
+
+  const roles = new Set(rolesResult.keys);
+  const isAdmin = roles.has("admin");
+  const canRecruit = isAdmin || roles.has("recruiter");
+  const canRelate = isAdmin || roles.has("relationship_manager");
+  const canValidate = isAdmin || roles.has("validator");
+  if (!canRecruit && !canRelate && !canValidate) notFound();
 
   const creator = profileResult.data;
   if (profileResult.error || !creator) notFound();
@@ -127,7 +173,7 @@ export default async function CreatorInternalDetail({
   const signedUrls = storagePaths.length
     ? await supabase.storage
         .from("story-evidence")
-        .createSignedUrls(storagePaths, 60)
+        .createSignedUrls(storagePaths, 600)
     : { data: [] };
   const imageUrlByPath = new Map(
     (signedUrls.data ?? []).map((item) => [item.path, item.signedUrl]),
@@ -141,72 +187,34 @@ export default async function CreatorInternalDetail({
   } | null = null;
 
   if (isAdmin) {
-    const staffRoles = await supabase
-      .from("roles")
-      .select("id, key")
-      .in("key", ["recruiter", "relationship_manager"]);
-    const recruiterRoleId = staffRoles.data?.find(
-      (role) => role.key === "recruiter",
-    )?.id;
-    const managerRoleId = staffRoles.data?.find(
-      (role) => role.key === "relationship_manager",
-    )?.id;
-    const staffRoleIds = [recruiterRoleId, managerRoleId].filter(
-      (id): id is number => id !== undefined,
-    );
-    const [staffLinks, recruiterAssignment, managerAssignment] =
-      await Promise.all([
-        staffRoleIds.length
-          ? supabase
-              .from("user_roles")
-              .select("user_id, role_id")
-              .is("revoked_at", null)
-              .in("role_id", staffRoleIds)
-          : Promise.resolve({ data: [], error: null }),
-        supabase
-          .from("recruiter_assignments")
-          .select("recruiter_id")
-          .eq("creator_id", creatorId)
-          .is("ended_at", null)
-          .maybeSingle(),
-        supabase
-          .from("relationship_assignments")
-          .select("manager_id")
-          .eq("creator_id", creatorId)
-          .is("ended_at", null)
-          .maybeSingle(),
-      ]);
-    const staffIds = [
-      ...new Set((staffLinks.data ?? []).map((link) => link.user_id)),
-    ];
-    const staffProfiles = staffIds.length
-      ? await supabase
-          .from("profiles")
-          .select("id, full_name")
-          .in("id", staffIds)
-      : { data: [], error: null };
+    type StaffRow = {
+      user_id: string;
+      roles: { key: string } | { key: string }[];
+      person: { full_name: string | null } | { full_name: string | null }[] | null;
+    };
+    const staff = (staffResult.data ?? []) as StaffRow[];
+    const first = <T,>(value: T | T[] | null) =>
+      Array.isArray(value) ? value[0] : value;
     const namesById = new Map(
-      (staffProfiles.data ?? []).map((person) => [person.id, person.full_name]),
+      staff.map((row) => [row.user_id, first(row.person)?.full_name ?? null]),
     );
-    const recruiterIds = new Set(
-      (staffLinks.data ?? [])
-        .filter((link) => link.role_id === recruiterRoleId)
-        .map((link) => link.user_id),
-    );
-    const managerIds = new Set(
-      (staffLinks.data ?? [])
-        .filter((link) => link.role_id === managerRoleId)
-        .map((link) => link.user_id),
-    );
+    const idsFor = (key: string) =>
+      new Set(
+        staff
+          .filter((row) => first(row.roles)?.key === key)
+          .map((row) => row.user_id),
+      );
+    const recruiterIds = idsFor("recruiter");
+    const managerIds = idsFor("relationship_manager");
 
     assignmentProps = {
       recruiters: [...recruiterIds].map((id) => ({
         id,
-        name: namesById.get(id) ?? id.slice(0, 8),
+        name: namesById.get(id) ?? "Sem nome",
       })),
       managers: [...managerIds].map((id) => ({
         id,
-        name: namesById.get(id) ?? id.slice(0, 8),
+        name: namesById.get(id) ?? "Sem nome",
       })),
       currentRecruiter: recruiterAssignment.data?.recruiter_id ?? "",
       currentManager: managerAssignment.data?.manager_id ?? "",
@@ -221,7 +229,14 @@ export default async function CreatorInternalDetail({
   );
 
   return (
-    <InternalShell active="painel" isAdmin={isAdmin}>
+    <InternalShell
+      active="painel"
+      isAdmin={isAdmin}
+      roles={[...roles]
+        .filter((role) => role !== "influencer")
+        .map((role) => roleNames[role] ?? role)}
+      email={user.email}
+    >
       <div className={styles.page}>
         <Link className={styles.back} href="/interno">
           ← Voltar à fila
@@ -312,13 +327,20 @@ export default async function CreatorInternalDetail({
                       Story {item.position}
                     </span>
                     {imageUrl ? (
-                      <Image
-                        src={imageUrl}
-                        alt={`Evidência do Story ${item.position}`}
-                        width={300}
-                        height={400}
-                        unoptimized
-                      />
+                      <a
+                        href={imageUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        title="Abrir em tamanho real"
+                      >
+                        <Image
+                          src={imageUrl}
+                          alt={`Evidência do Story ${item.position}`}
+                          width={270}
+                          height={480}
+                          unoptimized
+                        />
+                      </a>
                     ) : (
                       <div className="evidence-empty">Prévia indisponível</div>
                     )}
@@ -383,7 +405,7 @@ export default async function CreatorInternalDetail({
                   <strong>{historyLabels[entry.action] ?? entry.action}</strong>
                   <span>
                     {new Date(entry.created_at).toLocaleString("pt-BR")} ·{" "}
-                    {entry.actor_id.slice(0, 8)}…
+                    {actorName(entry.actor)}
                   </span>
                   {entry.reason && <p>{entry.reason}</p>}
                 </li>

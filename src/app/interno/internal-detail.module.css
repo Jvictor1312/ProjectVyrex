@@ -109,11 +109,14 @@
   font-size: 10px;
   line-height: 1.5;
 }
-.evidenceCard > img,
+.evidenceCard img,
 .evidenceCard > .emptyPreview {
   width: 100%;
-  aspect-ratio: 3 / 4;
-  object-fit: cover;
+  aspect-ratio: 9 / 16;
+  object-fit: contain;
+  background: #000;
+  border-radius: 12px;
+  cursor: zoom-in;
   border: 1px solid var(--line);
   background: var(--line);
 }
