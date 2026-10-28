@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { fetchActiveRoleKeys } from "@/lib/auth";
+import { invalidPhoneMessage, normalizePhone } from "@/lib/validation/phone";
 import { dashboardPathForRoles } from "@/lib/auth-routing";
 import {
   createSupabaseServerClient,
@@ -71,6 +72,7 @@ export async function signupAction(
     email: formData.get("email"),
     password: formData.get("password"),
     passwordConfirmation: formData.get("passwordConfirmation"),
+    phone: formData.get("phone") || undefined,
     termsAccepted: formData.get("termsAccepted") === "on",
   });
 
@@ -79,6 +81,10 @@ export async function signupAction(
       message: parsed.error.issues[0]?.message ?? invalidForm.message,
       success: false,
     };
+  }
+  const phone = parsed.data.phone ? normalizePhone(parsed.data.phone) : null;
+  if (parsed.data.phone && !phone) {
+    return { message: invalidPhoneMessage, success: false };
   }
   if (!isSupabaseConfigured()) return setupMessage;
 
@@ -89,6 +95,7 @@ export async function signupAction(
     options: {
       data: {
         full_name: parsed.data.fullName,
+        ...(phone ? { phone } : {}),
         terms_version: "draft-2026-10-14",
         privacy_version: "draft-2026-10-14",
       },
@@ -118,6 +125,49 @@ export async function signupAction(
   redirect("/cadastro/confirmacao");
 }
 
+export type RecoveryOptions =
+  | { status: "idle" }
+  | { status: "error"; message: string }
+  | {
+      status: "options";
+      email: string;
+      maskedEmail: string;
+      phoneHint: string | null;
+    };
+
+function maskEmail(email: string) {
+  const [name, domain] = email.split("@");
+  return `${name.slice(0, 2)}•••@${domain}`;
+}
+
+// Passo 1: mostra para onde a recuperação pode ser enviada. O e-mail aparece
+// mascarado mesmo se não houver conta, para não revelar quem está cadastrado.
+export async function recoveryOptionsAction(
+  _previousState: RecoveryOptions,
+  formData: FormData,
+): Promise<RecoveryOptions> {
+  const parsed = recoverySchema.safeParse({ email: formData.get("email") });
+  if (!parsed.success) {
+    return { status: "error", message: "Informe um e-mail válido." };
+  }
+  if (!isSupabaseConfigured()) {
+    return { status: "error", message: setupMessage.message };
+  }
+
+  const supabase = await createSupabaseServerClient();
+  const { data } = await supabase.rpc("recovery_phone_hint", {
+    lookup_email: parsed.data.email,
+  });
+  return {
+    status: "options",
+    email: parsed.data.email,
+    maskedEmail: maskEmail(parsed.data.email),
+    phoneHint: typeof data === "string" && data ? data : null,
+  };
+}
+
+// Passo 2: envia pelo canal escolhido. O SMS depende de um provedor de envio
+// configurado no Supabase; até lá, só o e-mail está disponível.
 export async function recoveryAction(
   _previousState: FormState,
   formData: FormData,
@@ -126,6 +176,13 @@ export async function recoveryAction(
   if (!parsed.success) return invalidForm;
   if (!isSupabaseConfigured()) return setupMessage;
 
+  if (formData.get("channel") === "phone") {
+    return {
+      message: "O envio por SMS ainda não está disponível. Use o e-mail.",
+      success: false,
+    };
+  }
+
   const supabase = await createSupabaseServerClient();
   await supabase.auth.resetPasswordForEmail(parsed.data.email, {
     redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"}/auth/callback?next=/redefinir-senha`,
@@ -133,7 +190,7 @@ export async function recoveryAction(
 
   return {
     message:
-      "Se houver uma conta com esse e-mail, enviaremos as instruções de recuperação.",
+      "Se houver uma conta com esse e-mail, enviamos as instruções de recuperação.",
     success: true,
   };
 }

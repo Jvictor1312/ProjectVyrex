@@ -19,6 +19,7 @@ export const signupSchema = z
     email: z.email().max(254),
     password: strongPasswordSchema,
     passwordConfirmation: z.string(),
+    phone: z.string().trim().max(32).optional(),
     termsAccepted: z.boolean().refine((accepted) => accepted, {
       message: "É necessário aceitar os termos e a política de privacidade.",
     }),

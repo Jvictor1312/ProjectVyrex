@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { AuthForm } from "@/app/components/auth-form";
+import { RecoveryForm } from "@/app/components/recovery-form";
 
 export const metadata: Metadata = { title: "Recuperar senha" };
 
@@ -11,7 +11,7 @@ export default function RecoveryPage() {
         <span className="brand-mark">V</span>
         <span>VYREX</span>
       </Link>
-      <AuthForm mode="recovery" />
+      <RecoveryForm />
     </main>
   );
 }

@@ -43,6 +43,5 @@ export const accountSettingsSchema = z.object({
     .string()
     .trim()
     .max(32)
-    .regex(/^[0-9+()\-\s]*$/, "Use apenas números, espaços, +, ( ) e -.")
     .optional(),
 });

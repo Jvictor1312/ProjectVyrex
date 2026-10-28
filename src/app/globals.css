@@ -1895,3 +1895,107 @@ button.signup-showcase-toggle:focus-visible {
     transform: none;
   }
 }
+
+.phone-reveal {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  width: fit-content;
+  margin: 2px 0 16px;
+  padding: 10px 16px;
+  border: 1px dashed #b9bcb9;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color 140ms ease,
+    background-color 140ms ease,
+    transform 100ms ease;
+}
+.phone-reveal:hover {
+  border-style: solid;
+  border-color: var(--ink);
+  background: #fff;
+}
+.phone-reveal:active {
+  transform: scale(0.98);
+}
+.phone-reveal span {
+  font-size: 18px;
+  transition: transform 160ms ease;
+}
+.phone-reveal:hover span {
+  transform: translateX(3px);
+}
+
+.recovery-options {
+  display: grid;
+  gap: 10px;
+  margin: 0 0 18px;
+  padding: 0;
+  border: 0;
+}
+.recovery-option {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 18px;
+  border: 1px solid #c9d0c8;
+  border-radius: 16px;
+  background: #fff;
+  cursor: pointer;
+  transition:
+    border-color 140ms ease,
+    transform 100ms ease;
+}
+.recovery-option:hover {
+  border-color: var(--ink);
+}
+.recovery-option:has(input:checked) {
+  border: 2px solid var(--ink);
+}
+.recovery-option:active {
+  transform: scale(0.99);
+}
+.recovery-option input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--ink);
+}
+.recovery-option span {
+  display: grid;
+  gap: 2px;
+  color: var(--muted);
+  font-size: 15px;
+}
+.recovery-option strong {
+  color: var(--ink);
+  font-size: 15px;
+}
+.recovery-option--disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+.link-button {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}

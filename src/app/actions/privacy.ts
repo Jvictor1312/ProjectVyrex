@@ -1,5 +1,6 @@
 "use server";
 
+import { invalidPhoneMessage, normalizePhone } from "@/lib/validation/phone";
 import { revalidatePath } from "next/cache";
 import { requireUser } from "@/lib/auth";
 import {
@@ -99,13 +100,17 @@ export async function updateAccountSettingsAction(
       success: false,
     };
   }
+  const phone = parsed.data.phone ? normalizePhone(parsed.data.phone) : null;
+  if (parsed.data.phone && !phone) {
+    return { message: invalidPhoneMessage, success: false };
+  }
 
   const { supabase, user } = await requireUser();
   const { data, error } = await supabase
     .from("profiles")
     .update({
       full_name: parsed.data.fullName,
-      phone: parsed.data.phone || null,
+      phone,
     })
     .eq("id", user.id)
     .select("id")

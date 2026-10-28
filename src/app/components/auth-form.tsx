@@ -68,6 +68,41 @@ export function PasswordField({
   );
 }
 
+// Telefone opcional: começa como um convite com seta e só vira campo se a
+// pessoa quiser informar o número.
+function OptionalPhoneField() {
+  const [open, setOpen] = useState(false);
+
+  if (!open) {
+    return (
+      <button
+        className="phone-reveal"
+        type="button"
+        onClick={() => setOpen(true)}
+        aria-expanded={false}
+      >
+        Quer recuperar sua senha também pelo celular? Adicione seu número
+        <span aria-hidden="true">→</span>
+      </button>
+    );
+  }
+
+  return (
+    <label className="field">
+      <span>Celular (opcional)</span>
+      <input
+        name="phone"
+        type="tel"
+        inputMode="tel"
+        autoComplete="tel"
+        placeholder="(11) 98765-4321"
+        maxLength={32}
+        autoFocus
+      />
+    </label>
+  );
+}
+
 const content: Record<
   AuthMode,
   { title: string; description: string; submit: string }
@@ -172,6 +207,7 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
             autoComplete="new-password"
             minLength={11}
           />
+          <OptionalPhoneField />
           <label className="check-field">
             <input name="termsAccepted" type="checkbox" required />
             <span>
