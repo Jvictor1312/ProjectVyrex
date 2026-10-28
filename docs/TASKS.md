@@ -15,13 +15,13 @@ Atualizado em: 2026-10-28. Reescrito para mostrar só o estado atual e as pendê
 ## Pendências
 
 ### Decisões do usuário
-- [ ] **Fonte "Avenir Next":** declarada, mas não carregada (no Windows aparece outra). Hospedar uma fonte própria ou assumir a do sistema.
-- [ ] **"Desfazer envio":** permitir que o criador retire um cadastro enviado por engano enquanto ninguém começou a análise.
-- [ ] **Apagar evidência já salva:** hoje só dá para trocar o print. Apagar exige nova regra no banco (política de exclusão em `metric_evidence`) e contraria a regra de nunca apagar dados; só fazer com autorização.
-- [ ] **Home, apontamentos de estilo do inspetor** (`design-taste-frontend`): texto de 14px (sugere 16px+), muitos tamanhos de fonte, sombras e linhas finas. O contraste já foi corrigido.
+- [x] **Fonte:** Figtree servida pelo site (texto e marca); Georgia nos títulos, com Gelasio como substituta em aparelhos sem Georgia. Decidido em 2026-10-28.
+- [x] **"Desfazer envio"** e **apagar evidência no rascunho** implementados (migration `202610280005`, 4 testes PGlite). Regra do usuário: depois que a equipe começa a análise, o criador não altera nada. **Falta aplicar a migration no banco real** (ver abaixo).
+- [x] **Home:** texto corrido em 16px, títulos de seção em 28px, contraste corrigido. Os demais apontamentos do inspetor (sem sombras, sem linhas finas, mais fotos) são regras da skill que conflitam com a identidade atual e não foram aplicados.
 - [ ] **Link "Área do criador"** no menu da equipe foi removido; recolocar se for útil.
 
 ### Dependem do usuário ou de serviços externos
+- [ ] **Aplicar a migration 202610280005_creator_withdraw_and_draft_evidence.sql no Supabase:** o token SUPABASE_ACCESS_TOKEN não existe neste computador. Colar o arquivo no SQL Editor do projeto e executar. Até lá, as telas de desfazer envio e apagar evidência avisam que o recurso ainda não está disponível.
 - [ ] **Testes com contas reais de todas as funções:** convidar recrutador, gestor de relacionamento e analista de validação pela tela de colaboradores; criar uma conta de criador em rascunho para testar o salvamento real das evidências e o fluxo completo (envio, triagem, validação, correção, decisão).
 - [ ] **E-mails em português** com remetente da Vyrex: exige SMTP próprio no Supabase. Modelos prontos em `supabase/templates/`.
 - [ ] **SMS** (recuperação por celular): exige provedor (Twilio, MessageBird ou Vonage).
