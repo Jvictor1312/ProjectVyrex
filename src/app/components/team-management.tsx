@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import {
   inviteInternalUserAction,
   manageInternalRoleAction,
@@ -114,19 +114,10 @@ export function UserActiveForm({
     setInternalUserActiveAction,
     emptyState,
   );
+  const [confirming, setConfirming] = useState(false);
+
   return (
-    <form
-      action={action}
-      className={styles.activeForm}
-      onSubmit={(event) => {
-        if (
-          active &&
-          !window.confirm("Desativar esta conta e bloquear seu acesso?")
-        ) {
-          event.preventDefault();
-        }
-      }}
-    >
+    <form action={action} className={styles.activeForm}>
       <input type="hidden" name="targetUser" value={userId} />
       <input type="hidden" name="enabled" value={String(!active)} />
       {active && (
@@ -136,17 +127,42 @@ export function UserActiveForm({
         </label>
       )}
       {!active && <input type="hidden" name="reason" value="" />}
-      <button
-        className={active ? styles.dangerButton : styles.secondaryButton}
-        type="submit"
-        disabled={pending}
-      >
-        {pending
-          ? "Atualizando..."
-          : active
-            ? "Desativar conta"
-            : "Reativar conta"}
-      </button>
+      {active && !confirming ? (
+        <button
+          className={styles.dangerButton}
+          type="button"
+          onClick={(event) => {
+            if (event.currentTarget.form?.reportValidity()) setConfirming(true);
+          }}
+        >
+          Desativar conta
+        </button>
+      ) : (
+        <span className={styles.confirmRow}>
+          {active && <span>Bloquear o acesso desta conta?</span>}
+          <button
+            className={active ? styles.dangerButton : styles.secondaryButton}
+            type="submit"
+            disabled={pending}
+          >
+            {pending
+              ? "Atualizando..."
+              : active
+                ? "Confirmar"
+                : "Reativar conta"}
+          </button>
+          {active && (
+            <button
+              className={styles.secondaryButton}
+              type="button"
+              disabled={pending}
+              onClick={() => setConfirming(false)}
+            >
+              Cancelar
+            </button>
+          )}
+        </span>
+      )}
       <Feedback state={state} />
     </form>
   );

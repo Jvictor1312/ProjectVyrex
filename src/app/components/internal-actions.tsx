@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useEffect, useState } from "react";
 import {
   assignCreatorResponsiblesAction,
   forwardCreatorAction,
@@ -203,31 +203,37 @@ export function SocialAccountReviewForm({ accountId }: { accountId: string }) {
   );
 }
 
+const decisionConfirmations: Record<string, string> = {
+  approved: "Aprovar este cadastro como elegível?",
+  rejected: "Rejeitar este cadastro? A justificativa vai para o criador.",
+  changes_requested: "Pedir correções? O motivo vai para o criador.",
+};
+
 export function FinalDecisionForm({ creatorId }: { creatorId: string }) {
   const [state, action, pending] = useActionState(
     recordFinalDecisionAction,
     emptyState,
   );
+  // Confirmação dentro da página (a janela do navegador trava a tela).
+  const [confirming, setConfirming] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (state.message) setConfirming(null);
+  }, [state]);
+
   return (
     <form
       action={action}
       className={`internal-action-form ${styles.actionForm} ${styles.criticalAction}`}
-      onSubmit={(event) => {
-        const formData = new FormData(event.currentTarget);
-        const decision = formData.get("decision");
-        const confirmation =
-          decision === "approved"
-            ? "Confirmar aprovação final do cadastro elegível?"
-            : decision === "rejected"
-              ? "Confirmar rejeição final? A justificativa será registrada e enviada ao criador."
-              : "Confirmar solicitação de correções? O motivo será enviado ao criador.";
-        if (!window.confirm(confirmation)) event.preventDefault();
-      }}
     >
       <input type="hidden" name="targetCreator" value={creatorId} />
       <label className="field">
         <span>Decisão final</span>
-        <select name="decision" defaultValue="approved">
+        <select
+          name="decision"
+          defaultValue="approved"
+          onChange={() => setConfirming(null)}
+        >
           <option value="approved">Aprovar cadastro elegível</option>
           <option value="rejected">Rejeitar cadastro</option>
           <option value="changes_requested">Solicitar correções</option>
@@ -237,12 +243,41 @@ export function FinalDecisionForm({ creatorId }: { creatorId: string }) {
         <span>Justificativa</span>
         <textarea name="reason" rows={3} maxLength={2000} required />
       </label>
-      <p className="field-hint">
-        A aprovação não representa promessa de campanha, contratação ou
-        pagamento.
-      </p>
       <Feedback state={state} />
-      <Submit pending={pending}>Registrar decisão</Submit>
+      {confirming ? (
+        <div className={styles.confirmBox} role="alertdialog" aria-live="polite">
+          <p>{decisionConfirmations[confirming]}</p>
+          <div>
+            <button
+              className="button button-dark"
+              type="submit"
+              disabled={pending}
+            >
+              {pending ? "Salvando..." : "Confirmar"}
+            </button>
+            <button
+              className="quiet-button"
+              type="button"
+              disabled={pending}
+              onClick={() => setConfirming(null)}
+            >
+              Cancelar
+            </button>
+          </div>
+        </div>
+      ) : (
+        <button
+          className="button button-dark"
+          type="button"
+          onClick={(event) => {
+            const form = event.currentTarget.form;
+            if (!form?.reportValidity()) return;
+            setConfirming(String(new FormData(form).get("decision")));
+          }}
+        >
+          Registrar decisão
+        </button>
+      )}
     </form>
   );
 }

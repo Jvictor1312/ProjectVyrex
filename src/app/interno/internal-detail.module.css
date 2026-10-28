@@ -232,3 +232,35 @@
 .back:active {
   transform: scale(0.97);
 }
+
+/* Confirmação dentro da página para decisões que não podem ser desfeitas. */
+.confirmBox {
+  display: grid;
+  gap: 12px;
+  padding: 16px 18px;
+  border: 2px solid var(--text);
+  border-radius: 14px;
+  background: var(--surface);
+  animation: confirm-in 140ms ease-out;
+}
+.confirmBox p {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 650;
+}
+.confirmBox div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+@keyframes confirm-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .confirmBox {
+    animation: none;
+  }
+}
