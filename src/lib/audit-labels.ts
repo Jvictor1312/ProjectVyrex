@@ -1,3 +1,5 @@
+import { roleLabels } from "@/lib/labels";
+
 // Textos legíveis para os registros de auditoria (audit_logs).
 const actionLabels: Record<string, string> = {
   "creator.application.submitted": "Cadastro enviado para análise",
@@ -27,6 +29,25 @@ const valueLabels: Record<string, string> = {
   revoked: "removida",
 };
 
+const entityLabels: Record<string, string> = {
+  eligibility_settings: "Critérios de elegibilidade",
+  site_settings: "Vídeo de apresentação",
+  data_request: "Pedido de privacidade",
+};
+
+// Em quem (ou em quê) a alteração foi feita, para mostrar no histórico.
+export function auditTargetName(
+  entityType: string,
+  entityId: string | null,
+  nameById: Map<string, string>,
+) {
+  return (
+    (entityId && nameById.get(entityId)) ||
+    entityLabels[entityType] ||
+    "Registro do sistema"
+  );
+}
+
 export function auditActionLabel(action: string) {
   return actionLabels[action] ?? "Ação administrativa";
 }
@@ -36,7 +57,12 @@ export function auditDetailsSummary(details: unknown): string | null {
   if (!details || typeof details !== "object") return null;
   const record = details as Record<string, unknown>;
   const parts: string[] = [];
-  for (const key of ["decision", "status", "outcome", "role", "enabled"]) {
+  // Mudança de função: "Recrutador adicionada" / "Administrador removida".
+  if (typeof record.role === "string") {
+    const label = (roleLabels as Record<string, string>)[record.role] ?? record.role;
+    parts.push(`Função ${label} ${record.enabled === false ? "removida" : "adicionada"}`);
+  }
+  for (const key of record.role ? ["decision", "status", "outcome"] : ["decision", "status", "outcome", "enabled"]) {
     const value = record[key];
     if (typeof value === "string") parts.push(valueLabels[value] ?? value);
     if (typeof value === "boolean")

@@ -29,7 +29,8 @@ Atualizado em: 2026-10-28. Reescrito para mostrar só o estado atual e as pendê
 ### Feito em 2026-10-28 (colaboradores e vídeo)
 - [x] **Cadastrar colaborador com e-mail que já tem conta** (ex.: quem se cadastrou antes como criador): a função de equipe é adicionada à conta existente, sem convite; a pessoa entra com a senha que já usa. Migration `202610280008` aplicada (`user_id_for_email`, só o servidor executa) e 1 teste novo.
 - [x] **Envio do vídeo de apresentação** com porcentagem e barra de progresso, aviso ao sair da página no meio do envio e "Salvando…" ao final. O vídeo atual (24 MB) já toca rápido; a demora era o envio sem retorno visual.
-- [ ] **Tela do usuário com espaço vago e quadro torto:** não reproduzido nas prévias; aguardando print/endereço do usuário.
+- [x] **Visão geral do criador em duas colunas** (computador): próximo passo, jornada em 5 etapas e histórico à esquerda; mensagens e avisos à direita. Celular continua em uma coluna.
+- [x] **Histórico administrativo agrupado e recolhido** (Colaboradores e Configurações): alterações no mesmo alvo com até 10 minutos entre elas viram subalterações da primeira; a seção começa sempre fechada. Regra em `src/lib/audit-groups.ts`, com teste.
 - [ ] Sobrou no Storage uma cópia do vídeo enviada duas vezes (`presentation/112708a0-…mp4`, 24 MB, sem uso). Só apagar se o usuário autorizar.
 
 ### Decisões do usuário

@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { TeamDirectory, type TeamMember } from "@/app/components/team-directory";
 import { InternalShell } from "../../../interno/internal-shell";
-import { AuditTable, RoleLegend } from "../../../interno/team-sections";
+import { AuditHistory, RoleLegend } from "../../../interno/team-sections";
 import styles from "../../../interno/internal.module.css";
 
 // Gestão de colaboradores real com dados fictícios, só em desenvolvimento.
@@ -82,23 +82,14 @@ export default async function TeamMembersPreview() {
         <RoleLegend
           counts={{ admin: 1, recruiter: 2, relationship_manager: 1, validator: 1 }}
         />
-        <AuditTable
+        <AuditHistory
           loadError={false}
           entries={[
-            {
-              id: "a1",
-              action: "Conta desativada",
-              details: "Diego Souza · Encerramento do contrato",
-              actor: "Ana Ribeiro",
-              createdAt: "2026-10-10T12:00:00Z",
-            },
-            {
-              id: "a2",
-              action: "Função atribuída",
-              details: "Bruno Tavares · Gestor de relacionamento",
-              actor: "Ana Ribeiro",
-              createdAt: "2026-09-20T15:30:00Z",
-            },
+            { id: "a1", action: "Função de colaborador alterada", details: "Função Recrutador adicionada", actor: "Ana Ribeiro", target: "user_role:2", targetName: "Bruno Tavares", createdAt: "2026-10-28T14:02:00Z" },
+            { id: "a2", action: "Função de colaborador alterada", details: "Função Gestor de relacionamento adicionada", actor: "Ana Ribeiro", target: "user_role:2", targetName: "Bruno Tavares", createdAt: "2026-10-28T14:05:00Z" },
+            { id: "a3", action: "Função de colaborador alterada", details: "Função Analista de validação removida", actor: "Ana Ribeiro", target: "user_role:2", targetName: "Bruno Tavares", createdAt: "2026-10-28T14:11:00Z" },
+            { id: "a4", action: "Conta ativada ou desativada", details: "desativada · “Encerramento do contrato”", actor: "Ana Ribeiro", target: "profile:4", targetName: "Diego Souza", createdAt: "2026-10-10T12:00:00Z" },
+            { id: "a5", action: "Critérios de elegibilidade alterados", details: "1.000 visualizações mínimas · 3 evidências obrigatórias", actor: "Ana Ribeiro", target: "eligibility_settings:", targetName: "Critérios de elegibilidade", createdAt: "2026-09-20T15:30:00Z" },
           ]}
         />
       </section>

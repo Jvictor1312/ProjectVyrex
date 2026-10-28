@@ -16,6 +16,7 @@ import {
 import { normalizeEvidenceImage } from "../src/lib/evidence/normalize.ts";
 import { safeLocalRedirectPath } from "../src/lib/security/redirect.ts";
 import { dashboardPathForRoles } from "../src/lib/auth-routing.ts";
+import { groupAuditEntries } from "../src/lib/audit-groups.ts";
 import { isLoopbackSupabaseUrl } from "../scripts/seed-local-test-users.mjs";
 
 const validSignup = {
@@ -263,4 +264,18 @@ test("CPF validation matches the database rule", () => {
   assert.equal(formatCpf("52998224725"), "529.982.247-25");
   assert.equal(looksLikeEmail("pessoa@vyrex.com"), true);
   assert.equal(looksLikeEmail("529.982.247-25"), false);
+});
+test("audit history groups changes to the same target within 10 minutes", () => {
+  const at = (minutes) => new Date(Date.UTC(2026, 9, 28, 12, minutes)).toISOString();
+  const groups = groupAuditEntries([
+    { id: "1", target: "ana", createdAt: at(0) },
+    { id: "2", target: "ana", createdAt: at(6) },
+    { id: "3", target: "ana", createdAt: at(15) }, // 9 min após a anterior: entra
+    { id: "4", target: "bruno", createdAt: at(7) },
+    { id: "5", target: "ana", createdAt: at(40) }, // 25 min depois: novo grupo
+  ]);
+  assert.deepEqual(
+    groups.map((group) => [group.primary.id, group.children.map((child) => child.id)]),
+    [["5", []], ["1", ["2", "3"]], ["4", []]],
+  );
 });

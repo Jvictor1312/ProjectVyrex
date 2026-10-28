@@ -2,8 +2,12 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { TeamDirectory, type TeamMember } from "@/app/components/team-directory";
 import { InternalShell } from "../internal-shell";
-import { AuditTable, RoleLegend } from "../team-sections";
-import { auditActionLabel, auditDetailsSummary } from "@/lib/audit-labels";
+import { AuditHistory, RoleLegend } from "../team-sections";
+import {
+  auditActionLabel,
+  auditDetailsSummary,
+  auditTargetName,
+} from "@/lib/audit-labels";
 import { requireUserFast } from "@/lib/auth";
 import {
   internalRoleKeys,
@@ -46,9 +50,9 @@ export default async function InternalTeamPage() {
       .is("revoked_at", null),
     supabase
       .from("audit_logs")
-      .select("id, actor_id, action, details, created_at")
+      .select("id, actor_id, action, entity_type, entity_id, details, created_at")
       .order("created_at", { ascending: false })
-      .limit(30),
+      .limit(80),
   ]);
   await ensureActive(activeResult);
   if (permission.error || !permission.data) redirect("/acesso-negado");
@@ -96,10 +100,12 @@ export default async function InternalTeamPage() {
 
   const nameById = new Map(profiles.map((profile) => [profile.id, profile.full_name]));
   const auditEntries = (auditResult.data ?? []).map((entry) => ({
-    id: entry.id,
+    id: String(entry.id),
     action: auditActionLabel(entry.action),
     details: auditDetailsSummary(entry.details),
     actor: (entry.actor_id && nameById.get(entry.actor_id)) || "Sistema",
+    target: `${entry.entity_type}:${entry.entity_id ?? ""}`,
+    targetName: auditTargetName(entry.entity_type, entry.entity_id, nameById),
     createdAt: entry.created_at,
   }));
 
@@ -121,7 +127,7 @@ export default async function InternalTeamPage() {
           loadError={loadError}
         />
         <RoleLegend counts={roleCounts} />
-        <AuditTable entries={auditEntries} loadError={Boolean(auditResult.error)} />
+        <AuditHistory entries={auditEntries} loadError={Boolean(auditResult.error)} />
       </section>
     </InternalShell>
   );

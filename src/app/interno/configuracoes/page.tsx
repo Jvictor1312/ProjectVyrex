@@ -9,7 +9,8 @@ import { isInternalRole, roleLabels } from "@/lib/labels";
 import { getPresentationVideoUrl } from "@/lib/site-media";
 import styles from "../internal.module.css";
 import teamStyles from "../team.module.css";
-import { EmptyState, Notice, PageHeader, Panel } from "../ui";
+import { AuditHistory } from "../team-sections";
+import { Notice, PageHeader, Panel } from "../ui";
 
 export const metadata: Metadata = { title: "Configurações" };
 
@@ -33,7 +34,7 @@ export default async function EligibilitySettingsPage() {
         .select("id, actor_id, details, created_at")
         .eq("action", "eligibility.settings.changed")
         .order("created_at", { ascending: false })
-        .limit(20),
+        .limit(60),
       getPresentationVideoUrl(),
       fetchActiveRoleKeys(supabase, user.id),
     ]);
@@ -41,6 +42,12 @@ export default async function EligibilitySettingsPage() {
   if (permission.error || !permission.data) redirect("/acesso-negado");
 
   const history = auditResult.data ?? [];
+  // Nomes de quem alterou os critérios, para o histórico.
+  const actorIds = [...new Set(history.map((entry) => entry.actor_id).filter(Boolean))] as string[];
+  const { data: actors } = actorIds.length
+    ? await supabase.from("profiles").select("id, full_name").in("id", actorIds)
+    : { data: [] };
+  const actorNames = new Map((actors ?? []).map((actor) => [actor.id, actor.full_name]));
   const settings = settingsResult.data;
 
   return (
@@ -90,47 +97,20 @@ export default async function EligibilitySettingsPage() {
           <PresentationVideoForm currentUrl={videoUrl} />
         </Panel>
 
-        <Panel title="Histórico de alterações dos critérios" flush>
-          {auditResult.error ? (
-            <div style={{ padding: 16 }}>
-              <Notice tone="danger" role="alert">
-                Não foi possível carregar o histórico agora. Atualize a página
-                para tentar de novo.
-              </Notice>
-            </div>
-          ) : history.length === 0 ? (
-            <EmptyState
-              title="Nenhuma alteração registrada"
-              text="Cada vez que os critérios forem salvos, a mudança aparece aqui."
-            />
-          ) : (
-            <table className={teamStyles.table}>
-              <thead>
-                <tr>
-                  <th scope="col">Alteração</th>
-                  <th scope="col">Data</th>
-                </tr>
-              </thead>
-              <tbody>
-                {history.map((entry) => (
-                  <tr key={entry.id}>
-                    <td data-label="Alteração">
-                      {auditDetailsSummary(entry.details) ?? "Critérios alterados"}
-                    </td>
-                    <td data-label="Data">
-                      <span className={teamStyles.date}>
-                        {new Date(entry.created_at).toLocaleString("pt-BR", {
-                          dateStyle: "short",
-                          timeStyle: "short",
-                        })}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
-        </Panel>
+        <AuditHistory
+          title="Histórico de alterações dos critérios"
+          loadError={Boolean(auditResult.error)}
+          emptyText="Cada vez que os critérios forem salvos, a mudança aparece aqui."
+          entries={history.map((entry) => ({
+            id: String(entry.id),
+            action: "Critérios alterados",
+            details: auditDetailsSummary(entry.details),
+            actor: (entry.actor_id && actorNames.get(entry.actor_id)) || "Sistema",
+            target: "eligibility_settings",
+            targetName: "Critérios de elegibilidade",
+            createdAt: entry.created_at,
+          }))}
+        />
       </section>
     </InternalShell>
   );
