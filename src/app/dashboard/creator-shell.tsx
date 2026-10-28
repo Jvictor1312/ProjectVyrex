@@ -7,18 +7,18 @@ import { CreatorNav } from "@/app/components/creator-nav";
 export function CreatorShell({ children }: { children: ReactNode }) {
   return (
     <main className="dashboard-page">
-      <header className="dashboard-header">
+      <header className="dashboard-header creator-header">
         <Link className="brand" href="/dashboard">
           <span className="brand-mark">V</span>
           <span>VYREX</span>
         </Link>
+        <CreatorNav />
         <form action={logoutAction}>
           <button className="quiet-button" type="submit">
             Sair
           </button>
         </form>
       </header>
-      <CreatorNav />
       {children}
     </main>
   );

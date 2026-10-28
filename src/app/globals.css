@@ -1053,6 +1053,22 @@ button.signup-showcase-toggle:focus-visible {
   padding: 0 6%;
   border-bottom: 1px solid var(--line);
 }
+/* Barra do criador: marca, menu e sair numa linha só, fixa no topo. */
+.creator-header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  gap: 16px;
+  background: var(--paper);
+}
+@media (max-width: 760px) {
+  .creator-header {
+    height: auto;
+    flex-wrap: wrap;
+    row-gap: 10px;
+    padding: 12px 20px;
+  }
+}
 .quiet-button {
   padding: 8px 12px;
   border: 0;

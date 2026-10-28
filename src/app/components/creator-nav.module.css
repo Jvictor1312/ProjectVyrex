@@ -1,13 +1,13 @@
+/* O menu fica dentro da barra do topo, entre a marca e o botão de sair. */
 .nav {
-  padding: 14px 6%;
-  border-bottom: 1px solid var(--line);
+  min-width: 0;
   overflow-x: auto;
   scrollbar-width: none;
 }
 
 .nav ul {
   display: flex;
-  gap: 6px;
+  gap: 4px;
   width: max-content;
   margin: 0 auto;
   padding: 4px;
@@ -20,7 +20,7 @@
 
 .nav a {
   display: block;
-  padding: 9px 16px;
+  padding: 8px 16px;
   border-radius: 999px;
   color: var(--muted);
   font-size: 14px;
@@ -50,7 +50,13 @@
   color: #fff;
 }
 
+/* No celular o menu desce para uma segunda linha da barra, rolando de lado. */
 @media (max-width: 760px) {
+  .nav {
+    order: 3;
+    flex: 1 0 100%;
+  }
+
   .nav ul {
     margin: 0;
   }

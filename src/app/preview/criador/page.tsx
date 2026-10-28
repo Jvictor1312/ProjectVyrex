@@ -9,16 +9,16 @@ export default function CreatorDashboardPreview() {
 
   return (
     <main className="dashboard-page">
-      <header className="dashboard-header">
+      <header className="dashboard-header creator-header">
         <Link className="brand" href="/">
           <span className="brand-mark">V</span>
           <span>VYREX</span>
         </Link>
+        <CreatorNav />
         <Link className="quiet-button" href="/login">
           Entrar na conta
         </Link>
       </header>
-      <CreatorNav />
       <CreatorOverview
         name="Marina"
         status="changes_requested"
