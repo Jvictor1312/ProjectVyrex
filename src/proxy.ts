@@ -37,6 +37,20 @@ export async function proxy(request: NextRequest) {
     response.cookies.getAll().forEach((cookie) => redirect.cookies.set(cookie));
     return redirect;
   }
+
+  // Sem sessão, as áreas com login nem começam a carregar: vão direto para o
+  // login (as páginas continuam conferindo sessão, função e conta ativa).
+  const { pathname } = request.nextUrl;
+  const privateArea =
+    pathname === "/dashboard" ||
+    pathname.startsWith("/dashboard/") ||
+    pathname === "/interno" ||
+    pathname.startsWith("/interno/");
+  if (!data?.claims?.sub && privateArea) {
+    const redirect = NextResponse.redirect(new URL("/login", request.url));
+    response.cookies.getAll().forEach((cookie) => redirect.cookies.set(cookie));
+    return redirect;
+  }
   return response;
 }
 
