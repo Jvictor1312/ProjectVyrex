@@ -4,7 +4,9 @@
   --ink: #101313;
   --paper: #f5f5f3;
   --white: #fff;
-  --muted: #737774;
+  /* Cinza de textos secundários: #5f6461 dá cerca de 5,9:1 sobre o fundo
+     (#737774, o anterior, ficava em 4,2:1, abaixo do mínimo de 4,5:1). */
+  --muted: #5f6461;
   --line: #dcdddb;
   --green: #343836;
   color-scheme: light;
