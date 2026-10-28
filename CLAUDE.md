@@ -41,8 +41,10 @@ O usuário acompanha tudo pelo VS Code, com o site aberto. **Dê mais empenho a 
 ## Supabase
 
 - Projeto na nuvem `zofxrohoilwjtzbcruse` (nome "Vyrex", região us-east-1). Chaves públicas em `.env.local`; `SUPABASE_SERVICE_ROLE_KEY` ainda é placeholder.
-- As 5 migrations de `supabase/migrations/` já estão aplicadas no banco (aplicadas pelo SQL Editor; não existe a tabela `supabase_migrations.schema_migrations`). Novas migrations devem ser aditivas e não destrutivas.
-- Critérios de elegibilidade atuais no banco: 0 seguidores mínimos e 1.000 visualizações por evidência (a migration `202610150004` alterou os valores iniciais de 3.000/2.000 citados nas diretrizes).
+- Todas as 8 migrations de `supabase/migrations/` estão aplicadas no banco (pelo SQL Editor ou pela Management API; não existe a tabela `supabase_migrations.schema_migrations`). Novas migrations devem ser aditivas e não destrutivas; aplique-as pela Management API (`POST /v1/projects/{ref}/database/query`) e inclua-as nos testes PGlite.
+- Critérios atuais no banco: 0 seguidores mínimos, 1.000 visualizações por evidência e **3 evidências obrigatórias** (posições 1 a 3; a 4ª e a 5ª são opcionais). As diretrizes citam 3.000/2.000 e 5 evidências: estão desatualizadas.
+- E-mails do Supabase: no plano gratuito sem SMTP próprio os textos não podem ser alterados. Os modelos em português estão em `supabase/templates/`; aplique-os quando o usuário configurar o SMTP.
+- Contas de teste: `jvictorbviana+user@gmail.com` (criador) e `jvictorbviana+adm@gmail.com` (admin). O usuário entra no Chrome; o Claude não digita as senhas.
 - O access token do Supabase (`sbp_...`) está salvo, a pedido do usuário, na variável de ambiente do usuário do Windows `SUPABASE_ACCESS_TOKEN`. Use-a para a Management API e o Supabase CLI. Nunca escreva o valor em arquivos do projeto, logs ou mensagens.
 
 ## Documentação

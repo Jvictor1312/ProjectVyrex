@@ -27,9 +27,14 @@ Atualizado em: 2026-10-15 (sessão 4)
 - [x] Área da equipe: layout único (`interno/internal-shell.tsx`), visual corporativo, modo escuro opcional (tema claro é o padrão; escolha salva no cookie `vyrex-internal-theme`). A ficha do criador também usa o layout.
 - [x] Vídeo de apresentação: admin envia em Configurações (upload direto ao Storage, bucket público `site-media`, até 50 MB); abre grande na tela de cadastro. Migration `202610280001_presentation_video.sql` aplicada no Supabase.
 - [x] Padrão visual único: botões em pílula com resposta ao toque, campos arredondados, links da home com sublinhado animado, esfera da home reativa. Login e recuperação sem barra preta (só o cadastro tem).
-- [ ] E-mails em português: modelos em `supabase/templates/` prontos; aplicar no Supabase depende de aprovação do usuário. Remetente sem "Supabase" exige SMTP próprio (ex.: Resend), configurado pelo usuário no painel.
-- [ ] Recuperação de senha escolhendo e-mail ou telefone: bloqueada. O cadastro não pede telefone, o SMS está desligado e exige um provedor (Twilio etc.), e mostrar os contatos cadastrados a partir do e-mail expõe dados de terceiros. Proposta registrada na conversa.
-- [ ] Testar com as contas `+user` e `+adm`: o usuário precisa entrar no Chrome (o Claude não digita senhas no Supabase da nuvem). A `+user` ainda não confirmou o e-mail.
+- [x] Conta `+adm` recebeu a função admin; `+user` é criadora. As duas confirmadas.
+- [x] Só as 3 primeiras evidências são obrigatórias (migration `202610280002`, aplicada). Corrige também a brecha em que qualquer evidência aprovada contava na aprovação.
+- [x] Celular opcional no cadastro (convite com seta abre o campo); validado no servidor com `libphonenumber-js/max` e salvo em E.164 (migration `202610280003`, aplicada).
+- [x] Recuperação de senha em 2 passos: e-mail → escolha do canal mascarado. SMS aparece como "em breve".
+- [x] Home redesenhada: menos texto, passos, públicos, critérios atualizados, dúvidas e chamada final.
+- [ ] E-mails em português e remetente próprio: bloqueado até o usuário configurar SMTP (o Supabase recusa alterar os textos no plano gratuito sem SMTP). Modelos prontos em `supabase/templates/`.
+- [ ] SMS de recuperação e verificação de posse do celular: exige um provedor de SMS (Twilio, MessageBird ou Vonage) configurado no Supabase.
+- [ ] Testar as telas logadas com dados reais: o usuário precisa entrar no Chrome.
 
 ## Critério de status
 

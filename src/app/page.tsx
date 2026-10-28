@@ -1,4 +1,55 @@
 import Link from "next/link";
+import styles from "./home.module.css";
+
+const steps = [
+  {
+    title: "Você se cadastra",
+    text: "Perfil, redes sociais e prints dos seus Stories.",
+  },
+  {
+    title: "A equipe analisa",
+    text: "Cada perfil é conferido por uma pessoa, não por robô.",
+  },
+  {
+    title: "Conectamos às marcas",
+    text: "Perfis aprovados entram na base para campanhas compatíveis.",
+  },
+];
+
+const criteria = [
+  { title: "Sem mínimo de seguidores", text: "Quem está começando também entra." },
+  { title: "3 Stories obrigatórios", text: "Prints recentes, até 5 no total." },
+  { title: "1.000 visualizações", text: "Por Story enviado." },
+  { title: "Análise humana", text: "Números conferidos pela equipe." },
+];
+
+const faq = [
+  {
+    question: "Como funciona o cadastro?",
+    answer:
+      "Crie a conta, informe seu perfil e suas redes, envie os prints dos Stories e mande para análise.",
+  },
+  {
+    question: "Ser aprovado garante campanha ou pagamento?",
+    answer:
+      "Não. A aprovação coloca seu perfil na base de criadores elegíveis para futuras campanhas.",
+  },
+  {
+    question: "Quem vê as evidências que eu envio?",
+    answer:
+      "Só você e a equipe autorizada. Os arquivos ficam em armazenamento privado.",
+  },
+  {
+    question: "E se houver uma pendência?",
+    answer:
+      "A equipe pede a correção e você acompanha tudo pelas mensagens da plataforma.",
+  },
+  {
+    question: "O que a Vyrex faz por uma marca?",
+    answer:
+      "Planeja a campanha, seleciona criadores compatíveis, coordena as entregas e reúne os resultados.",
+  },
+];
 
 export default function HomePage() {
   return (
@@ -34,9 +85,8 @@ export default function HomePage() {
             Marketing de influência <em>com estratégia.</em>
           </h1>
           <p className="hero-description">
-            Nossa proposta é combinar tecnologia própria e operação estratégica
-            para aproximar marcas de criadores compatíveis, organizar entregas e
-            acompanhar os resultados disponíveis.
+            Conectamos marcas a criadores compatíveis, com análise humana do
+            cadastro à campanha.
           </p>
           <div className="hero-actions">
             <Link className="button button-dark" href="/cadastro">
@@ -53,175 +103,76 @@ export default function HomePage() {
           <div className="brand-disc">
             <span>VYREX</span>
           </div>
-          <span className="art-label label-top">CRIADORES, EM MOVIMENTO</span>
-          <span className="art-label label-bottom">
-            MARCAS&nbsp; · &nbsp;CRIADORES
-          </span>
-          <span className="art-index">01 — 05</span>
         </div>
       </section>
 
-      <section className="principles" id="como-funciona">
-        <div className="principles-intro">
-          <h2>Tecnologia própria. Estratégia e execução.</h2>
-        </div>
-        <article className="principle">
-          <span className="principle-number">01</span>
-          <h3>Entender o objetivo</h3>
-          <p>
-            Público, região, nicho, formato e orçamento orientam o planejamento
-            de cada campanha.
-          </p>
-        </article>
-        <article className="principle">
-          <span className="principle-number">02</span>
-          <h3>Selecionar com contexto</h3>
-          <p>
-            Seguidores não contam sozinhos. Nicho, localização, métricas e
-            compatibilidade também importam.
-          </p>
-        </article>
-        <article className="principle">
-          <span className="principle-number">03</span>
-          <h3>Acompanhar a entrega</h3>
-          <p>
-            A proposta é coordenar publicações, conferir entregas e reunir os
-            resultados disponíveis para a marca.
-          </p>
-        </article>
+      <section className={styles.section} id="como-funciona">
+        <h2 className={styles.title}>Como funciona</h2>
+        <ol className={styles.steps}>
+          {steps.map((step, index) => (
+            <li className={styles.step} key={step.title}>
+              <span className={styles.stepNumber}>{index + 1}</span>
+              <h3>{step.title}</h3>
+              <p>{step.text}</p>
+            </li>
+          ))}
+        </ol>
       </section>
 
-      <section className="public-info audience-section" id="publicos">
-        <div>
-          <h2>Conexões que começam com compatibilidade.</h2>
-          <p>
-            A plataforma está sendo construída para organizar a rede e apoiar a
-            futura operação comercial da VYREX.
-          </p>
+      <section className={styles.section} id="publicos">
+        <div className={styles.audiences}>
+          <article className={`${styles.audience} ${styles.audienceDark}`}>
+            <h2>Para criadores</h2>
+            <p>
+              Monte seu perfil, envie seus Stories e acompanhe a análise da
+              equipe pela plataforma.
+            </p>
+            <Link className={styles.ctaLight} href="/cadastro">
+              Criar minha conta
+            </Link>
+          </article>
+          <article className={styles.audience}>
+            <h2>Para marcas</h2>
+            <p>
+              Planejamos a campanha a partir do seu público e objetivo, e
+              selecionamos criadores compatíveis.
+            </p>
+            <a className={styles.ctaDark} href="#perguntas">
+              Saiba como funciona
+            </a>
+          </article>
         </div>
-        <ul className="audience-points">
-          <li>
-            <strong>Para marcas</strong>
-            <span>
-              A proposta é planejar, selecionar e coordenar criadores alinhados
-              ao público, objetivo e orçamento da campanha.
-            </span>
-          </li>
-          <li>
-            <strong>Para criadores</strong>
-            <span>
-              Um perfil organizado para análise manual e possíveis campanhas
-              compatíveis. A aprovação não garante trabalho ou pagamento.
-            </span>
-          </li>
+      </section>
+
+      <section className={styles.section} id="criterios">
+        <h2 className={styles.title}>Critérios para criadores</h2>
+        <ul className={styles.criteria}>
+          {criteria.map((item) => (
+            <li key={item.title}>
+              <strong>{item.title}</strong>
+              <span>{item.text}</span>
+            </li>
+          ))}
         </ul>
       </section>
 
-      <section className="public-info eligibility-section" id="criterios">
-        <div>
-          <h2>Uma análise humana, com critérios claros.</h2>
-          <p>
-            Seguidores ajudam a orientar a prioridade conforme cada campanha,
-            mas não são um corte para entrar na rede. Criadores em início de
-            jornada também podem se cadastrar.
-          </p>
-        </div>
-        <div>
-          <ul className="eligibility-points">
-            <li>
-              <strong>Sem mínimo de seguidores</strong>
-              <span>
-                Audiências maiores podem ter prioridade conforme a campanha, sem
-                excluir quem está começando.
-              </span>
-            </li>
-            <li>
-              <strong>Cinco evidências</strong>
-              <span>Stories recentes, identificados individualmente.</span>
-            </li>
-            <li>
-              <strong>1.000 visualizações por Story</strong>
-              <span>
-                Cinco evidências recentes, analisadas individualmente pela
-                equipe.
-              </span>
-            </li>
-            <li>
-              <strong>Validação manual</strong>
-              <span>
-                A equipe confere perfis e evidências. Imagens não comprovam
-                métricas automaticamente.
-              </span>
-            </li>
-          </ul>
-          <p className="public-note">
-            O limite inicial de idade das evidências é de sete dias. Os valores
-            de visualizações e idade podem ser alterados por um administrador
-            autorizado. Seguidores não são um requisito mínimo para cadastro ou
-            aprovação.
-          </p>
+      <section className={styles.section} id="perguntas">
+        <h2 className={styles.title}>Dúvidas</h2>
+        <div className={styles.faq}>
+          {faq.map((item) => (
+            <details key={item.question}>
+              <summary>{item.question}</summary>
+              <p>{item.answer}</p>
+            </details>
+          ))}
         </div>
       </section>
 
-      <section className="public-info faq-section" id="perguntas">
-        <div>
-          <h2>O que esperar do processo.</h2>
-        </div>
-        <div className="faq-list">
-          <details>
-            <summary>Como funciona o cadastro?</summary>
-            <p>
-              Você cria uma conta, informa seu perfil e suas redes, envia cinco
-              evidências e encaminha os dados para análise manual.
-            </p>
-          </details>
-          <details>
-            <summary>Os números são verificados automaticamente?</summary>
-            <p>
-              Não. Seguidores e visualizações são informados por você e
-              conferidos pela equipe. Uma captura de tela não é validação
-              automática.
-            </p>
-          </details>
-          <details>
-            <summary>O que acontece se houver uma pendência?</summary>
-            <p>
-              A equipe pode solicitar uma correção. Você acompanha a solicitação
-              e as mensagens na sua área da plataforma.
-            </p>
-          </details>
-          <details>
-            <summary>Ser aprovado garante uma campanha ou pagamento?</summary>
-            <p>
-              Não. A aprovação indica elegibilidade para integrar a base da
-              Vyrex; não garante campanha, contratação, trabalho ou pagamento.
-            </p>
-          </details>
-          <details>
-            <summary>O que a VYREX faz para uma marca?</summary>
-            <p>
-              A proposta é partir do objetivo e do público da empresa para
-              planejar a campanha, selecionar criadores compatíveis, coordenar
-              entregas e reunir resultados disponíveis. Vendas não são
-              garantidas.
-            </p>
-          </details>
-          <details>
-            <summary>Quem pode ver as evidências que envio?</summary>
-            <p>
-              Os arquivos ficam em armazenamento privado e são acessíveis ao
-              titular e à equipe autorizada para a análise.
-            </p>
-          </details>
-          <details>
-            <summary>Como faço um pedido sobre meus dados?</summary>
-            <p>
-              Depois de entrar, acesse Privacidade para registrar um pedido. A
-              equipe analisa e responde pela plataforma; o atendimento não é
-              automático.
-            </p>
-          </details>
-        </div>
+      <section className={styles.finalCta}>
+        <h2>Pronto para começar?</h2>
+        <Link className={styles.ctaLight} href="/cadastro">
+          Criar minha conta
+        </Link>
       </section>
 
       <footer className="site-footer">
@@ -229,7 +180,6 @@ export default function HomePage() {
           <span className="brand-mark">V</span>
           <span>VYREX</span>
         </Link>
-        <p>Presença que abre caminhos.</p>
         <span>© 2026 VYREX</span>
       </footer>
     </main>
