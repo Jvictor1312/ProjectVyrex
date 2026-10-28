@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { BrandContact } from "./components/brand-contact";
 import styles from "./home.module.css";
+import { getSignedInUser } from "@/lib/auth";
 
 const facts = [
   { title: "Cadastro gratuito", text: "Leva poucos minutos" },
@@ -39,7 +40,12 @@ const orbits = [
   { tilt: 120, duration: 52, electron: 10.5 },
 ];
 
-export default function HomePage() {
+export default async function HomePage() {
+  // Quem já entrou vê o atalho para o painel em vez de "Entrar" e "Criar conta".
+  // /login leva ao painel certo (criador ou equipe) sem pedir a senha de novo.
+  const signedIn = await getSignedInUser();
+  const firstName = signedIn?.user.name?.trim().split(/\s+/)[0] ?? null;
+
   return (
     <main className="landing">
       <header className="topbar">
@@ -51,10 +57,18 @@ export default function HomePage() {
           <Link href="#como-funciona">Como funciona</Link>
           <Link href="#publicos">Para marcas</Link>
           <Link href="#perguntas">Dúvidas</Link>
-          <Link href="/login">Entrar</Link>
-          <Link className="button button-dark button-small" href="/cadastro">
-            Quero me cadastrar
-          </Link>
+          {signedIn ? (
+            <Link className="button button-dark button-small" href="/login">
+              {firstName ? `${firstName}, ir para o meu painel` : "Ir para o meu painel"}
+            </Link>
+          ) : (
+            <>
+              <Link href="/login">Entrar</Link>
+              <Link className="button button-dark button-small" href="/cadastro">
+                Quero me cadastrar
+              </Link>
+            </>
+          )}
         </nav>
       </header>
 
@@ -69,12 +83,20 @@ export default function HomePage() {
             marcas consultam para suas campanhas.
           </p>
           <div className={styles.heroActions}>
-            <Link className={styles.primary} href="/cadastro">
-              Criar meu perfil grátis
-            </Link>
-            <Link className={styles.secondary} href="/login">
-              Já tenho conta
-            </Link>
+            {signedIn ? (
+              <Link className={styles.primary} href="/login">
+                Ir para o meu painel
+              </Link>
+            ) : (
+              <>
+                <Link className={styles.primary} href="/cadastro">
+                  Criar meu perfil grátis
+                </Link>
+                <Link className={styles.secondary} href="/login">
+                  Já tenho conta
+                </Link>
+              </>
+            )}
           </div>
           <ul className={styles.facts}>
             {facts.map((fact) => (

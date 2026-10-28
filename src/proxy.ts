@@ -28,12 +28,25 @@ export async function proxy(request: NextRequest) {
   });
 
   // Confere o token localmente e, se vencido, renova e grava o cookie novo.
-  await supabase.auth.getClaims();
+  const { data } = await supabase.auth.getClaims();
+
+  // Quem já está logado não precisa criar conta: segue para /login, que
+  // leva ao painel certo (criador ou equipe). Os cookies renovados vão junto.
+  if (data?.claims?.sub && request.nextUrl.pathname === "/cadastro") {
+    const redirect = NextResponse.redirect(new URL("/login", request.url));
+    response.cookies.getAll().forEach((cookie) => redirect.cookies.set(cookie));
+    return redirect;
+  }
   return response;
 }
 
 export const config = {
+  // A página inicial, o login e o cadastro também passam por aqui, para a
+  // sessão continuar ativa e quem já entrou não precisar entrar de novo.
   matcher: [
+    "/",
+    "/login",
+    "/cadastro",
     "/dashboard/:path*",
     "/interno/:path*",
     "/redefinir-senha",

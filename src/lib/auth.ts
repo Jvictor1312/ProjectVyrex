@@ -73,6 +73,20 @@ async function authenticate(withRoles: boolean) {
   return { supabase, user: data.user, roles };
 }
 
+// Para páginas públicas (home, login, cadastro): diz se há alguém logado,
+// sem redirecionar. Confere o token localmente, sem ir ao servidor.
+export async function getSignedInUser() {
+  if (!isSupabaseConfigured()) return null;
+  const supabase = await createSupabaseServerClient();
+  const { data, error } = await supabase.auth.getClaims();
+  const claims = data?.claims;
+  if (error || !claims?.sub) return null;
+  return {
+    supabase,
+    user: { id: claims.sub, email: claims.email ?? null, name: nameFromClaims(claims) },
+  };
+}
+
 export async function requireUser() {
   const { supabase, user } = await authenticate(false);
   return { supabase, user };
