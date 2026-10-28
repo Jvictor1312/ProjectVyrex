@@ -34,11 +34,17 @@ async function authenticate(withRoles: boolean) {
   }
 
   const supabase = await createSupabaseServerClient();
-  const { data, error } = await supabase.auth.getUser();
+  // getClaims confere a assinatura do token localmente (chaves ES256 do
+  // projeto), sem ir ao servidor de autenticação a cada página.
+  const { data: claimsData, error } = await supabase.auth.getClaims();
+  const claims = claimsData?.claims;
 
-  if (error || !data.user) {
+  if (error || !claims?.sub) {
     redirect("/login");
   }
+  const data = {
+    user: { id: claims.sub, email: claims.email ?? null },
+  };
 
   // O perfil e as funções são buscados juntos para economizar uma ida ao banco.
   const [profile, roles] = await Promise.all([

@@ -81,13 +81,19 @@ export function EvidenceBoard({
     if (fileInput.current) fileInput.current.value = "";
   }
 
-  const today = new Date().toISOString().slice(0, 10);
+  // Datas no fuso de quem está usando (toISOString usaria o horário UTC e,
+  // à noite no Brasil, já mostraria o dia seguinte).
+  const localDate = (time: number) => {
+    const date = new Date(time);
+    return new Date(time - date.getTimezoneOffset() * 60_000)
+      .toISOString()
+      .slice(0, 10);
+  };
+  const today = localDate(Date.now());
   const earliest =
     maxStoryAgeDays === null
       ? undefined
-      : new Date(Date.now() - maxStoryAgeDays * 86_400_000)
-          .toISOString()
-          .slice(0, 10);
+      : localDate(Date.now() - maxStoryAgeDays * 86_400_000);
 
   return (
     <form action={action} className={styles.board}>
@@ -175,7 +181,11 @@ export function EvidenceBoard({
         aria-hidden="true"
         onChange={(event) => {
           const file = event.currentTarget.files?.[0];
-          const position = pickingFor.current;
+          // Sem quadro escolhido, a imagem vai para o primeiro quadro vazio.
+          const position =
+            pickingFor.current ??
+            slots.find((slot) => !slot.uploaded)?.position ??
+            null;
           if (!file || position === null) return;
           setDraft({ position, url: URL.createObjectURL(file), name: file.name });
         }}

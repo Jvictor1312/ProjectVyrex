@@ -1,48 +1,51 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { logoutAction } from "@/app/actions/auth";
-import { CreatorNav } from "@/app/components/creator-nav";
 import {
   AccountSettingsForm,
+  DataRequestForm,
   PasswordForm,
 } from "@/app/components/privacy-forms";
 import { requireUser } from "@/lib/auth";
+import {
+  dataRequestKindLabels,
+  dataRequestStatusLabels,
+} from "@/lib/validation/privacy";
+import { CreatorShell } from "../creator-shell";
 import styles from "../dashboard.module.css";
 
-export const metadata: Metadata = { title: "Configurações da conta" };
+export const metadata: Metadata = { title: "Configurações" };
 
+// Conta, senha e privacidade numa só tela; a privacidade fica recolhida.
 export default async function CreatorSettingsPage() {
   const { supabase, user } = await requireUser();
-  const { data: profile, error } = await supabase
-    .from("profiles")
-    .select("full_name, phone")
-    .eq("id", user.id)
-    .maybeSingle();
+  const [profileResult, requestsResult] = await Promise.all([
+    supabase
+      .from("profiles")
+      .select("full_name, phone")
+      .eq("id", user.id)
+      .maybeSingle(),
+    supabase
+      .from("data_requests")
+      .select("id, kind, details, status, resolution_note, created_at")
+      .eq("user_id", user.id)
+      .order("created_at", { ascending: false })
+      .limit(20),
+  ]);
+  const profile = profileResult.data;
+  const requests = requestsResult.data ?? [];
 
   return (
-    <main className="dashboard-page">
-      <header className="dashboard-header">
-        <Link className="brand" href="/dashboard">
-          <span className="brand-mark">V</span>
-          <span>VYREX</span>
-        </Link>
-        <form action={logoutAction}>
-          <button className="quiet-button" type="submit">
-            Sair
-          </button>
-        </form>
-      </header>
-      <CreatorNav />
+    <CreatorShell>
       <section className="dashboard-content">
-        <h1>Sua conta</h1>
+        <h1>Configurações</h1>
         <p className="dashboard-email">{user.email}</p>
-        {error || !profile ? (
+        {profileResult.error || !profile ? (
           <p className="setup-warning" role="alert">
             Não foi possível carregar os dados da conta.
           </p>
         ) : (
           <section className={styles.historySection}>
-            <h2>Dados da conta</h2>
+            <h2>Seus dados</h2>
             <AccountSettingsForm
               initial={{
                 fullName: profile.full_name ?? "",
@@ -55,15 +58,36 @@ export default async function CreatorSettingsPage() {
           <h2>Alterar senha</h2>
           <PasswordForm />
         </section>
-        <section className={styles.historySection}>
-          <h2>Encerrar sessão</h2>
-          <form action={logoutAction}>
-            <button className="button button-dark" type="submit">
-              Sair da conta
-            </button>
-          </form>
-        </section>
+
+        <details className={styles.privacy} id="privacidade">
+          <summary>Privacidade e seus dados</summary>
+          <p className={styles.statusDescription}>
+            Peça acesso, correção, cópia ou exclusão dos seus dados. Veja a{" "}
+            <Link href="/privacidade">política de privacidade</Link>.
+          </p>
+          <DataRequestForm />
+          {requests.length > 0 && (
+            <ol className={styles.requestList}>
+              {requests.map((request) => (
+                <li key={request.id}>
+                  <strong>
+                    {dataRequestKindLabels[
+                      request.kind as keyof typeof dataRequestKindLabels
+                    ] ?? request.kind}{" "}
+                    · {dataRequestStatusLabels[request.status] ?? request.status}
+                  </strong>
+                  <time dateTime={request.created_at}>
+                    {new Date(request.created_at).toLocaleDateString("pt-BR")}
+                  </time>
+                  {request.resolution_note && (
+                    <p>Resposta da equipe: {request.resolution_note}</p>
+                  )}
+                </li>
+              ))}
+            </ol>
+          )}
+        </details>
       </section>
-    </main>
+    </CreatorShell>
   );
 }

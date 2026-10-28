@@ -8,8 +8,6 @@ const items = [
   { href: "/dashboard", label: "Visão geral" },
   { href: "/dashboard/perfil", label: "Meu cadastro" },
   { href: "/dashboard/mensagens", label: "Mensagens" },
-  { href: "/dashboard/notificacoes", label: "Notificações" },
-  { href: "/dashboard/privacidade", label: "Privacidade" },
   { href: "/dashboard/configuracoes", label: "Configurações" },
 ];
 

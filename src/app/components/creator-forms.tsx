@@ -61,9 +61,26 @@ export function CreatorWizard({
   const [activeStep, setActiveStep] = useState(
     firstIncomplete < 0 ? 0 : firstIncomplete,
   );
+  const wizardRef = useRef<HTMLDivElement>(null);
+  const changedByUser = useRef(false);
+
+  // Ao trocar de etapa, leva a pessoa ao começo da etapa nova.
+  useEffect(() => {
+    if (!changedByUser.current) return;
+    wizardRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, [activeStep]);
+
+  function goTo(step: number) {
+    changedByUser.current = true;
+    setActiveStep(Math.min(steps.length - 1, Math.max(0, step)));
+  }
 
   return (
-    <div className="creator-wizard" data-active-step={activeStep}>
+    <div
+      className="creator-wizard"
+      data-active-step={activeStep}
+      ref={wizardRef}
+    >
       <nav aria-label="Etapas do cadastro">
         <ol className="creator-wizard-steps">
           {steps.map((step, index) => (
@@ -77,7 +94,7 @@ export function CreatorWizard({
                   aria-current={index === activeStep ? "step" : undefined}
                   aria-controls={step.panelId}
                   aria-label={`Etapa ${index + 1}: ${step.title}, ${step.complete ? "concluída" : "pendente"}`}
-                  onClick={() => setActiveStep(index)}
+                  onClick={() => goTo(index)}
                 >
                   <span className="wizard-step-number" aria-hidden="true">
                     {step.complete ? "✓" : `0${index + 1}`}
@@ -109,7 +126,7 @@ export function CreatorWizard({
           className="quiet-button"
           type="button"
           disabled={activeStep === 0}
-          onClick={() => setActiveStep((step) => Math.max(0, step - 1))}
+          onClick={() => goTo(activeStep - 1)}
         >
           Etapa anterior
         </button>
@@ -120,9 +137,7 @@ export function CreatorWizard({
           className="button button-dark"
           type="button"
           disabled={activeStep >= steps.length - 1}
-          onClick={() =>
-            setActiveStep((step) => Math.min(steps.length - 1, step + 1))
-          }
+          onClick={() => goTo(activeStep + 1)}
         >
           Continuar
         </button>
@@ -149,8 +164,8 @@ export function CreatorProfileForm({
   const formRef = useRef<HTMLFormElement>(null);
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [saveStatus, setSaveStatus] = useState<
-    "saved" | "waiting" | "saving" | "error"
-  >("saved");
+    "idle" | "saved" | "waiting" | "saving" | "error"
+  >("idle");
 
   useEffect(() => {
     return () => {
@@ -236,19 +251,23 @@ export function CreatorProfileForm({
           ))}
         </div>
       </fieldset>
-      <p className="field-hint" aria-live="polite">
-        {pending || saveStatus === "saving"
-          ? "Salvando alterações..."
-          : saveStatus === "waiting"
-            ? "Salvamento automático em instantes..."
+      <div className="autosave-row">
+        <button className="button button-dark" type="submit" disabled={pending}>
+          {pending ? "Salvando..." : "Salvar"}
+        </button>
+        <p
+          className={`autosave-status autosave-${saveStatus}`}
+          aria-live="polite"
+        >
+          {pending || saveStatus === "saving" || saveStatus === "waiting"
+            ? "Salvando…"
             : saveStatus === "error"
-              ? state.message || "Não foi possível salvar. Tente novamente."
-              : state.message || "Alterações salvas no servidor."}
-      </p>
-      <ActionMessage state={state} />
-      <button className="button button-dark" type="submit" disabled={pending}>
-        {pending ? "Salvando..." : "Salvar agora"}
-      </button>
+              ? state.message || "Não foi possível salvar. Tente de novo."
+              : saveStatus === "saved"
+                ? "Salvo ✓"
+                : ""}
+        </p>
+      </div>
     </form>
   );
 }
@@ -323,11 +342,7 @@ export function SocialAccountForm({
           defaultValue={initialAccount?.followersReported ?? ""}
         />
       </label>
-      <p className="field-hint">
-        Não há mínimo obrigatório de seguidores. A audiência é considerada em
-        conjunto com nicho, localização e compatibilidade da campanha; a equipe
-        confere as métricas manualmente.
-      </p>
+      <p className="field-hint">Não há mínimo de seguidores.</p>
       <ActionMessage state={state} />
       <button className="button button-dark" type="submit" disabled={pending}>
         {pending

@@ -154,7 +154,6 @@ export async function uploadStoryEvidenceAction(
     .maybeSingle();
   if (existing.error) return errorState;
 
-  const evidenceId = existing.data?.id ?? randomUUID();
   const storagePath = `${user.id}/${randomUUID()}.webp`;
 
   try {
@@ -189,13 +188,14 @@ export async function uploadStoryEvidenceAction(
       ? await supabase
           .from("metric_evidence")
           .update(evidence)
-          .eq("id", evidenceId)
+          .eq("id", existing.data.id)
           .eq("creator_id", user.id)
           .select("id")
           .maybeSingle()
       : await supabase
           .from("metric_evidence")
-          .insert({ ...evidence, id: evidenceId, creator_id: user.id })
+          // O id é gerado pelo banco: o usuário não tem permissão para defini-lo.
+          .insert({ ...evidence, creator_id: user.id })
           .select("id")
           .single();
 

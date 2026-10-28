@@ -194,3 +194,41 @@
   clip: rect(0 0 0 0);
   white-space: nowrap;
 }
+
+.privacy {
+  margin-top: 8px;
+  padding: 18px 0;
+  border-top: 1px solid #dce0da;
+}
+
+.privacy summary {
+  font-size: 18px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.privacy[open] summary {
+  margin-bottom: 12px;
+}
+
+.requestList {
+  display: grid;
+  gap: 10px;
+  margin: 18px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.requestList li {
+  display: grid;
+  gap: 4px;
+  padding: 12px 14px;
+  border: 1px solid #dce0da;
+  border-radius: 12px;
+  font-size: 14px;
+}
+
+.notificationHeading h3 {
+  margin: 0;
+  font-size: 16px;
+}

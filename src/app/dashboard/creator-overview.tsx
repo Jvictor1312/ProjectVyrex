@@ -32,6 +32,7 @@ type NextStep = { title: string; text?: string; href: string; cta: string };
 
 export function nextStepFor(
   status: string,
+  hasPublicName: boolean,
   accountCount: number,
   evidenceCount: number,
   requiredEvidence: number,
@@ -68,6 +69,14 @@ export function nextStepFor(
         cta: "Ver mensagens",
       };
     default:
+      if (!hasPublicName) {
+        return {
+          title: "Complete seu perfil",
+          text: "Diga como quer ser apresentado às marcas.",
+          href: "/dashboard/perfil#perfil",
+          cta: "Completar perfil",
+        };
+      }
       if (accountCount === 0) {
         return {
           title: "Adicione sua rede social",
@@ -207,7 +216,7 @@ export function CreatorOverview({
         />
         <FeedSection
           title="Notificações"
-          href="/dashboard/notificacoes"
+          href="/dashboard/mensagens#avisos"
           empty="Nada novo por aqui."
           items={notifications.map((notification) => ({
             id: notification.id,

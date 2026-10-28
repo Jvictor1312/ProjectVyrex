@@ -1999,3 +1999,22 @@ button.signup-showcase-toggle:focus-visible {
   clip: rect(0 0 0 0);
   white-space: nowrap;
 }
+
+.autosave-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px;
+}
+.autosave-status {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 600;
+}
+.autosave-saved {
+  color: #2f6b45;
+}
+.autosave-error {
+  color: #a64337;
+}

@@ -1,6 +1,4 @@
 import type { Metadata } from "next";
-import Link from "next/link";
-import { CreatorNav } from "@/app/components/creator-nav";
 import {
   CreatorWizard,
   CreatorProfileForm,
@@ -9,6 +7,7 @@ import {
 } from "@/app/components/creator-forms";
 import { EvidenceBoard } from "@/app/components/evidence-board";
 import { requireUser } from "@/lib/auth";
+import { CreatorShell } from "../creator-shell";
 
 export const metadata: Metadata = { title: "Completar perfil" };
 
@@ -114,17 +113,7 @@ export default async function CreatorProfilePage() {
   }
 
   return (
-    <main className="dashboard-page">
-      <header className="dashboard-header">
-        <Link className="brand" href="/dashboard">
-          <span className="brand-mark">V</span>
-          <span>VYREX</span>
-        </Link>
-        <Link className="quiet-button" href="/dashboard">
-          Voltar ao painel
-        </Link>
-      </header>
-      <CreatorNav />
+    <CreatorShell>
       <section className="profile-content">
         <h1>Meu cadastro</h1>
         <p className="profile-lede">Tudo é salvo enquanto você preenche.</p>
@@ -254,7 +243,15 @@ export default async function CreatorProfilePage() {
                 ))}
               </div>
             )}
-            {canEdit && <SocialAccountForm />}
+            {canEdit &&
+              (accounts.length === 0 ? (
+                <SocialAccountForm />
+              ) : (
+                <details className="account-edit add-account">
+                  <summary>+ Adicionar outra rede</summary>
+                  <SocialAccountForm />
+                </details>
+              ))}
           </section>
 
           <section
@@ -408,6 +405,6 @@ export default async function CreatorProfilePage() {
           </section>
         </CreatorWizard>
       </section>
-    </main>
+    </CreatorShell>
   );
 }

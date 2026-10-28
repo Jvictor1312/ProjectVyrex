@@ -1,7 +1,5 @@
-import Link from "next/link";
-import { logoutAction } from "@/app/actions/auth";
-import { CreatorNav } from "@/app/components/creator-nav";
 import { requireUser } from "@/lib/auth";
+import { CreatorShell } from "./creator-shell";
 import { CreatorOverview, nextStepFor } from "./creator-overview";
 
 export default async function CreatorDashboardPage() {
@@ -14,6 +12,7 @@ export default async function CreatorDashboardPage() {
     accountsResult,
     evidenceResult,
     settingsResult,
+    accountResult,
   ] = await Promise.all([
     supabase
       .from("creator_profiles")
@@ -53,6 +52,7 @@ export default async function CreatorDashboardPage() {
       .select("required_story_evidence")
       .eq("singleton", true)
       .maybeSingle(),
+    supabase.from("profiles").select("full_name").eq("id", user.id).maybeSingle(),
   ]);
 
   const creatorProfile = profileResult.data;
@@ -77,21 +77,13 @@ export default async function CreatorDashboardPage() {
   const status = creatorProfile?.status ?? "incomplete";
 
   return (
-    <main className="dashboard-page">
-      <header className="dashboard-header">
-        <Link className="brand" href="/">
-          <span className="brand-mark">V</span>
-          <span>VYREX</span>
-        </Link>
-        <form action={logoutAction}>
-          <button className="quiet-button" type="submit">
-            Sair
-          </button>
-        </form>
-      </header>
-      <CreatorNav />
+    <CreatorShell>
       <CreatorOverview
-        name={creatorProfile?.public_name ?? null}
+        name={
+          creatorProfile?.public_name ||
+          accountResult.data?.full_name?.split(" ")[0] ||
+          null
+        }
         status={status}
         decisionReason={creatorProfile?.decision_reason ?? null}
         steps={[
@@ -105,6 +97,7 @@ export default async function CreatorDashboardPage() {
         evidenceIssues={evidenceIssues}
         nextStep={nextStepFor(
           status,
+          Boolean(creatorProfile?.public_name?.trim()),
           accountCount,
           evidence.length,
           requiredEvidence,
@@ -115,6 +108,6 @@ export default async function CreatorDashboardPage() {
         history={historyResult.data ?? []}
         hasLoadError={hasLoadError}
       />
-    </main>
+    </CreatorShell>
   );
 }
