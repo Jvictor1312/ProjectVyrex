@@ -6,6 +6,10 @@ coverage/
 .env*
 !.env.example
 /logins.txt
+# Saídas das skills (inspetor da design-taste-frontend, prints do agent-browser)
+.taste-skill/
+# Cache local do graphify (caminhos desta máquina; recriado pela skill)
+graphify-out/
 npm-debug.log*
 *.tsbuildinfo
 # --- Node (GitHub) ---
