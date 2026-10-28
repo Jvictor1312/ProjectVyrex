@@ -462,3 +462,26 @@ button.linkDark {
   font-family: inherit;
   cursor: pointer;
 }
+
+/* Celular: links das caixas com área de toque de 44px. */
+@media (max-width: 760px) {
+  .linkLight,
+  .linkDark,
+  button.linkDark {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    margin-top: 0;
+  }
+
+  /* Botões principais na largura toda: mais fáceis de tocar com o polegar. */
+  .heroActions {
+    display: grid;
+  }
+  .primary,
+  .secondary,
+  .primaryLight {
+    justify-content: center;
+    min-height: 52px;
+  }
+}

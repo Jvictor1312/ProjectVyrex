@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Figtree, Gelasio } from "next/font/google";
 import "./globals.css";
 
@@ -24,6 +24,16 @@ export const metadata: Metadata = {
   },
   description:
     "A VYREX aproxima marcas e criadores com estratégia de marketing de influência, tecnologia própria e gestão de campanhas.",
+};
+
+// Celular: a página ocupa a tela toda (inclusive ao redor do "risco" do
+// iPhone, compensado com safe-area no CSS) e a barra do navegador fica na cor
+// do site. O zoom com os dedos continua liberado (acessibilidade).
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+  themeColor: "#f5f5f3",
 };
 
 export default function RootLayout({

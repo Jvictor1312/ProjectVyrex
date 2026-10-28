@@ -321,4 +321,18 @@
   .feed {
     grid-template-columns: 1fr;
   }
+
+  /* Botão principal na largura toda e links com área de toque de 44px. */
+  .cta {
+    justify-content: center;
+    width: 100%;
+    min-height: 48px;
+  }
+
+  .feedHeading a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    margin: -12px 0;
+  }
 }

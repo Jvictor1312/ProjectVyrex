@@ -521,4 +521,16 @@
   .roleLegend > div:last-child {
     border-bottom: 0;
   }
+  /* Janela quase da largura da tela e botão de fechar do tamanho do dedo. */
+  .dialog {
+    width: calc(100vw - 16px);
+    max-height: calc(100svh - 16px);
+  }
+  .closeButton {
+    width: 44px;
+    height: 44px;
+  }
+  .facts dt {
+    font-size: 13px;
+  }
 }

@@ -78,7 +78,8 @@ Removidas por não servirem a este projeto: `hyperframes` (vídeo), `frontend-de
 ## Testar telas com login
 
 - O Supabase é o banco real na nuvem: o Claude não cria contas nem digita senhas nele. O usuário cria as contas de teste e entra no Chrome; o Claude pode dar a função de equipe a uma conta via SQL quando o usuário pedir.
-- Sem login, use as previews (só em desenvolvimento): `/preview/criador`, `/preview/criador/evidencias`, `/preview/equipe`. Elas usam os mesmos componentes das telas reais; mantenha assim ao criar novas telas.
+- Sem login, use as previews (só em desenvolvimento): `/preview/criador`, `/preview/criador/cadastro`, `/preview/criador/evidencias`, `/preview/equipe`, `/preview/equipe/colaboradores`.
+- **Celular primeiro** (decisão do usuário: a maioria dos usuários vem do celular; o computador já está aprovado). Ajustes de celular ficam em `@media (max-width: 760px)` sem alterar o computador: campos com 16px (sem zoom no iPhone), alvos de toque de 44px ou mais, texto de 12px no mínimo, menu do criador fixo embaixo. Confira em 390 e 360px. Elas usam os mesmos componentes das telas reais; mantenha assim ao criar novas telas.
 
 ## Problemas conhecidos
 

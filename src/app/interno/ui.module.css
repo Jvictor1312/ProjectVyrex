@@ -338,6 +338,26 @@
   line-height: 1.4;
 }
 
+/* Celular: botões e campos com pelo menos 44px (tamanho do dedo) e campos
+   com letra de 16px, abaixo disso o iPhone dá zoom ao tocar no campo. */
+@media (max-width: 760px) {
+  .button,
+  .small {
+    min-height: 44px;
+  }
+  .field input,
+  .field select {
+    min-height: 44px;
+    font-size: 16px;
+  }
+  .field textarea {
+    font-size: 16px;
+  }
+  .field small {
+    font-size: 13px;
+  }
+}
+
 .srOnly {
   position: absolute;
   width: 1px;

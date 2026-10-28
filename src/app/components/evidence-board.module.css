@@ -366,6 +366,26 @@ button.tile:disabled {
   .remove {
     grid-column: 2;
     grid-row: 1;
+    min-height: 44px;
+  }
+
+  /* Botões do tamanho do dedo (44px) e largura total, fáceis de acertar. */
+  .addMany {
+    justify-self: stretch;
+    min-height: 48px;
+  }
+
+  .actions {
+    display: grid;
+  }
+
+  .save,
+  .cancel {
+    min-height: 48px;
+  }
+
+  .details {
+    padding: 16px;
   }
 }
 
@@ -454,4 +474,17 @@ button.tile:disabled {
 .deleteNo:focus-visible {
   outline: 2px solid var(--ink);
   outline-offset: 2px;
+}
+@media (max-width: 760px) {
+  .deleteLink {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 0 4px;
+  }
+  .deleteYes,
+  .deleteNo {
+    min-height: 44px;
+    padding: 0 16px;
+  }
 }

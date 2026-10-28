@@ -2124,6 +2124,46 @@ button.signup-showcase-toggle:focus-visible {
     width: min(100% - 32px, 880px);
     margin-top: 24px;
   }
+  /* Celular: campos e botões de 48px, opções de categoria de 44px. */
+  .dashboard-page .button {
+    min-height: 48px;
+  }
+  .dashboard-page .field input,
+  .dashboard-page .editor-form input:not([type="checkbox"]),
+  .dashboard-page .editor-form select,
+  .dashboard-page .editor-form textarea {
+    min-height: 48px;
+  }
+  .dashboard-page .category-option {
+    min-height: 44px;
+    padding: 0 14px;
+  }
+  .dashboard-page .category-option input {
+    width: 20px;
+    height: 20px;
+  }
+  .dashboard-page .wizard-step {
+    min-height: 48px;
+  }
+  .account-edit summary {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
+  /* O "i" de ajuda continua pequeno na tela, mas a área de toque tem 44px. */
+  .wizard-step-help > summary,
+  .info-help > summary {
+    position: relative;
+  }
+  .wizard-step-help > summary::before,
+  .info-help > summary::before {
+    position: absolute;
+    inset: -8px;
+    content: "";
+  }
+  .creator-wizard-navigation .quiet-button {
+    min-height: 48px;
+  }
 }
 /* Desfazer envio do cadastro (área do criador). */
 .withdraw-application {
@@ -2156,4 +2196,90 @@ button.signup-showcase-toggle:focus-visible {
   border-color: #f6f7f5;
   background: #f6f7f5;
   color: var(--ink);
+}
+/* ===== Celular (até 760px): toque, leitura e zoom =====
+   Só vale no celular; no computador nada muda.
+   - Campos com letra de 16px: abaixo disso o iPhone dá zoom ao tocar.
+   - Botões e links soltos com pelo menos 44px de altura (tamanho do dedo).
+   - Nenhum texto abaixo de 12px. */
+@media (max-width: 760px) {
+  html :is(input:not([type="checkbox"]):not([type="radio"]):not([type="file"]), select, textarea) {
+    font-size: 16px;
+  }
+  .button,
+  .button-small,
+  .quiet-button,
+  .brand {
+    min-height: 44px;
+  }
+  .quiet-button {
+    display: inline-flex;
+    align-items: center;
+  }
+  .field input,
+  .field select {
+    min-height: 48px;
+  }
+  .password-visibility-toggle {
+    right: 2px;
+    width: 44px;
+    height: 44px;
+  }
+  .auth-links a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
+  .check-field {
+    align-items: center;
+    min-height: 44px;
+  }
+  .check-field input {
+    width: 22px;
+    height: 22px;
+  }
+  .topnav > a:not(.button) {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
+  .topnav .button {
+    font-size: 13px;
+  }
+  .eyebrow,
+  .site-footer > span,
+  .site-footer p,
+  .signup-orb-prompt,
+  .preview-strip,
+  .preview-strip span {
+    font-size: 12px;
+  }
+  .submit-button {
+    min-height: 52px;
+  }
+  .signup-showcase-brand,
+  button.signup-showcase-toggle {
+    min-height: 44px;
+  }
+
+  /* Área do criador: o menu desce para uma barra fixa embaixo (ver
+     creator-nav.module.css); a página ganha espaço para ela não cobrir nada. */
+  .dashboard-page {
+    padding-bottom: calc(84px + env(safe-area-inset-bottom));
+  }
+  .creator-header {
+    height: 60px;
+    flex-wrap: nowrap;
+    padding: 0 16px;
+  }
+}
+/* Telas bem estreitas: o topo da página inicial fica só com "Entrar" e o
+   botão de cadastro, para não espremer os itens. */
+@media (max-width: 480px) {
+  .topnav > a:nth-child(-n + 3) {
+    display: none;
+  }
+  .topnav > a:not(.button) {
+    padding: 0 6px;
+  }
 }

@@ -19,6 +19,13 @@ Atualizado em: 2026-10-28. Reescrito para mostrar só o estado atual e as pendê
 - [x] **CPF opcional** em Configurações (tabela `user_documents`, só o próprio usuário lê; dígitos e duplicidade conferidos no banco). **Recuperação por CPF ou e-mail:** com CPF, a tela mostra o e-mail mascarado e envia as instruções para ele; o e-mail completo nunca vai ao navegador. Migration `202610280007` aplicada; 5 testes novos.
 - [ ] Testar a recuperação por CPF de ponta a ponta: salvar um CPF real em Configurações e pedir a recuperação informando o CPF (envia e-mail de verdade).
 
+### Feito em 2026-10-28 (logo e celular)
+- [x] **Logo oficial em SVG** (`public/vyrex-logo.svg`, componente `VyrexLogo`) em todas as telas; ícone da aba com o "V" do logo.
+- [x] **Celular (até 760px), sem mudar o computador:** campos com letra de 16px (sem zoom automático no iPhone); botões e links soltos com 44–52px; nenhum texto abaixo de 12px; menu do criador como barra fixa embaixo, com ícones e espaço do iPhone (safe-area); botões principais na largura toda; janelas da equipe quase em tela cheia. Medido em 390 e 360px: nada sai da tela.
+- [x] **Instalar na tela inicial** (`manifest.webmanifest`): abre como aplicativo, começa em `/login`.
+- [x] Prévia nova `/preview/criador/cadastro` (Meu cadastro, sem login).
+- [ ] Conferir no celular de verdade (iPhone e Android): barra de baixo, teclado sobre os campos, envio de prints pela galeria.
+
 ### Decisões do usuário
 - [x] **Fonte:** Figtree servida pelo site (texto e marca); Georgia nos títulos, com Gelasio como substituta em aparelhos sem Georgia. Decidido em 2026-10-28.
 - [x] **"Desfazer envio"** e **apagar evidência no rascunho** implementados (migration `202610280005`, 4 testes PGlite). Regra do usuário: depois que a equipe começa a análise, o criador não altera nada. Migration já aplicada no banco real.

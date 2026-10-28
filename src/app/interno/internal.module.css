@@ -680,4 +680,27 @@ td.empty {
   .queueTable .table tbody tr:hover td {
     background: transparent;
   }
+  /* Alvos de toque com 44px e campos com 16px (sem zoom no iPhone). */
+  .sideLink,
+  .sideLinkActive {
+    padding: 12px;
+  }
+  .themeToggle,
+  .logoutForm button,
+  .logoutLink,
+  .pagination a {
+    min-height: 44px;
+  }
+  .filters input,
+  .filters select,
+  .filters button {
+    height: 44px;
+    font-size: 16px;
+  }
+  .brand {
+    min-height: 44px;
+  }
+  .brandTag {
+    font-size: 12px;
+  }
 }
