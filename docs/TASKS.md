@@ -90,7 +90,8 @@ Atualizado em: 2026-10-15 (sessão 4)
 - [x] Área do criador revisada: vocabulário único (`labels.ts`), tamanhos no padrão (bloco `.dashboard-page` no fim de `globals.css`), regra quebrada de `.application-review` corrigida, mínimo de evidências com reserva única (3), textos ("Link do perfil", "situação", "Falta salvar", datas sem segundos), foco visível, classes sem uso removidas. Inspetor `--app`: 7 tamanhos de fonte, sem aviso de contraste.
 - [ ] Fonte "Avenir Next" é declarada mas não carregada (no Windows aparece outra). Decidir com o usuário: hospedar uma fonte própria ou assumir a do sistema.
 - [ ] Removido do menu da equipe o link "Área do criador" (levava ao painel de criador, que a equipe não usa). Recolocar se for necessário.
-- [ ] E-mails, último acesso e convites dependem de `SUPABASE_SERVICE_ROLE_KEY` real no servidor.
+- [x] `SUPABASE_SERVICE_ROLE_KEY` configurada no `.env.local` (chave secreta nova, `sb_secret_`): colaboradores mostram e-mails e último acesso; convites liberados (não testados para não enviar e-mail real).
+- [ ] Segurança: a chave secreta e a `service_role` antiga foram coladas na conversa em 2026-10-28. Trocar a secreta e desativar as chaves antigas (JWT) depois de migrar o site para a chave publicável (`sb_publishable_`), já que a chave pública atual também é do tipo antigo.
 
 ## Critério de status
 
