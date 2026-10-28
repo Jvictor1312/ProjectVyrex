@@ -1,37 +1,57 @@
 .nav {
+  padding: 14px 6%;
   border-bottom: 1px solid var(--line);
-  padding: 0 6%;
   overflow-x: auto;
+  scrollbar-width: none;
 }
 
 .nav ul {
   display: flex;
   gap: 6px;
-  margin: 0;
-  padding: 0;
+  width: max-content;
+  margin: 0 auto;
+  padding: 4px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: #fff;
   list-style: none;
   white-space: nowrap;
 }
 
 .nav a {
   display: block;
-  padding: 14px 12px;
-  border-bottom: 2px solid transparent;
+  padding: 9px 16px;
+  border-radius: 999px;
   color: var(--muted);
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 600;
+  transition:
+    background-color 140ms ease,
+    color 140ms ease,
+    transform 100ms ease;
 }
 
 .nav a:hover {
+  background: #f0f0ee;
   color: var(--ink);
+}
+
+.nav a:active {
+  transform: scale(0.95);
 }
 
 .nav a:focus-visible {
   outline: 2px solid var(--ink);
-  outline-offset: -2px;
+  outline-offset: 2px;
 }
 
 .nav a.active {
-  border-bottom-color: var(--ink);
-  color: var(--ink);
+  background: var(--ink);
+  color: #fff;
+}
+
+@media (max-width: 760px) {
+  .nav ul {
+    margin: 0;
+  }
 }

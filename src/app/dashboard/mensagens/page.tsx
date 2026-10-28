@@ -29,13 +29,7 @@ export default async function CreatorMessagesPage() {
       </header>
       <CreatorNav />
       <section className="dashboard-content">
-        <p className="eyebrow">
-          <span /> ÁREA DO CRIADOR
-        </p>
         <h1>Mensagens da equipe</h1>
-        <p className={styles.statusDescription}>
-          Comunicações registradas pela equipe sobre o seu cadastro.
-        </p>
         {error ? (
           <p className="setup-warning" role="alert">
             Não foi possível carregar as mensagens. Tente novamente mais tarde.

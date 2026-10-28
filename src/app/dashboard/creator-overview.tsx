@@ -1,0 +1,275 @@
+import Link from "next/link";
+import styles from "./creator-overview.module.css";
+
+const statusLabels: Record<string, string> = {
+  incomplete: "Cadastro incompleto",
+  submitted: "Aguardando análise",
+  under_review: "Em análise",
+  changes_requested: "Correção solicitada",
+  approved: "Aprovado",
+  rejected: "Rejeitado",
+  suspended: "Suspenso",
+};
+
+const statusTones: Record<string, "good" | "alert" | "neutral"> = {
+  approved: "good",
+  changes_requested: "alert",
+  rejected: "alert",
+  suspended: "alert",
+};
+
+const historyLabels: Record<string, string> = {
+  submitted: "Cadastro enviado",
+  forwarded: "Encaminhado para validação",
+  approved: "Cadastro aprovado",
+  rejected: "Cadastro rejeitado",
+  changes_requested: "Correção solicitada",
+  suspended: "Cadastro suspenso",
+  reinstated: "Cadastro reativado",
+};
+
+type NextStep = { title: string; text?: string; href: string; cta: string };
+
+export function nextStepFor(
+  status: string,
+  accountCount: number,
+  evidenceCount: number,
+  requiredEvidence: number,
+  hasEvidenceIssues: boolean,
+): NextStep {
+  switch (status) {
+    case "changes_requested":
+      return {
+        title: "Corrija as pendências",
+        text: "Atualize o que a equipe pediu e envie de novo.",
+        href: "/dashboard/perfil",
+        cta: "Corrigir cadastro",
+      };
+    case "submitted":
+    case "under_review":
+      return {
+        title: "Seu cadastro está em análise",
+        text: "Avisaremos por aqui quando houver novidade.",
+        href: "/dashboard/mensagens",
+        cta: "Ver mensagens",
+      };
+    case "approved":
+      return {
+        title: "Seu perfil foi aprovado",
+        text: "Mantenha seus dados atualizados.",
+        href: "/dashboard/perfil",
+        cta: "Ver meu cadastro",
+      };
+    case "rejected":
+    case "suspended":
+      return {
+        title: "Veja a resposta da equipe",
+        href: "/dashboard/mensagens",
+        cta: "Ver mensagens",
+      };
+    default:
+      if (accountCount === 0) {
+        return {
+          title: "Adicione sua rede social",
+          href: "/dashboard/perfil#redes",
+          cta: "Adicionar rede",
+        };
+      }
+      if (evidenceCount < requiredEvidence || hasEvidenceIssues) {
+        return {
+          title: "Envie as evidências dos Stories",
+          text: `${evidenceCount} de ${requiredEvidence} enviadas.`,
+          href: "/dashboard/perfil#evidencias",
+          cta: "Enviar evidências",
+        };
+      }
+      return {
+        title: "Envie para análise",
+        text: "Tudo pronto.",
+        href: "/dashboard/perfil#envio",
+        cta: "Revisar e enviar",
+      };
+  }
+}
+
+export type CreatorOverviewProps = {
+  name: string | null;
+  status: string;
+  decisionReason: string | null;
+  steps: { label: string; done: boolean }[];
+  evidenceIssues: {
+    position: number;
+    review_status: string;
+    review_reason: string | null;
+  }[];
+  nextStep: NextStep;
+  messages: { id: string; body: string; created_at: string }[];
+  notifications: {
+    id: string;
+    title: string;
+    body: string;
+    created_at: string;
+  }[];
+  history: {
+    id: string;
+    action: string;
+    reason: string | null;
+    created_at: string;
+  }[];
+  hasLoadError: boolean;
+};
+
+function shortDate(value: string) {
+  return new Date(value).toLocaleDateString("pt-BR", {
+    day: "2-digit",
+    month: "short",
+  });
+}
+
+export function CreatorOverview({
+  name,
+  status,
+  decisionReason,
+  steps,
+  evidenceIssues,
+  nextStep,
+  messages,
+  notifications,
+  history,
+  hasLoadError,
+}: CreatorOverviewProps) {
+  const tone = statusTones[status] ?? "neutral";
+  const showSteps = status === "incomplete" || status === "changes_requested";
+
+  return (
+    <section className={styles.page}>
+      <h1 className={styles.greeting}>Olá{name ? `, ${name}` : ""}.</h1>
+
+      {hasLoadError && (
+        <p className="setup-warning" role="alert">
+          Não foi possível carregar seu cadastro. Recarregue a página.
+        </p>
+      )}
+
+      <section className={styles.card} aria-labelledby="next-step-title">
+        <span className={`${styles.badge} ${styles[tone]}`}>
+          {statusLabels[status] ?? "Em atualização"}
+        </span>
+        <h2 id="next-step-title">{nextStep.title}</h2>
+        {nextStep.text && <p className={styles.cardText}>{nextStep.text}</p>}
+        {decisionReason && <p className={styles.reason}>{decisionReason}</p>}
+
+        {evidenceIssues.length > 0 && (
+          <ul className={styles.issues} aria-label="Pendências nas evidências">
+            {evidenceIssues.map((item) => (
+              <li key={item.position}>
+                <strong>Story {item.position}</strong>
+                {item.review_reason ??
+                  (item.review_status === "rejected"
+                    ? "Rejeitada"
+                    : "Correção solicitada")}
+              </li>
+            ))}
+          </ul>
+        )}
+
+        {showSteps && (
+          <ol className={styles.steps} aria-label="Etapas do cadastro">
+            {steps.map((step) => (
+              <li key={step.label} className={step.done ? styles.done : ""}>
+                <span className={styles.stepMark} aria-hidden="true">
+                  {step.done ? "✓" : ""}
+                </span>
+                {step.label}
+                <span className={styles.srOnly}>
+                  {step.done ? " (concluída)" : " (pendente)"}
+                </span>
+              </li>
+            ))}
+          </ol>
+        )}
+
+        <Link className={styles.cta} href={nextStep.href}>
+          {nextStep.cta}
+        </Link>
+      </section>
+
+      <div className={styles.feed}>
+        <FeedSection
+          title="Mensagens"
+          href="/dashboard/mensagens"
+          empty="Nenhuma mensagem ainda."
+          items={messages.map((message) => ({
+            id: message.id,
+            body: message.body,
+            date: message.created_at,
+          }))}
+        />
+        <FeedSection
+          title="Notificações"
+          href="/dashboard/notificacoes"
+          empty="Nada novo por aqui."
+          items={notifications.map((notification) => ({
+            id: notification.id,
+            title: notification.title,
+            body: notification.body,
+            date: notification.created_at,
+          }))}
+        />
+      </div>
+
+      {history.length > 0 && (
+        <section className={styles.history} aria-labelledby="history-title">
+          <h2 id="history-title">Histórico</h2>
+          <ol>
+            {history.map((entry) => (
+              <li key={entry.id}>
+                <time dateTime={entry.created_at}>
+                  {shortDate(entry.created_at)}
+                </time>
+                <span>
+                  {historyLabels[entry.action] ?? "Atualização do cadastro"}
+                  {entry.reason && <small>{entry.reason}</small>}
+                </span>
+              </li>
+            ))}
+          </ol>
+        </section>
+      )}
+    </section>
+  );
+}
+
+function FeedSection({
+  title,
+  href,
+  empty,
+  items,
+}: {
+  title: string;
+  href: string;
+  empty: string;
+  items: { id: string; title?: string; body: string; date: string }[];
+}) {
+  return (
+    <section className={styles.feedSection}>
+      <div className={styles.feedHeading}>
+        <h2>{title}</h2>
+        {items.length > 0 && <Link href={href}>Ver todas</Link>}
+      </div>
+      {items.length === 0 ? (
+        <p className={styles.empty}>{empty}</p>
+      ) : (
+        <ul>
+          {items.slice(0, 3).map((item) => (
+            <li key={item.id}>
+              {item.title && <strong>{item.title}</strong>}
+              <p>{item.body}</p>
+              <time dateTime={item.date}>{shortDate(item.date)}</time>
+            </li>
+          ))}
+        </ul>
+      )}
+    </section>
+  );
+}

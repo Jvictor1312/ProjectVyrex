@@ -34,9 +34,6 @@ export default async function CreatorSettingsPage() {
       </header>
       <CreatorNav />
       <section className="dashboard-content">
-        <p className="eyebrow">
-          <span /> CONFIGURAÇÕES
-        </p>
         <h1>Sua conta</h1>
         <p className="dashboard-email">{user.email}</p>
         {error || !profile ? (

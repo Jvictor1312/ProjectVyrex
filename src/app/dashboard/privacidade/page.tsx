@@ -36,17 +36,10 @@ export default async function CreatorPrivacyPage() {
       </header>
       <CreatorNav />
       <section className="dashboard-content">
-        <p className="eyebrow">
-          <span /> PRIVACIDADE
-        </p>
         <h1>Seus dados</h1>
         <p className={styles.statusDescription}>
-          Você pode pedir acesso, correção, cópia, eliminação ou oposição ao
-          tratamento dos seus dados. A plataforma registra o pedido e a
-          resposta da equipe; a análise é feita manualmente e pode depender de
-          obrigações legais. Consulte a{" "}
-          <Link href="/privacidade">política de privacidade</Link> (rascunho em
-          revisão jurídica).
+          Peça acesso, correção, cópia ou exclusão dos seus dados. Veja a{" "}
+          <Link href="/privacidade">política de privacidade</Link>.
         </p>
 
         <section className={styles.historySection}>

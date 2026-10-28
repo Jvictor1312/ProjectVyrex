@@ -29,13 +29,7 @@ export default async function CreatorNotificationsPage() {
       </header>
       <CreatorNav />
       <section className="dashboard-content">
-        <p className="eyebrow">
-          <span /> ÁREA DO CRIADOR
-        </p>
         <h1>Notificações</h1>
-        <p className={styles.statusDescription}>
-          Atualizações do seu cadastro e mensagens da plataforma.
-        </p>
         {error ? (
           <p className="setup-warning" role="alert">
             Não foi possível carregar as notificações. Tente novamente mais
