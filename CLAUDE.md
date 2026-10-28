@@ -19,9 +19,19 @@ As diretrizes não são uma ordem para recomeçar a auditoria a cada sessão. Tr
 - **Não publicar em produção** sem autorização explícita.
 - O usuário não programa com frequência: explique em português simples e sem jargão desnecessário.
 
+## Mostrar o trabalho, não só fazer (regra do usuário)
+
+O usuário acompanha tudo pelo VS Code, com o site aberto. **Dê mais empenho a mostrar o que foi feito do que só fazer.**
+
+- **Site sempre rodando:** o VS Code liga o servidor sozinho ao abrir a pasta (tarefa "Vyrex: servidor local" em `.vscode/tasks.json`). Antes de iniciar um servidor, verifique se http://localhost:3000 já responde. Se responder, use esse servidor e não abra outro. Se não responder, inicie `npm run dev` e mantenha-o ligado durante todo o trabalho.
+- **Tela por tela:** depois de cada alteração visível, abra o site num navegador **visível** e percorra as telas afetadas uma por uma, no ritmo em que o usuário consiga acompanhar. Use o Claude in Chrome quando estiver conectado; senão, use o Playwright com `headless=False` (skill `webapp-testing`).
+- **Prova do resultado:** tire prints das telas alteradas e mostre ao usuário. Diga em qual endereço (por exemplo, `localhost:3000/dashboard`) ele pode ver cada mudança e o que mudou ali.
+- Se não houver como abrir um navegador visível, diga isso claramente e mostre a verificação alternativa que foi feita. Nunca afirme que mostrou uma tela que não foi aberta.
+
 ## Ambiente local
 
 - Node.js 24 LTS instalado em `C:\Program Files\nodejs`. Se o shell não encontrar `node`/`npm`, adicione esse caminho ao PATH do comando.
+- Python **não** está instalado. Os scripts da skill `webapp-testing` precisam de Python + `playwright`. Antes de usar, peça para instalar ou use o Playwright de Node.
 - Servidor de desenvolvimento: `npm run dev` → http://localhost:3000 (hot reload).
 - Verificações: `npm run typecheck`, `npm run lint`, `npm test` (PGlite + validação), `npm run build`.
 - Next.js desta versão tem mudanças em relação ao que você conhece: consulte `node_modules/next/dist/docs/` antes de escrever código Next (ver `AGENTS.md`).

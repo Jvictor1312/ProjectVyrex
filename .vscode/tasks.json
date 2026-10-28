@@ -1,0 +1,22 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Vyrex: servidor local",
+      "type": "npm",
+      "script": "dev",
+      "isBackground": true,
+      "runOptions": { "runOn": "folderOpen" },
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": false },
+      "problemMatcher": {
+        "owner": "nextjs",
+        "pattern": { "regexp": "^x{0}$" },
+        "background": {
+          "activesBegin": "next dev",
+          "beginsPattern": "next dev",
+          "endsPattern": "Ready in"
+        }
+      }
+    }
+  ]
+}
