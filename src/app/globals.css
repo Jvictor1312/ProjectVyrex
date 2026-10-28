@@ -452,7 +452,9 @@ h1 em {
 .signup-showcase {
   position: sticky;
   top: 0;
+  align-self: start;
   display: flex;
+  height: 100svh;
   min-height: 100svh;
   flex-direction: column;
   justify-content: space-between;
@@ -571,35 +573,40 @@ h1 em {
   color: #aeb5b0;
   font-size: 10px;
 }
-/* Puxador único: recolhe a barra aberta e indica a ação na barra recolhida. */
+/* Botão único na base da barra: recolhe a barra aberta e abre a recolhida. */
 .signup-showcase-toggle {
-  position: absolute;
-  z-index: 2;
-  top: 50%;
-  right: 2px;
-  display: grid;
-  place-items: center;
-  width: 32px;
-  height: 32px;
-  padding: 0 0 2px;
-  border: 1px solid #ffffff40;
-  border-radius: 50%;
-  background: #101211;
+  position: relative;
+  z-index: 1;
+  align-self: center;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 44px;
+  padding: 0 22px;
+  border: 1px solid #ffffff55;
+  border-radius: 999px;
+  background: #ffffff0d;
   color: #f6f7f5;
-  font-size: 20px;
+  font-size: 14px;
+  font-weight: 700;
   line-height: 1;
   cursor: pointer;
-  transform: translateY(-50%);
   transition:
     background-color 160ms ease,
     color 160ms ease,
-    border-color 160ms ease;
+    border-color 160ms ease,
+    transform 120ms ease;
 }
 button.signup-showcase-toggle:hover,
 .signup-showcase--rail:hover .signup-showcase-toggle {
   border-color: #fff;
   background: #f6f7f5;
   color: #101211;
+}
+button.signup-showcase-toggle:active,
+.signup-showcase--rail:active .signup-showcase-toggle {
+  transform: scale(0.96);
 }
 button.signup-showcase-toggle:focus-visible {
   outline: 2px solid #fff;
@@ -631,8 +638,11 @@ button.signup-showcase-toggle:focus-visible {
   transform: rotate(180deg);
 }
 .signup-showcase--rail .signup-showcase-toggle {
-  right: 50%;
-  transform: translate(50%, -50%);
+  width: 40px;
+  min-height: 40px;
+  margin-top: auto;
+  padding: 0;
+  font-size: 16px;
 }
 .signup-showcase--rail:focus-visible {
   outline: 2px solid #101211;
@@ -700,7 +710,7 @@ button.signup-showcase-toggle:focus-visible {
   display: flex;
   width: min(100%, 520px);
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
   gap: 14px;
   margin: 0 auto;
 }
@@ -1732,6 +1742,9 @@ button.signup-showcase-toggle:focus-visible {
   .signup-layout--collapsed {
     grid-template-columns: 1fr;
   }
+  .signup-showcase {
+    height: auto;
+  }
   .signup-showcase--rail {
     min-height: 56px;
     flex-direction: row;
@@ -1742,17 +1755,9 @@ button.signup-showcase-toggle:focus-visible {
     transform: none;
   }
   .signup-showcase--rail .signup-showcase-toggle {
-    right: 20px;
-    transform: translateY(-50%) rotate(90deg);
-  }
-  section.signup-showcase {
-    padding-bottom: 48px;
-  }
-  section.signup-showcase > .signup-showcase-toggle {
-    top: auto;
-    right: 50%;
-    bottom: 2px;
-    transform: translateX(50%) rotate(90deg);
+    margin-top: 0;
+    margin-left: auto;
+    rotate: 90deg;
   }
 }
 @media (prefers-reduced-motion: reduce) {

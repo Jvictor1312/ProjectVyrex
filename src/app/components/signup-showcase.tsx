@@ -17,10 +17,6 @@ export function SignupExperience({ children }: { children: ReactNode }) {
       />
       <section className="signup-form-panel">
         <header className="signup-form-header">
-          <Link className="brand" href="/" aria-label="Vyrex, página inicial">
-            <span className="brand-mark">V</span>
-            <span>VYREX</span>
-          </Link>
           <div className="signup-form-header-actions">
             <p>
               Já tem uma conta? <Link href="/login">Entrar</Link>
@@ -80,7 +76,7 @@ function SignupShowcase({
           VYREX
         </span>
         <span className="signup-showcase-toggle" aria-hidden="true">
-          ›
+          →
         </span>
       </button>
     );
@@ -104,9 +100,6 @@ function SignupShowcase({
         </Link>
 
         <div className="signup-showcase-center">
-          <p className="signup-showcase-kicker">
-            CRIADORES · CONEXÕES · ANÁLISE HUMANA
-          </p>
           <button
             ref={orbRef}
             className="signup-orb"
@@ -119,14 +112,8 @@ function SignupShowcase({
             <span className="signup-orb-prompt">Conheça a empresa</span>
           </button>
           <p className="signup-showcase-instruction">
-            Um espaço para apresentar seu trabalho e participar de uma análise
-            cuidadosa.
+            Apresente seu trabalho para a nossa equipe.
           </p>
-        </div>
-
-        <div className="signup-showcase-bottom">
-          <span>01 — 04</span>
-          <span>Perfil · Redes · Evidências · Revisão</span>
         </div>
 
         <button
@@ -134,10 +121,8 @@ function SignupShowcase({
           type="button"
           onClick={onToggle}
           aria-expanded={true}
-          aria-label="Recolher apresentação"
-          title="Recolher apresentação"
         >
-          <span aria-hidden="true">‹</span>
+          <span aria-hidden="true">←</span> Recolher
         </button>
       </section>
 

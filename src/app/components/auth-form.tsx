@@ -14,7 +14,7 @@ type AuthMode = "login" | "signup" | "recovery" | "reset";
 
 const initialState: FormState = { message: "", success: false };
 const passwordRequirements =
-  "Mínimo de 11 caracteres, incluindo maiúscula, minúscula e caractere especial.";
+  "Mínimo de 11 caracteres, com maiúscula, minúscula e símbolo.";
 
 export function PasswordField({
   name,
@@ -112,9 +112,11 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
       className={mode === "signup" ? "auth-form signup-auth-form" : "auth-form"}
     >
       <div className="auth-heading">
-        <p className="eyebrow">
-          <span /> {mode === "signup" ? "CRIADORES" : "VYREX / CRIADORES"}
-        </p>
+        {mode !== "signup" && (
+          <p className="eyebrow">
+            <span /> VYREX / CRIADORES
+          </p>
+        )}
         <h1>{copy.title}</h1>
         <p>{copy.description}</p>
       </div>
@@ -182,10 +184,6 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
               <Link href="/privacidade"> política de privacidade</Link>.
             </span>
           </label>
-          <p className="fine-print">
-            Cadastro aprovado significa elegibilidade para oportunidades
-            futuras, não contratação ou pagamento.
-          </p>
         </>
       )}
 
