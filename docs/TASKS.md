@@ -16,7 +16,7 @@ Atualizado em: 2026-10-28. Reescrito para mostrar só o estado atual e as pendê
 
 ### Decisões do usuário
 - [x] **Fonte:** Figtree servida pelo site (texto e marca); Georgia nos títulos, com Gelasio como substituta em aparelhos sem Georgia. Decidido em 2026-10-28.
-- [x] **"Desfazer envio"** e **apagar evidência no rascunho** implementados (migration `202610280005`, 4 testes PGlite). Regra do usuário: depois que a equipe começa a análise, o criador não altera nada. **Falta aplicar a migration no banco real** (ver abaixo).
+- [x] **"Desfazer envio"** e **apagar evidência no rascunho** implementados (migration `202610280005`, 4 testes PGlite). Regra do usuário: depois que a equipe começa a análise, o criador não altera nada. Migration já aplicada no banco real.
 - [x] **Home:** texto corrido em 16px, títulos de seção em 28px, contraste corrigido. Os demais apontamentos do inspetor (sem sombras, sem linhas finas, mais fotos) são regras da skill que conflitam com a identidade atual e não foram aplicados.
 - [ ] **Link "Área do criador"** no menu da equipe foi removido; recolocar se for útil.
 
@@ -27,7 +27,7 @@ Atualizado em: 2026-10-28. Reescrito para mostrar só o estado atual e as pendê
 - [ ] **SMS** (recuperação por celular): exige provedor (Twilio, MessageBird ou Vonage).
 - [ ] **Termos e política de privacidade:** rascunhos; precisam de revisão jurídica.
 - [ ] **Publicação:** só com autorização. Antes: configurar as variáveis de ambiente na hospedagem, Site URL e callbacks do Auth.
-- [ ] **Segurança das chaves (fim do projeto, decisão do usuário):** a chave secreta e a `service_role` antiga foram coladas na conversa em 2026-10-28. Trocar a secreta; migrar a chave pública para `sb_publishable_` e então desativar as chaves antigas (JWT).
+- [ ] **Segurança das chaves (fim do projeto, decisão do usuário):** a chave secreta e a `service_role` antiga foram coladas na conversa em 2026-10-28. Trocar a secreta; migrar a chave pública para `sb_publishable_` e então desativar as chaves antigas (JWT). O token de acesso (`sbp_`) também foi colado na conversa: apagar e gerar outro em supabase.com/dashboard/account/tokens.
 
 ### Técnicas (podem ser feitas sem o usuário)
 - [ ] **Testes automáticos de navegador** (cadastro, envio, análise, correção). Fora do escopo por decisão do usuário em 2026-10-28.
