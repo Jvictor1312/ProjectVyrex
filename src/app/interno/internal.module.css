@@ -91,24 +91,13 @@
   display: inline-flex;
   align-items: center;
   gap: 9px;
+  min-height: 26px;
   padding: 0 8px;
-  font-size: 13px;
-  font-weight: 800;
-  letter-spacing: 1.5px;
+  color: var(--text);
 }
 
-.brandMark {
-  width: 26px;
-  height: 26px;
-  display: grid;
-  place-items: center;
-  border-radius: 50%;
-  background: var(--text);
-  color: var(--surface);
-  font-family: Georgia, var(--font-serif), serif;
-  font-size: 15px;
-  font-weight: 400;
-  letter-spacing: 0;
+.brand .brandLogo {
+  height: 15px;
 }
 
 .brandTag {

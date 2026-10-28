@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { AuthForm } from "@/app/components/auth-form";
+import { VyrexLogo } from "@/app/components/vyrex-logo";
 import { fetchActiveRoleKeys, getSignedInUser } from "@/lib/auth";
 import { dashboardPathForRoles } from "@/lib/auth-routing";
 
@@ -35,8 +36,7 @@ export default async function LoginPage({
   return (
     <main className="auth-page">
       <Link className="brand auth-brand" href="/">
-        <span className="brand-mark">V</span>
-        <span>VYREX</span>
+        <VyrexLogo />
       </Link>
       {configurationMessage && (
         <p className="form-message error" role="alert">

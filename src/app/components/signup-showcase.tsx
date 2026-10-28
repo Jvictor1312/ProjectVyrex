@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import type { PointerEvent, ReactNode } from "react";
+import { VyrexLogo, VyrexMark } from "./vyrex-logo";
 
 export function SignupExperience({
   children,
@@ -78,12 +79,7 @@ function SignupShowcase({
         aria-expanded={false}
         aria-label="Mostrar apresentação da Vyrex"
       >
-        <span className="brand-mark" aria-hidden="true">
-          V
-        </span>
-        <span className="signup-rail-word" aria-hidden="true">
-          VYREX
-        </span>
+        <VyrexLogo className="signup-rail-logo" decorative />
         <span className="signup-showcase-toggle" aria-hidden="true">
           →
         </span>
@@ -104,8 +100,7 @@ function SignupShowcase({
           href="/"
           aria-label="Vyrex, início"
         >
-          <span className="brand-mark">V</span>
-          <span>VYREX</span>
+          <VyrexLogo decorative />
         </Link>
 
         <div className="signup-showcase-center">
@@ -117,7 +112,7 @@ function SignupShowcase({
             aria-expanded={dialogOpen}
             onClick={() => setDialogOpen(true)}
           >
-            <span className="signup-orb-word">VYREX</span>
+            <VyrexLogo className="signup-orb-word" />
             <span className="signup-orb-prompt">Conheça a empresa</span>
           </button>
           <p className="signup-showcase-instruction">
@@ -164,7 +159,7 @@ function SignupShowcase({
         ) : (
           <div className="signup-video-placeholder">
             <span className="signup-video-mark" aria-hidden="true">
-              V
+              <VyrexMark />
             </span>
             <p>O vídeo de apresentação estará aqui em breve.</p>
           </div>

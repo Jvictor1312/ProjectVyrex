@@ -2,6 +2,7 @@ import Link from "next/link";
 import { cookies } from "next/headers";
 import type { ReactNode } from "react";
 import { logoutAction } from "@/app/actions/auth";
+import { VyrexLogo } from "@/app/components/vyrex-logo";
 import styles from "./internal.module.css";
 import { ThemeToggle } from "./theme-toggle";
 import { Avatar } from "./ui";
@@ -46,7 +47,7 @@ function NavGroup({
   );
 }
 
-// Layout único da área da equipe: menu lateral, tema claro/escuro e saída.
+// Layout único da área da equipe: logo, menu lateral, tema claro/escuro e saída.
 export async function InternalShell({
   active,
   isAdmin,
@@ -76,8 +77,7 @@ export async function InternalShell({
     <main className={styles.shell} data-theme={theme}>
       <aside className={styles.sidebar}>
         <Link className={styles.brand} href="/interno">
-          <span className={styles.brandMark}>V</span>
-          <span>VYREX</span>
+          <VyrexLogo className={styles.brandLogo} />
           <span className={styles.brandTag}>Equipe</span>
         </Link>
         <nav className={styles.sideNav} aria-label="Área da equipe">

@@ -182,10 +182,10 @@
   transform: translate(-50%, -50%) scale(1.05);
 }
 
-.nucleus span {
-  font-size: clamp(20px, 2.4vw, 28px);
-  font-weight: 800;
-  letter-spacing: 1.5px;
+.nucleus .nucleusLogo {
+  width: 64%;
+  height: auto;
+  color: var(--ink);
 }
 
 @keyframes orbit-spin {

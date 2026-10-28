@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" width="600" height="600" role="img" aria-label="VYREX">
+  <rect width="600" height="600" rx="132" fill="#FFFFFF"/>
+  <g transform="translate(120 268) scale(0.64)" fill="#23272A">
+    <!-- V -->
+    <path d="M0 0H24L50 74L76 0H100L62 100H38Z"/>
+    <!-- Y: braço esquerdo cortado -->
+    <path d="M112 0H136L156.5 33L143 50Z"/>
+    <path d="M186 0H210L172 60V100H150V58Z"/>
+    <!-- R: base do bojo solta da haste -->
+    <path d="M231 0H290C312 0 327 14 327 33C327 52 312 66 290 66H262V46H289C299 46 305 40 305 33C305 26 299 20 289 20H253V100H231Z"/>
+    <path d="M285 62H309L330 100H305Z"/>
+    <!-- E: barra do meio solta -->
+    <path d="M350 0H438V20H372V80H438V100H350Z"/>
+    <path d="M381 40H432V60H381Z"/>
+    <!-- X: diagonal superior cortada -->
+    <path d="M462 0H488L562 100H536Z"/>
+    <path d="M536 0H562L542.8 26H516.8Z"/>
+    <path d="M499 50H525L488 100H462Z"/>
+  </g>
+</svg>

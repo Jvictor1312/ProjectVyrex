@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { VyrexLogo } from "@/app/components/vyrex-logo";
 
 export const metadata: Metadata = { title: "Termos de uso" };
 
@@ -7,8 +8,7 @@ export default function TermsPage() {
   return (
     <main className="legal-page">
       <Link className="brand" href="/">
-        <span className="brand-mark">V</span>
-        <span>VYREX</span>
+        <VyrexLogo />
       </Link>
       <article>
         <p className="eyebrow">

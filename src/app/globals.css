@@ -50,9 +50,19 @@ input {
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  font-size: 15px;
-  font-weight: 800;
-  letter-spacing: 1.7px;
+  color: var(--ink);
+}
+/* Logo oficial (componente VyrexLogo): a altura define o tamanho. */
+.vyrex-logo {
+  display: block;
+  width: auto;
+  height: 17px;
+  aspect-ratio: 562 / 100;
+}
+.brand-mark svg,
+.signup-video-mark svg {
+  width: 45%;
+  height: 45%;
 }
 .brand-mark {
   display: grid;
@@ -65,14 +75,6 @@ input {
   font-family: Georgia, var(--font-serif), serif;
   font-size: 16px;
   font-weight: 500;
-  letter-spacing: 0;
-}
-.brand > span:not(.brand-mark),
-.signup-showcase-brand > span:not(.brand-mark),
-.brand-disc span,
-.signup-orb-word {
-  font-family: var(--font-sans), "Arial Black", Arial, sans-serif;
-  font-weight: 900;
   letter-spacing: 0;
 }
 .topnav {
@@ -411,13 +413,8 @@ h1 em {
   align-items: center;
   border-top: 1px solid var(--line);
 }
-.site-footer .brand {
-  font-size: 12px;
-}
-.site-footer .brand-mark {
-  width: 22px;
-  height: 22px;
-  font-size: 13px;
+.site-footer .vyrex-logo {
+  height: 13px;
 }
 .site-footer p,
 .site-footer > span {
@@ -494,10 +491,6 @@ h1 em {
   font-size: 14px;
   font-weight: 800;
 }
-.signup-showcase-brand .brand-mark {
-  background: #fff;
-  color: #101211;
-}
 .signup-showcase-center {
   position: relative;
   z-index: 1;
@@ -551,8 +544,8 @@ h1 em {
   outline-offset: 18px;
 }
 .signup-orb-word {
-  font-size: 29px;
-  font-weight: 800;
+  width: 112px;
+  height: auto;
 }
 .signup-orb-prompt {
   color: #5c625e;
@@ -627,17 +620,15 @@ button.signup-showcase-toggle:focus-visible {
 .signup-showcase--rail::before {
   inset: 10px;
 }
-.signup-showcase--rail .brand-mark {
-  background: #fff;
-  color: #101211;
-}
-.signup-rail-word {
-  color: #aeb5b0;
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 0.32em;
-  writing-mode: vertical-rl;
-  transform: rotate(180deg);
+/* Logo deitado na barra recolhida: o giro não muda a caixa, por isso as
+   margens compensam a diferença entre largura e altura. */
+.signup-rail-logo {
+  flex: none;
+  width: 92px;
+  height: auto;
+  margin: 38px -30px;
+  color: #fff;
+  transform: rotate(-90deg);
 }
 .signup-showcase--rail .signup-showcase-toggle {
   align-self: center;
@@ -1823,8 +1814,9 @@ button.signup-showcase-toggle:focus-visible {
     flex-direction: row;
     padding: 0 20px;
   }
-  .signup-rail-word {
-    writing-mode: horizontal-tb;
+  .signup-rail-logo {
+    width: 76px;
+    margin: 0;
     transform: none;
   }
   .signup-showcase--rail .signup-showcase-toggle {

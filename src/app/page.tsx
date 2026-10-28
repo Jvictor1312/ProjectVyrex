@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { BrandContact } from "./components/brand-contact";
+import { VyrexLogo } from "./components/vyrex-logo";
 import styles from "./home.module.css";
 import { getSignedInUser } from "@/lib/auth";
 
@@ -50,8 +51,7 @@ export default async function HomePage() {
     <main className="landing">
       <header className="topbar">
         <Link className="brand" href="/" aria-label="Vyrex, página inicial">
-          <span className="brand-mark">V</span>
-          <span>VYREX</span>
+          <VyrexLogo decorative />
         </Link>
         <nav className="topnav" aria-label="Navegação principal">
           <Link href="#como-funciona">Como funciona</Link>
@@ -132,7 +132,7 @@ export default async function HomePage() {
             </div>
           ))}
           <div className={styles.nucleus}>
-            <span>VYREX</span>
+            <VyrexLogo className={styles.nucleusLogo} decorative />
           </div>
         </div>
       </section>
@@ -192,11 +192,10 @@ export default async function HomePage() {
       </section>
 
       <footer className="site-footer">
-        <Link className="brand" href="/" aria-label="Vyrex">
-          <span className="brand-mark">V</span>
-          <span>VYREX</span>
+        <Link className="brand" href="/" aria-label="Vyrex, página inicial">
+          <VyrexLogo decorative />
         </Link>
-        <span>© 2026 VYREX</span>
+        <span>© 2026 Vyrex</span>
       </footer>
     </main>
   );

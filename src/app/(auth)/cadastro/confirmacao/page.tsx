@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { VyrexLogo } from "@/app/components/vyrex-logo";
 
 export const metadata: Metadata = { title: "Confirme seu cadastro" };
 
@@ -7,8 +8,7 @@ export default function SignupConfirmationPage() {
   return (
     <main className="auth-page">
       <Link className="brand auth-brand" href="/">
-        <span className="brand-mark">V</span>
-        <span>VYREX</span>
+        <VyrexLogo />
       </Link>
       <section className="auth-form" aria-labelledby="confirmation-title">
         <div className="auth-heading">

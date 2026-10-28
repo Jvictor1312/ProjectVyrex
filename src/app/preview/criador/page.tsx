@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { CreatorNav } from "@/app/components/creator-nav";
+import { VyrexLogo } from "@/app/components/vyrex-logo";
 import { CreatorOverview } from "../../dashboard/creator-overview";
 
 // Mostra a visão geral real do criador com dados fictícios, sem login.
@@ -11,8 +12,7 @@ export default function CreatorDashboardPreview() {
     <main className="dashboard-page">
       <header className="dashboard-header creator-header">
         <Link className="brand" href="/">
-          <span className="brand-mark">V</span>
-          <span>VYREX</span>
+          <VyrexLogo />
         </Link>
         <CreatorNav />
         <Link className="quiet-button" href="/login">
