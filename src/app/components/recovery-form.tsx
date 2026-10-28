@@ -67,34 +67,23 @@ export function RecoveryForm() {
   return (
     <form action={send} className="auth-form">
       <div className="auth-heading">
-        <h1>Para onde enviamos?</h1>
+        <h1>Confirme o envio.</h1>
         <p>
           {options.kind === "cpf"
-            ? "Encontramos a conta ligada a esse CPF. As instruções vão para o e-mail abaixo."
-            : "Escolha como quer recuperar sua senha."}
+            ? "Se houver uma conta ativa com esse CPF, as instruções vão para o e-mail cadastrado nela."
+            : "Se houver uma conta com esse e-mail, as instruções vão para ele."}
         </p>
       </div>
       <input type="hidden" name="identifier" value={options.identifier} />
       <input type="hidden" name="kind" value={options.kind} />
-      <fieldset className="recovery-options">
-        <legend className="sr-only">Canal de recuperação</legend>
-        <label className="recovery-option">
-          <input type="radio" name="channel" value="email" defaultChecked />
+      <div className="recovery-options">
+        <div className="recovery-option">
           <span>
-            <strong>E-mail</strong>
-            {options.maskedEmail}
+            <strong>Enviar para</strong>
+            {options.maskedEmail ?? "O e-mail cadastrado na conta desse CPF"}
           </span>
-        </label>
-        {options.phoneHint && (
-          <label className="recovery-option recovery-option--disabled">
-            <input type="radio" name="channel" value="phone" disabled />
-            <span>
-              <strong>Celular · em breve</strong>
-              (••) •••••-{options.phoneHint}
-            </span>
-          </label>
-        )}
-      </fieldset>
+        </div>
+      </div>
       {state.message && (
         <p
           className={state.success ? "form-message success" : "form-message error"}

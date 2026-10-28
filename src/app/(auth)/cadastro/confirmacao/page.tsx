@@ -19,7 +19,8 @@ export default function SignupConfirmationPage() {
           <p>
             Se o cadastro puder ser concluído, as próximas instruções serão
             enviadas ao endereço informado. Após confirmar o e-mail, entre para
-            continuar seu perfil.
+            continuar seu perfil. Já tem uma conta com esse e-mail? Entre com sua senha ou use{" "}
+            <Link href="/recuperar-senha">Esqueci minha senha</Link>.
           </p>
         </div>
         <nav className="auth-links" aria-label="Próximos passos">
