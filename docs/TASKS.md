@@ -21,7 +21,7 @@ Atualizado em: 2026-10-28. Reescrito para mostrar só o estado atual e as pendê
 - [ ] **Link "Área do criador"** no menu da equipe foi removido; recolocar se for útil.
 
 ### Dependem do usuário ou de serviços externos
-- [ ] **Aplicar a migration 202610280005_creator_withdraw_and_draft_evidence.sql no Supabase:** o token SUPABASE_ACCESS_TOKEN não existe neste computador. Colar o arquivo no SQL Editor do projeto e executar. Até lá, as telas de desfazer envio e apagar evidência avisam que o recurso ainda não está disponível.
+- [x] **Migration `202610280005` aplicada no Supabase** em 2026-10-28 pela Management API (token salvo na variável do Windows `SUPABASE_ACCESS_TOKEN`). Conferido: funções criadas, só usuários logados executam, a API já as reconhece.
 - [ ] **Testes com contas reais de todas as funções:** convidar recrutador, gestor de relacionamento e analista de validação pela tela de colaboradores; criar uma conta de criador em rascunho para testar o salvamento real das evidências e o fluxo completo (envio, triagem, validação, correção, decisão).
 - [ ] **E-mails em português** com remetente da Vyrex: exige SMTP próprio no Supabase. Modelos prontos em `supabase/templates/`.
 - [ ] **SMS** (recuperação por celular): exige provedor (Twilio, MessageBird ou Vonage).
