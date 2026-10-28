@@ -120,6 +120,16 @@ export async function signupAction(
     };
   }
 
+  // Com confirmação de e-mail ativa, o Supabase não retorna erro para um
+  // e-mail já cadastrado: devolve um usuário sem identidades.
+  if (data.user && data.user.identities?.length === 0) {
+    return {
+      message:
+        "Este e-mail já está cadastrado. Entre com sua senha ou use a recuperação de senha.",
+      success: false,
+    };
+  }
+
   if (data.session) redirect("/dashboard");
   redirect("/cadastro/confirmacao");
 }

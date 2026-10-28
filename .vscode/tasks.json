@@ -3,8 +3,12 @@
   "tasks": [
     {
       "label": "Vyrex: servidor local",
-      "type": "npm",
-      "script": "dev",
+      "type": "process",
+      "command": "C:\\Program Files\\nodejs\\npm.cmd",
+      "args": ["run", "dev"],
+      "options": {
+        "env": { "PATH": "C:\\Program Files\\nodejs;${env:PATH}" }
+      },
       "isBackground": true,
       "runOptions": { "runOn": "folderOpen" },
       "presentation": { "reveal": "always", "panel": "dedicated", "clear": false },

@@ -2,6 +2,17 @@
 
 Atualizado em: 2026-10-15 (sessão 4)
 
+## Sessão 2026-10-27 (Claude Code)
+
+- [x] Indicador "N" do Next.js desligado em desenvolvimento (`devIndicators: false`).
+- [x] Cadastro com e-mail já existente agora mostra "Este e-mail já está cadastrado" (o Supabase devolve um usuário sem identidades em vez de erro).
+- [x] Apresentação do cadastro: um único puxador na própria barra preta recolhe e abre; recolhida, a barra vira uma faixa clicável. Verificado em navegador (computador e celular), com prints.
+- [x] `loading.tsx` em `/dashboard`, `/interno` e `/interno/[creatorId]`: a troca de tela agora é imediata, com tela de carregamento enquanto o Supabase responde.
+- [x] Esfera do cadastro move sem re-renderizar o componente a cada movimento do mouse.
+- [ ] Telas com login ainda não medidas nem verificadas no navegador (falta uma conta de teste).
+- [ ] Site sem favicon (404 no console). Pasta `Public` com P maiúsculo: funciona no Windows, quebra em Linux (deploy).
+- [ ] Teste `assigned relationship manager can request corrections` desatualizado (falta nome público antes da submissão).
+
 ## Critério de status
 
 - **Concluída:** comportamento verificado e a verificação está descrita.

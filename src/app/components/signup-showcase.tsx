@@ -5,15 +5,16 @@ import { useEffect, useRef, useState } from "react";
 import type { PointerEvent, ReactNode } from "react";
 
 export function SignupExperience({ children }: { children: ReactNode }) {
-  const [showcaseVisible, setShowcaseVisible] = useState(true);
+  const [showcaseOpen, setShowcaseOpen] = useState(true);
 
   return (
     <main
-      className={`signup-layout${showcaseVisible ? "" : " signup-layout--showcase-hidden"}`}
+      className={`signup-layout${showcaseOpen ? "" : " signup-layout--collapsed"}`}
     >
-      {showcaseVisible && (
-        <SignupShowcase onCollapse={() => setShowcaseVisible(false)} />
-      )}
+      <SignupShowcase
+        open={showcaseOpen}
+        onToggle={() => setShowcaseOpen((open) => !open)}
+      />
       <section className="signup-form-panel">
         <header className="signup-form-header">
           <Link className="brand" href="/" aria-label="Vyrex, página inicial">
@@ -21,15 +22,6 @@ export function SignupExperience({ children }: { children: ReactNode }) {
             <span>VYREX</span>
           </Link>
           <div className="signup-form-header-actions">
-            {!showcaseVisible && (
-              <button
-                className="signup-showcase-reopen"
-                type="button"
-                onClick={() => setShowcaseVisible(true)}
-              >
-                Mostrar apresentação
-              </button>
-            )}
             <p>
               Já tem uma conta? <Link href="/login">Entrar</Link>
             </p>
@@ -41,22 +33,57 @@ export function SignupExperience({ children }: { children: ReactNode }) {
   );
 }
 
-function SignupShowcase({ onCollapse }: { onCollapse: () => void }) {
-  const [position, setPosition] = useState({ x: 0, y: 0 });
+function SignupShowcase({
+  open,
+  onToggle,
+}: {
+  open: boolean;
+  onToggle: () => void;
+}) {
   const [dialogOpen, setDialogOpen] = useState(false);
   const dialogRef = useRef<HTMLDialogElement>(null);
+  const orbRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     const dialog = dialogRef.current;
     if (dialog && dialogOpen && !dialog.open) dialog.showModal();
   }, [dialogOpen]);
 
+  // Move a esfera direto no estilo, sem re-renderizar o componente a cada
+  // movimento do mouse.
   function moveOrb(event: PointerEvent<HTMLElement>) {
-    if (event.pointerType !== "mouse") return;
+    const orb = orbRef.current;
+    if (event.pointerType !== "mouse" || !orb) return;
     const bounds = event.currentTarget.getBoundingClientRect();
     const x = (event.clientX - bounds.left) / bounds.width - 0.5;
     const y = (event.clientY - bounds.top) / bounds.height - 0.5;
-    setPosition({ x: x * 16, y: y * 16 });
+    orb.style.transform = `translate3d(${x * 16}px, ${y * 16}px, 0)`;
+  }
+
+  function resetOrb() {
+    if (orbRef.current) orbRef.current.style.transform = "";
+  }
+
+  if (!open) {
+    return (
+      <button
+        className="signup-showcase signup-showcase--rail"
+        type="button"
+        onClick={onToggle}
+        aria-expanded={false}
+        aria-label="Mostrar apresentação da Vyrex"
+      >
+        <span className="brand-mark" aria-hidden="true">
+          V
+        </span>
+        <span className="signup-rail-word" aria-hidden="true">
+          VYREX
+        </span>
+        <span className="signup-showcase-toggle" aria-hidden="true">
+          ›
+        </span>
+      </button>
+    );
   }
 
   return (
@@ -65,7 +92,7 @@ function SignupShowcase({ onCollapse }: { onCollapse: () => void }) {
         className="signup-showcase"
         aria-label="Conheça a Vyrex"
         onPointerMove={moveOrb}
-        onPointerLeave={() => setPosition({ x: 0, y: 0 })}
+        onPointerLeave={resetOrb}
       >
         <Link
           className="signup-showcase-brand"
@@ -81,11 +108,9 @@ function SignupShowcase({ onCollapse }: { onCollapse: () => void }) {
             CRIADORES · CONEXÕES · ANÁLISE HUMANA
           </p>
           <button
+            ref={orbRef}
             className="signup-orb"
             type="button"
-            style={{
-              transform: `translate3d(${position.x}px, ${position.y}px, 0)`,
-            }}
             aria-haspopup="dialog"
             aria-expanded={dialogOpen}
             onClick={() => setDialogOpen(true)}
@@ -102,15 +127,18 @@ function SignupShowcase({ onCollapse }: { onCollapse: () => void }) {
         <div className="signup-showcase-bottom">
           <span>01 — 04</span>
           <span>Perfil · Redes · Evidências · Revisão</span>
-          <button
-            className="signup-showcase-collapse"
-            type="button"
-            onClick={onCollapse}
-            aria-label="Recolher apresentação"
-          >
-            Recolher <span aria-hidden="true">←</span>
-          </button>
         </div>
+
+        <button
+          className="signup-showcase-toggle"
+          type="button"
+          onClick={onToggle}
+          aria-expanded={true}
+          aria-label="Recolher apresentação"
+          title="Recolher apresentação"
+        >
+          <span aria-hidden="true">‹</span>
+        </button>
       </section>
 
       <dialog
