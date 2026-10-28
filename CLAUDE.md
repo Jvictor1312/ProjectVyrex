@@ -31,7 +31,8 @@ O usuário acompanha tudo pelo VS Code, com o site aberto. **Dê mais empenho a 
 ## Ambiente local
 
 - Node.js 24 LTS instalado em `C:\Program Files\nodejs`. Se o shell não encontrar `node`/`npm`, adicione esse caminho ao PATH do comando.
-- Python **não** está instalado. Os scripts da skill `webapp-testing` precisam de Python + `playwright`. Antes de usar, peça para instalar ou use o Playwright de Node.
+- Python 3.13 instalado (`%LOCALAPPDATA%\Programs\Python\Python313`), com `playwright` e Chromium para a skill `webapp-testing`.
+- Claude in Chrome está conectado: prefira-o para mostrar as telas ao usuário no Chrome dele.
 - Servidor de desenvolvimento: `npm run dev` → http://localhost:3000 (hot reload).
 - Verificações: `npm run typecheck`, `npm run lint`, `npm test` (PGlite + validação), `npm run build`.
 - Next.js desta versão tem mudanças em relação ao que você conhece: consulte `node_modules/next/dist/docs/` antes de escrever código Next (ver `AGENTS.md`).
