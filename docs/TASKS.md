@@ -74,6 +74,22 @@ Atualizado em: 2026-10-15 (sessão 4)
 - [x] Verificado no navegador (preview, computador e celular), typecheck, lint e `npm test` (35/35). O lint passou a ignorar `.claude/` (scripts das skills).
 - [ ] Testar o salvamento real com login: a conta +user já enviou o cadastro (não editável). Testar quando houver uma conta em rascunho ou com correção pedida.
 
+## Sessão 2026-10-28, reformulação da área interna (Claude Code)
+
+- [x] Skills `security-and-hardening` e `ui-ux-pro-max` instaladas.
+- [x] Base comum: `src/lib/labels.ts` (nomes oficiais de funções, situações e redes), `src/app/interno/ui.tsx` (cabeçalho, painel, indicadores, etiqueta com cor + texto, avatar, aviso, estado vazio, botões, campos). CSS interno reescrito sem duplicações; escala 24/16/14/13px.
+- [x] Gestão de colaboradores (`/interno/equipe`): busca sem acento, filtros por função e situação, tabela (cartões no celular), janela Gerenciar com funções em caixas de marcar e desativação com motivo e confirmação, explicação das funções, histórico em tabela. Prévia: `/preview/equipe/colaboradores`.
+- [x] Corrigido: desativar enviava o formulário sem passar pela confirmação (botão trocava de tipo durante o clique). Mensagens das regras do banco (último administrador, própria conta) agora específicas.
+- [x] Visão geral (`/interno`): títulos por perfil, indicadores compactos, lista de cadastros como componente único (`creator-queue.tsx`, usado também pela prévia), etiquetas coloridas, estados vazios orientando o próximo passo.
+- [x] Configurações e Pedidos de privacidade no novo padrão; textos técnicos ("migration…") e desatualizados ("cinco evidências", "views") trocados pelos valores reais.
+- [x] Ficha do criador: escala de texto corrigida (antes 9–12px), nomes de funções e redes padronizados.
+- [x] Menu lateral agrupado (Operação / Administração); no celular ele aparecia escondido e agora vira barra no topo.
+- [x] Verificado: typecheck, lint, `npm test` 35/35, `npm run build`; navegador em 1366, 1920 e 390 px (sem rolagem lateral) nas prévias.
+- [ ] Ver com login de administrador: `/interno/equipe`, `/interno/configuracoes`, `/interno/privacidade` e a ficha `/interno/[id]` (sem prévia; só verificados por tipos/lint/build).
+- [ ] Área do criador (`/dashboard`) ainda não passou pela mesma revisão de tamanhos e textos.
+- [ ] Removido do menu da equipe o link "Área do criador" (levava ao painel de criador, que a equipe não usa). Recolocar se for necessário.
+- [ ] E-mails, último acesso e convites dependem de `SUPABASE_SERVICE_ROLE_KEY` real no servidor.
+
 ## Critério de status
 
 - **Concluída:** comportamento verificado e a verificação está descrita.
