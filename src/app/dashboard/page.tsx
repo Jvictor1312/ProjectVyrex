@@ -1,9 +1,9 @@
-import { requireUser } from "@/lib/auth";
+import { requireUserFast } from "@/lib/auth";
 import { CreatorShell } from "./creator-shell";
 import { CreatorOverview, nextStepFor } from "./creator-overview";
 
 export default async function CreatorDashboardPage() {
-  const { supabase, user } = await requireUser();
+  const { supabase, user, activeCheck, ensureActive } = await requireUserFast();
   const [
     profileResult,
     messageResult,
@@ -13,6 +13,7 @@ export default async function CreatorDashboardPage() {
     evidenceResult,
     settingsResult,
     accountResult,
+    activeResult,
   ] = await Promise.all([
     supabase
       .from("creator_profiles")
@@ -52,8 +53,14 @@ export default async function CreatorDashboardPage() {
       .select("required_story_evidence")
       .eq("singleton", true)
       .maybeSingle(),
-    supabase.from("profiles").select("full_name").eq("id", user.id).maybeSingle(),
+    supabase
+      .from("profiles")
+      .select("full_name")
+      .eq("id", user.id)
+      .maybeSingle(),
+    activeCheck,
   ]);
+  await ensureActive(activeResult);
 
   const creatorProfile = profileResult.data;
   const accountCount = accountsResult.count ?? 0;
@@ -66,13 +73,13 @@ export default async function CreatorDashboardPage() {
   );
   const hasLoadError = Boolean(
     accountsResult.error ||
-      evidenceResult.error ||
-      settingsResult.error ||
-      profileResult.error ||
-      messageResult.error ||
-      notificationResult.error ||
-      historyResult.error ||
-      !creatorProfile,
+    evidenceResult.error ||
+    settingsResult.error ||
+    profileResult.error ||
+    messageResult.error ||
+    notificationResult.error ||
+    historyResult.error ||
+    !creatorProfile,
   );
   const status = creatorProfile?.status ?? "incomplete";
 

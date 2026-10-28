@@ -7,7 +7,7 @@ import {
   SubmitApplicationButton,
 } from "@/app/components/creator-forms";
 import { EvidenceBoard } from "@/app/components/evidence-board";
-import { requireUser } from "@/lib/auth";
+import { requireUserFast } from "@/lib/auth";
 import { CreatorShell } from "../creator-shell";
 
 export const metadata: Metadata = { title: "Completar perfil" };
@@ -20,38 +20,45 @@ const evidenceStatus: Record<string, string> = {
 };
 
 export default async function CreatorProfilePage() {
-  const { supabase, user } = await requireUser();
-  const [profileResult, accountsResult, evidenceResult, settingsResult] =
-    await Promise.all([
-      supabase
-        .from("creator_profiles")
-        .select(
-          "public_name, city, region, biography, categories, status, decision_reason",
-        )
-        .eq("user_id", user.id)
-        .maybeSingle(),
-      supabase
-        .from("social_accounts")
-        .select(
-          "id, platform, handle, profile_url, followers_reported, followers_reported_at, verification_status",
-        )
-        .eq("creator_id", user.id)
-        .order("created_at"),
-      supabase
-        .from("metric_evidence")
-        .select(
-          "id, position, content_type, story_published_on, views_reported, review_status, review_reason, storage_path",
-        )
-        .eq("creator_id", user.id)
-        .order("position"),
-      supabase
-        .from("eligibility_settings")
-        .select(
-          "minimum_followers, minimum_story_views, max_story_age_days, required_story_evidence",
-        )
-        .eq("singleton", true)
-        .maybeSingle(),
-    ]);
+  const { supabase, user, activeCheck, ensureActive } = await requireUserFast();
+  const [
+    profileResult,
+    accountsResult,
+    evidenceResult,
+    settingsResult,
+    activeResult,
+  ] = await Promise.all([
+    supabase
+      .from("creator_profiles")
+      .select(
+        "public_name, city, region, biography, categories, status, decision_reason",
+      )
+      .eq("user_id", user.id)
+      .maybeSingle(),
+    supabase
+      .from("social_accounts")
+      .select(
+        "id, platform, handle, profile_url, followers_reported, followers_reported_at, verification_status",
+      )
+      .eq("creator_id", user.id)
+      .order("created_at"),
+    supabase
+      .from("metric_evidence")
+      .select(
+        "id, position, content_type, story_published_on, views_reported, review_status, review_reason, storage_path",
+      )
+      .eq("creator_id", user.id)
+      .order("position"),
+    supabase
+      .from("eligibility_settings")
+      .select(
+        "minimum_followers, minimum_story_views, max_story_age_days, required_story_evidence",
+      )
+      .eq("singleton", true)
+      .maybeSingle(),
+    activeCheck,
+  ]);
+  await ensureActive(activeResult);
 
   const profile = profileResult.data;
   const accounts = accountsResult.data ?? [];
@@ -265,8 +272,8 @@ export default async function CreatorProfilePage() {
               <div>
                 <h2>Evidências</h2>
                 <p>
-                  Toque em cada quadro e envie o print do Story. Os marcados
-                  com * são obrigatórios.
+                  Toque em cada quadro e envie o print do Story. Os marcados com
+                  * são obrigatórios.
                 </p>
               </div>
             </div>
@@ -336,8 +343,7 @@ export default async function CreatorProfilePage() {
                 <dt>Evidências</dt>
                 <dd>
                   {evidence.length} enviadas ({requiredEvidence} obrigatórias);
-                  mínimo de{" "}
-                  {minimumViews.toLocaleString("pt-BR")} visualizações
+                  mínimo de {minimumViews.toLocaleString("pt-BR")} visualizações
                   {maxStoryAgeDays === null
                     ? ""
                     : ` e até ${maxStoryAgeDays} dias de idade`}

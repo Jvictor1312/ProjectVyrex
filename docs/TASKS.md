@@ -36,6 +36,15 @@ Atualizado em: 2026-10-15 (sessão 4)
 - [ ] SMS de recuperação e verificação de posse do celular: exige um provedor de SMS (Twilio, MessageBird ou Vonage) configurado no Supabase.
 - [ ] Testar as telas logadas com dados reais: o usuário precisa entrar no Chrome.
 
+## Sessão 2026-10-28, fluxo do criador (Claude Code)
+
+- [x] Corrigido: nenhuma evidência salvava (ação enviava `id`, sem permissão de coluna). Conta +user com perfil, rede e 3 evidências, cadastro ENVIADO (status submitted), pronto para o teste do admin.
+- [x] Login conferido localmente (getClaims/ES256) e checagem de conta ativa junto com as consultas (`requireUserFast`): telas do criador em produção ~0,42–0,69 s (antes ~0,75–1,2 s).
+- [x] Abas do criador: Visão geral, Meu cadastro, Mensagens (com avisos), Configurações (com privacidade).
+- [x] Segundo envio do cadastro é bloqueado pelo banco e pela tela.
+- [ ] Decidir com o usuário: como o criador corrige um cadastro enviado por engano (ex.: "desfazer envio" enquanto ninguém começou a análise).
+- [ ] Próximo: teste do fluxo de administrador com a conta +adm.
+
 ## Critério de status
 
 - **Concluída:** comportamento verificado e a verificação está descrita.

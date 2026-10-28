@@ -5,7 +5,7 @@ import {
   DataRequestForm,
   PasswordForm,
 } from "@/app/components/privacy-forms";
-import { requireUser } from "@/lib/auth";
+import { requireUserFast } from "@/lib/auth";
 import {
   dataRequestKindLabels,
   dataRequestStatusLabels,
@@ -17,8 +17,8 @@ export const metadata: Metadata = { title: "Configurações" };
 
 // Conta, senha e privacidade numa só tela; a privacidade fica recolhida.
 export default async function CreatorSettingsPage() {
-  const { supabase, user } = await requireUser();
-  const [profileResult, requestsResult] = await Promise.all([
+  const { supabase, user, activeCheck, ensureActive } = await requireUserFast();
+  const [profileResult, requestsResult, activeResult] = await Promise.all([
     supabase
       .from("profiles")
       .select("full_name, phone")
@@ -30,7 +30,9 @@ export default async function CreatorSettingsPage() {
       .eq("user_id", user.id)
       .order("created_at", { ascending: false })
       .limit(20),
+    activeCheck,
   ]);
+  await ensureActive(activeResult);
   const profile = profileResult.data;
   const requests = requestsResult.data ?? [];
 
@@ -74,7 +76,8 @@ export default async function CreatorSettingsPage() {
                     {dataRequestKindLabels[
                       request.kind as keyof typeof dataRequestKindLabels
                     ] ?? request.kind}{" "}
-                    · {dataRequestStatusLabels[request.status] ?? request.status}
+                    ·{" "}
+                    {dataRequestStatusLabels[request.status] ?? request.status}
                   </strong>
                   <time dateTime={request.created_at}>
                     {new Date(request.created_at).toLocaleDateString("pt-BR")}

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { NotificationReadButton } from "@/app/components/notification-read-button";
-import { requireUser } from "@/lib/auth";
+import { requireUserFast } from "@/lib/auth";
 import { CreatorShell } from "../creator-shell";
 import styles from "../dashboard.module.css";
 
@@ -8,22 +8,26 @@ export const metadata: Metadata = { title: "Mensagens" };
 
 // Mensagens da equipe e avisos do sistema ficam juntos numa só tela.
 export default async function CreatorMessagesPage() {
-  const { supabase, user } = await requireUser();
-  const [messagesResult, notificationsResult] = await Promise.all([
-    supabase
-      .from("team_messages")
-      .select("id, body, created_at")
-      .eq("creator_id", user.id)
-      .eq("visible_to_creator", true)
-      .order("created_at", { ascending: false })
-      .limit(50),
-    supabase
-      .from("notifications")
-      .select("id, title, body, created_at, read_at")
-      .eq("user_id", user.id)
-      .order("created_at", { ascending: false })
-      .limit(50),
-  ]);
+  const { supabase, user, activeCheck, ensureActive } = await requireUserFast();
+  const [messagesResult, notificationsResult, activeResult] = await Promise.all(
+    [
+      supabase
+        .from("team_messages")
+        .select("id, body, created_at")
+        .eq("creator_id", user.id)
+        .eq("visible_to_creator", true)
+        .order("created_at", { ascending: false })
+        .limit(50),
+      supabase
+        .from("notifications")
+        .select("id, title, body, created_at, read_at")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false })
+        .limit(50),
+      activeCheck,
+    ],
+  );
+  await ensureActive(activeResult);
   const messages = messagesResult.data ?? [];
   const notifications = notificationsResult.data ?? [];
 

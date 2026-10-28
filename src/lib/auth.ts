@@ -71,6 +71,40 @@ export async function requireUser() {
   return { supabase, user };
 }
 
+// Para telas: confere o login localmente e devolve na hora. A checagem de
+// conta ativa é feita junto com as consultas da tela (uma rodada só até o
+// banco); a tela chama `ensureActive` com o resultado. Os dados de contas
+// desativadas já são bloqueados pelas regras do banco (RLS).
+export async function requireUserFast() {
+  if (!isSupabaseConfigured()) {
+    await cookies();
+    redirect("/login?configuracao=supabase");
+  }
+  const supabase = await createSupabaseServerClient();
+  const { data: claimsData, error } = await supabase.auth.getClaims();
+  const claims = claimsData?.claims;
+  if (error || !claims?.sub) redirect("/login");
+
+  const user = { id: claims.sub, email: claims.email ?? null };
+  const activeCheck = supabase
+    .from("profiles")
+    .select("is_active")
+    .eq("id", user.id)
+    .maybeSingle();
+
+  async function ensureActive(
+    result: Awaited<typeof activeCheck>,
+  ): Promise<void> {
+    if (result.error) redirect("/login?configuracao=banco");
+    if (!result.data?.is_active) {
+      await supabase.auth.signOut();
+      redirect("/login?conta-desativada=1");
+    }
+  }
+
+  return { supabase, user, activeCheck, ensureActive };
+}
+
 export async function requireUserWithRoles() {
   const { supabase, user, roles } = await authenticate(true);
   return { supabase, user, roleKeys: roles.keys, rolesError: roles.error };
