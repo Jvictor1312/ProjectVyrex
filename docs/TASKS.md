@@ -85,8 +85,10 @@ Atualizado em: 2026-10-15 (sessão 4)
 - [x] Ficha do criador: escala de texto corrigida (antes 9–12px), nomes de funções e redes padronizados.
 - [x] Menu lateral agrupado (Operação / Administração); no celular ele aparecia escondido e agora vira barra no topo.
 - [x] Verificado: typecheck, lint, `npm test` 35/35, `npm run build`; navegador em 1366, 1920 e 390 px (sem rolagem lateral) nas prévias.
-- [ ] Ver com login de administrador: `/interno/equipe`, `/interno/configuracoes`, `/interno/privacidade` e a ficha `/interno/[id]` (sem prévia; só verificados por tipos/lint/build).
-- [ ] Área do criador (`/dashboard`) ainda não passou pela mesma revisão de tamanhos e textos.
+- [x] Conferido com login de administrador (conta +adm, só leitura): visão geral, colaboradores, configurações, privacidade e ficha do criador.
+- [x] Ajustes vistos com dados reais: contas da equipe com etiqueta "Equipe" e fora dos indicadores (decisão do usuário); rodapé do menu com nome (do token) e funções; justificativa da decisão com o tom certo; categorias e verificação com rótulos; vídeo de apresentação compacto e remoção com confirmação.
+- [x] Área do criador revisada: vocabulário único (`labels.ts`), tamanhos no padrão (bloco `.dashboard-page` no fim de `globals.css`), regra quebrada de `.application-review` corrigida, mínimo de evidências com reserva única (3), textos ("Link do perfil", "situação", "Falta salvar", datas sem segundos), foco visível, classes sem uso removidas. Inspetor `--app`: 7 tamanhos de fonte, sem aviso de contraste.
+- [ ] Fonte "Avenir Next" é declarada mas não carregada (no Windows aparece outra). Decidir com o usuário: hospedar uma fonte própria ou assumir a do sistema.
 - [ ] Removido do menu da equipe o link "Área do criador" (levava ao painel de criador, que a equipe não usa). Recolocar se for necessário.
 - [ ] E-mails, último acesso e convites dependem de `SUPABASE_SERVICE_ROLE_KEY` real no servidor.
 
