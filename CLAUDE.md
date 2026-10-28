@@ -79,6 +79,6 @@ Removidas por não servirem a este projeto: `hyperframes` (vídeo), `frontend-de
 
 ## Problemas conhecidos
 
-- `Public/image.png` e `Public/image2.png` estão corrompidos e não são usados. A pasta `Public` com P maiúsculo funciona no Windows, mas quebra em Linux (deploy).
+- Arquivos estáticos ficam em `public/` (minúsculo; o Linux diferencia maiúsculas). A antiga pasta `Public/` só tinha duas imagens corrompidas e foi removida em 2026-10-28 (continuam no histórico do git).
 
 @docs/DIRETRIZES.md
