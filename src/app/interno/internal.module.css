@@ -410,10 +410,32 @@
   color: var(--text);
   white-space: nowrap;
 }
+/* Texto de apoio ou lista vazia; na tabela, a célula vazia fica centralizada. */
 .empty {
-  height: 100px;
+  margin: 4px 0 14px;
   color: var(--muted) !important;
+  font-size: 14px;
+}
+td.empty {
+  height: 100px;
   text-align: center;
+}
+
+/* Blocos das telas de equipe, configurações e privacidade. */
+.section {
+  display: grid;
+  gap: 12px;
+  margin-top: 22px;
+  padding: 22px 24px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--surface);
+}
+.section > h2,
+.section h2 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
 }
 
 .pagination {

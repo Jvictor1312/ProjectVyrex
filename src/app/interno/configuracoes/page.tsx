@@ -4,7 +4,8 @@ import { InfoHelp } from "@/app/components/info-help";
 import { PresentationVideoForm } from "@/app/components/presentation-video-form";
 import { EligibilitySettingsForm } from "@/app/components/team-management";
 import { InternalShell } from "../internal-shell";
-import { requireUser } from "@/lib/auth";
+import { auditDetailsSummary } from "@/lib/audit-labels";
+import { requireUserFast } from "@/lib/auth";
 import { getPresentationVideoUrl } from "@/lib/site-media";
 import internalStyles from "../internal.module.css";
 import styles from "../team-management.module.css";
@@ -12,29 +13,30 @@ import styles from "../team-management.module.css";
 export const metadata: Metadata = { title: "Configurações" };
 
 export default async function EligibilitySettingsPage() {
-  const { supabase, user } = await requireUser();
-  const { data: allowed, error: permissionError } = await supabase.rpc(
-    "has_permission",
-    { permission_name: "creators.configure_eligibility" },
-  );
-  if (permissionError || !allowed) redirect("/acesso-negado");
-
-  const [settingsResult, auditResult, videoUrl] = await Promise.all([
-    supabase
-      .from("eligibility_settings")
-      .select(
-        "minimum_followers, required_story_evidence, minimum_story_views, max_story_age_days, updated_at",
-      )
-      .eq("singleton", true)
-      .maybeSingle(),
-    supabase
-      .from("audit_logs")
-      .select("id, actor_id, details, created_at")
-      .eq("action", "eligibility.settings.changed")
-      .order("created_at", { ascending: false })
-      .limit(20),
-    getPresentationVideoUrl(),
-  ]);
+  const { supabase, user, activeCheck, ensureActive } = await requireUserFast();
+  const [permission, activeResult, settingsResult, auditResult, videoUrl] =
+    await Promise.all([
+      supabase.rpc("has_permission", {
+        permission_name: "creators.configure_eligibility",
+      }),
+      activeCheck,
+      supabase
+        .from("eligibility_settings")
+        .select(
+          "minimum_followers, required_story_evidence, minimum_story_views, max_story_age_days, updated_at",
+        )
+        .eq("singleton", true)
+        .maybeSingle(),
+      supabase
+        .from("audit_logs")
+        .select("id, actor_id, details, created_at")
+        .eq("action", "eligibility.settings.changed")
+        .order("created_at", { ascending: false })
+        .limit(20),
+      getPresentationVideoUrl(),
+    ]);
+  await ensureActive(activeResult);
+  if (permission.error || !permission.data) redirect("/acesso-negado");
 
   const history = auditResult.data ?? [];
 
@@ -107,11 +109,13 @@ export default async function EligibilitySettingsPage() {
             <div className={styles.auditList}>
               {history.map((entry) => (
                 <article className={styles.auditRow} key={entry.id}>
-                  <strong>{entry.actor_id?.slice(0, 8) ?? "Sistema"}</strong>
+                  <strong>
+                    {auditDetailsSummary(entry.details) ??
+                      "Critérios alterados"}
+                  </strong>
                   <span>
                     {new Date(entry.created_at).toLocaleString("pt-BR")}
                   </span>
-                  <code>{JSON.stringify(entry.details)}</code>
                 </article>
               ))}
             </div>
