@@ -51,7 +51,7 @@ export default async function CreatorMessagesPage() {
                 <article className={styles.notificationItem} key={message.id}>
                   <p>{message.body}</p>
                   <time dateTime={message.created_at}>
-                    {new Date(message.created_at).toLocaleString("pt-BR")}
+                    {new Date(message.created_at).toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" })}
                   </time>
                 </article>
               ))}
@@ -78,7 +78,7 @@ export default async function CreatorMessagesPage() {
                   </div>
                   <p>{notification.body}</p>
                   <time dateTime={notification.created_at}>
-                    {new Date(notification.created_at).toLocaleString("pt-BR")}
+                    {new Date(notification.created_at).toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" })}
                   </time>
                   {!notification.read_at && (
                     <NotificationReadButton notificationId={notification.id} />

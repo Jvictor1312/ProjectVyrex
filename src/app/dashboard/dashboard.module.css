@@ -1,44 +1,26 @@
+/* Mensagens e Configurações do criador. Escala: seções 18px (serifado),
+   texto 14px, apoio 13px. */
 .statusDescription {
   max-width: 650px;
-  margin: 12px 0 0;
-  color: #646a67;
+  margin: 8px 0 0;
+  color: #5f6461;
   font-size: 15px;
-  line-height: 1.65;
-}
-
-.demoNotice {
-  margin: 0 0 24px;
-  padding: 13px 15px;
-  border: 1px solid #c9c5b5;
-  background: #f0eee5;
-  color: #4e4b40;
-  font-size: 14px;
   line-height: 1.6;
 }
 
-.activityGrid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 34px;
-  margin: 18px 0 30px;
-}
-
-.activitySection,
 .historySection {
   min-width: 0;
-  padding: 21px 0;
+  padding: 18px 0;
   border-top: 1px solid #dce0da;
 }
 
-.activitySection h2,
 .historySection h2 {
-  margin: 0 0 12px;
+  margin: 0 0 10px;
   font-family: Georgia, "Times New Roman", serif;
-  font-size: 23px;
+  font-size: 20px;
   font-weight: 400;
 }
 
-.activityHeading,
 .notificationHeading {
   display: flex;
   align-items: baseline;
@@ -46,43 +28,42 @@
   gap: 12px;
 }
 
-.activityHeading a {
-  color: #3c5147;
-  font-size: 14px;
-  text-decoration-thickness: 1px;
-  text-underline-offset: 3px;
-}
-
 .notificationList {
-  margin-top: 28px;
+  margin-top: 20px;
   border-top: 1px solid #dce0da;
 }
 
 .notificationItem {
   display: grid;
-  gap: 9px;
-  padding: 20px 0;
+  gap: 6px;
+  padding: 14px 0;
   border-bottom: 1px solid #eceeeb;
 }
 
 .notificationHeading h2 {
   margin: 0;
   font-family: Georgia, "Times New Roman", serif;
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 400;
+}
+
+.notificationHeading h3 {
+  margin: 0;
+  font-size: 15px;
 }
 
 .notificationItem p {
   margin: 0;
-  color: #555d58;
-  font-size: 15px;
+  color: #4b524e;
+  font-size: 14px;
   line-height: 1.6;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
 }
 
-.notificationItem time {
-  color: #858c87;
+.notificationItem time,
+.historySection li time {
+  color: #5f6461;
   font-size: 13px;
 }
 
@@ -94,96 +75,44 @@
 
 .notificationUnread {
   color: #8d3e28;
+  font-weight: 600;
 }
 
 .notificationRead {
-  color: #646a67;
+  color: #5f6461;
 }
 
 .empty {
-  color: #747b77;
+  color: #5f6461;
   font-size: 14px;
   line-height: 1.6;
 }
 
-.activityItem,
 .historySection li {
   display: grid;
-  gap: 6px;
-  padding: 12px 0;
+  gap: 4px;
+  padding: 10px 0;
   border-top: 1px solid #eceeeb;
 }
 
-.activityItem p,
 .historySection li p {
   margin: 0;
-  color: #555d58;
+  color: #4b524e;
   font-size: 14px;
   line-height: 1.6;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
 }
 
-.activityItem strong,
 .historySection li strong {
   color: #181a19;
   font-size: 14px;
-}
-
-.activityItem time,
-.historySection li time {
-  color: #858c87;
-  font-size: 13px;
 }
 
 .historySection ol {
   margin: 0;
   padding: 0;
   list-style: none;
-}
-
-@media (max-width: 680px) {
-  .activityGrid {
-    grid-template-columns: 1fr;
-    gap: 0;
-  }
-}
-
-.progressList {
-  display: grid;
-  gap: 8px;
-  margin: 20px 0 0;
-  padding: 16px 18px;
-  border: 1px solid #dce0da;
-  background: #fff;
-  list-style: none;
-  font-size: 13px;
-}
-
-.progressList li {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.pendingBox {
-  margin: 20px 0 0;
-  padding: 14px 16px;
-  border-left: 3px solid #a64337;
-  background: #f6e9e5;
-  color: #59352f;
-  font-size: 15px;
-  line-height: 1.6;
-}
-
-.pendingBox h2 {
-  margin: 0 0 6px;
-  font-size: 14px;
-}
-
-.pendingBox ul {
-  margin: 0;
-  padding-left: 18px;
 }
 
 .srOnly {
@@ -197,14 +126,20 @@
 
 .privacy {
   margin-top: 8px;
-  padding: 18px 0;
+  padding: 16px 0;
   border-top: 1px solid #dce0da;
 }
 
 .privacy summary {
-  font-size: 18px;
-  font-weight: 700;
+  width: fit-content;
+  font-size: 16px;
+  font-weight: 650;
   cursor: pointer;
+}
+
+.privacy summary:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
 }
 
 .privacy[open] summary {
@@ -213,8 +148,8 @@
 
 .requestList {
   display: grid;
-  gap: 10px;
-  margin: 18px 0 0;
+  gap: 8px;
+  margin: 16px 0 0;
   padding: 0;
   list-style: none;
 }
@@ -222,13 +157,8 @@
 .requestList li {
   display: grid;
   gap: 4px;
-  padding: 12px 14px;
+  padding: 10px 12px;
   border: 1px solid #dce0da;
-  border-radius: 12px;
+  border-radius: 8px;
   font-size: 14px;
-}
-
-.notificationHeading h3 {
-  margin: 0;
-  font-size: 16px;
 }

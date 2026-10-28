@@ -9,29 +9,9 @@ import {
 } from "@/app/actions/creator";
 import { categoriesList, socialPlatforms } from "@/lib/validation/creator";
 import type { FormState } from "@/lib/validation/auth";
+import { categoryLabels, platformLabels } from "@/lib/labels";
 
 const initialState: FormState = { message: "", success: false };
-const categoryLabels: Record<string, string> = {
-  games: "Games",
-  beleza: "Beleza",
-  tecnologia: "Tecnologia",
-  humor: "Humor",
-  lifestyle: "Lifestyle",
-  esportes: "Esportes",
-  alimentacao: "Alimentação",
-  moda: "Moda",
-  viagens: "Viagens",
-  educacao: "Educação",
-  musica: "Música",
-  outros: "Outros",
-};
-const platformLabels: Record<(typeof socialPlatforms)[number], string> = {
-  instagram: "Instagram",
-  tiktok: "TikTok",
-  youtube: "YouTube",
-  other: "Outra rede",
-};
-
 function ActionMessage({ state }: { state: FormState }) {
   if (!state.message) return null;
   return (
@@ -256,7 +236,7 @@ export function CreatorProfileForm({
       </fieldset>
       <div className="autosave-row">
         <button className="button button-dark" type="submit" disabled={pending}>
-          {pending ? "Salvando..." : "Salvar"}
+          {pending ? "Salvando…" : "Salvar"}
         </button>
         <p
           className={`autosave-status autosave-${saveStatus}`}
@@ -267,7 +247,7 @@ export function CreatorProfileForm({
             : saveStatus === "error"
               ? state.message || "Não foi possível salvar. Tente de novo."
               : saveStatus === "saved"
-                ? "Salvo ✓"
+                ? "Salvo"
                 : ""}
         </p>
       </div>
@@ -322,7 +302,7 @@ export function SocialAccountForm({
         </label>
       </div>
       <label className="field">
-        <span>URL pública do perfil</span>
+        <span>Link do perfil</span>
         <input
           name="profileUrl"
           type="url"
@@ -349,7 +329,7 @@ export function SocialAccountForm({
       <ActionMessage state={state} />
       <button className="button button-dark" type="submit" disabled={pending}>
         {pending
-          ? "Salvando..."
+          ? "Salvando…"
           : initialAccount
             ? "Salvar alterações"
             : "Adicionar rede"}
@@ -367,8 +347,7 @@ export function SubmitApplicationButton() {
     <form action={action} className="submit-application">
       <ActionMessage state={state} />
       <button className="button button-dark" type="submit" disabled={pending}>
-        {pending ? "Enviando..." : "Enviar para análise manual"}
-        <span aria-hidden="true">↗</span>
+        {pending ? "Enviando…" : "Enviar para análise"}
       </button>
     </form>
   );

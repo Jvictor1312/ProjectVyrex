@@ -1,85 +1,95 @@
+/* Visão geral do criador. Escala da plataforma: título 30px (serifado, marca
+   da Vyrex), seções 16px, texto 14–15px, apoio 13px; botões de 40px e cantos
+   de 12px. */
 .page {
-  width: min(100% - 40px, 820px);
-  margin: 48px auto 72px;
+  width: min(100% - 40px, 880px);
+  margin: 36px auto 64px;
 }
 
 .greeting {
-  margin: 0 0 28px;
+  margin: 0 0 20px;
   font-family: Georgia, "Times New Roman", serif;
-  font-size: clamp(36px, 6vw, 52px);
+  font-size: clamp(26px, 4vw, 32px);
   font-weight: 400;
-  line-height: 1.05;
+  line-height: 1.15;
 }
 
 /* O cartão preto é o único destaque da tela: o próximo passo do criador. */
 .card {
   display: grid;
   justify-items: start;
-  gap: 14px;
-  padding: clamp(24px, 4vw, 40px);
-  border-radius: 20px;
+  gap: 12px;
+  padding: 24px;
+  border-radius: 12px;
   background: var(--ink);
   color: #f6f7f5;
 }
 
 .card h2 {
-  margin: 4px 0 0;
+  margin: 2px 0 0;
   font-family: Georgia, "Times New Roman", serif;
-  font-size: clamp(26px, 4vw, 34px);
+  font-size: 22px;
   font-weight: 400;
-  line-height: 1.15;
+  line-height: 1.25;
 }
 
+/* Situação: ponto colorido + texto (a cor nunca aparece sozinha). */
 .badge {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 6px 12px;
+  gap: 6px;
+  padding: 2px 10px;
   border: 1px solid #ffffff40;
   border-radius: 999px;
+  color: #f6f7f5;
   font-size: 13px;
-  font-weight: 700;
+  font-weight: 600;
+  line-height: 22px;
 }
 
 .badge::before {
-  width: 8px;
-  height: 8px;
+  width: 7px;
+  height: 7px;
   border-radius: 50%;
-  background: currentColor;
+  background: var(--tone, #c9cecb);
   content: "";
 }
 
 .neutral {
-  color: #f6f7f5;
+  --tone: #c9cecb;
 }
-
-.good {
-  color: #9fd8b0;
+.info {
+  --tone: #9dbaf5;
 }
-
-.alert {
-  color: #f2b2a5;
+.success {
+  --tone: #8fd4a6;
+}
+.warning {
+  --tone: #f0c674;
+}
+.danger {
+  --tone: #f29a8c;
 }
 
 .cardText {
   margin: 0;
   color: #c9cecb;
-  font-size: 16px;
+  font-size: 15px;
   line-height: 1.5;
 }
 
 .reason {
   margin: 0;
-  padding-left: 14px;
+  padding-left: 12px;
   border-left: 2px solid #ffffff55;
   color: #e4e7e5;
-  font-size: 15px;
+  font-size: 14px;
   line-height: 1.5;
 }
 
 .issues {
   display: grid;
-  gap: 8px;
+  gap: 6px;
   width: 100%;
   margin: 0;
   padding: 0;
@@ -89,23 +99,23 @@
 .issues li {
   display: grid;
   gap: 2px;
-  padding: 12px 14px;
-  border-radius: 12px;
+  padding: 10px 12px;
+  border-radius: 8px;
   background: #ffffff12;
   color: #e4e7e5;
-  font-size: 15px;
+  font-size: 14px;
 }
 
 .issues strong {
-  color: #f2b2a5;
-  font-size: 14px;
+  color: #f0c674;
+  font-size: 13px;
 }
 
 .steps {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
-  margin: 8px 0 4px;
+  gap: 8px;
+  margin: 4px 0 0;
   padding: 0;
   list-style: none;
 }
@@ -114,22 +124,22 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 8px 14px 8px 8px;
+  padding: 4px 12px 4px 4px;
   border: 1px solid #ffffff30;
   border-radius: 999px;
   color: #aeb5b0;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 600;
 }
 
 .stepMark {
   display: grid;
   place-items: center;
-  width: 22px;
-  height: 22px;
+  width: 20px;
+  height: 20px;
   border: 1px solid #ffffff55;
   border-radius: 50%;
-  font-size: 12px;
+  font-size: 11px;
 }
 
 .steps li.done {
@@ -145,17 +155,17 @@
 .cta {
   display: inline-flex;
   align-items: center;
-  min-height: 52px;
-  margin-top: 6px;
-  padding: 0 28px;
-  border-radius: 999px;
+  min-height: 40px;
+  margin-top: 4px;
+  padding: 0 18px;
+  border-radius: 8px;
   background: #f6f7f5;
   color: var(--ink);
-  font-size: 16px;
-  font-weight: 700;
+  font-size: 14px;
+  font-weight: 650;
   transition:
-    background-color 160ms ease,
-    transform 120ms ease;
+    background-color 140ms ease,
+    transform 100ms ease;
 }
 
 .cta:hover {
@@ -163,26 +173,27 @@
 }
 
 .cta:active {
-  transform: scale(0.97);
+  transform: scale(0.98);
 }
 
 .cta:focus-visible {
-  outline: 3px solid #fff;
+  outline: 2px solid #fff;
   outline-offset: 3px;
 }
 
 .feed {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 20px;
-  margin-top: 20px;
+  gap: 16px;
+  margin-top: 16px;
 }
 
-.feedSection {
+.feedSection,
+.history {
   min-width: 0;
-  padding: 22px 24px;
+  padding: 18px 20px;
   border: 1px solid var(--line);
-  border-radius: 20px;
+  border-radius: 12px;
   background: #fff;
 }
 
@@ -191,22 +202,27 @@
   align-items: baseline;
   justify-content: space-between;
   gap: 12px;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
 }
 
 .feedHeading h2,
 .history h2 {
   margin: 0;
-  font-size: 18px;
-  font-weight: 700;
+  font-size: 16px;
+  font-weight: 650;
 }
 
 .feedHeading a {
   color: var(--ink);
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 600;
   text-decoration: underline;
   text-underline-offset: 3px;
+}
+
+.feedHeading a:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
 }
 
 .feedSection ul,
@@ -218,8 +234,8 @@
 
 .feedSection li {
   display: grid;
-  gap: 4px;
-  padding: 12px 0;
+  gap: 2px;
+  padding: 10px 0;
   border-top: 1px solid #ecedeb;
 }
 
@@ -228,7 +244,7 @@
 }
 
 .feedSection li strong {
-  font-size: 15px;
+  font-size: 14px;
 }
 
 .feedSection li p {
@@ -236,7 +252,7 @@
   margin: 0;
   overflow: hidden;
   color: #3d423f;
-  font-size: 15px;
+  font-size: 14px;
   line-height: 1.45;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
@@ -244,34 +260,31 @@
 
 .feedSection time,
 .history time {
-  color: var(--muted);
+  color: #5f6461;
   font-size: 13px;
 }
 
 .empty {
-  margin: 8px 0 0;
-  color: var(--muted);
-  font-size: 15px;
+  margin: 6px 0 0;
+  color: #5f6461;
+  font-size: 14px;
+  line-height: 1.5;
 }
 
 .history {
-  margin-top: 20px;
-  padding: 22px 24px;
-  border: 1px solid var(--line);
-  border-radius: 20px;
-  background: #fff;
+  margin-top: 16px;
 }
 
 .history h2 {
-  margin-bottom: 8px;
+  margin-bottom: 6px;
 }
 
 .history li {
   display: grid;
-  grid-template-columns: 70px 1fr;
+  grid-template-columns: minmax(56px, auto) 1fr;
   gap: 12px;
-  padding: 10px 0;
-  font-size: 15px;
+  padding: 8px 0;
+  font-size: 14px;
 }
 
 .history li span {
@@ -282,7 +295,7 @@
 
 .history small {
   color: #3d423f;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 400;
 }
 
@@ -297,7 +310,12 @@
 
 @media (max-width: 680px) {
   .page {
-    margin-top: 28px;
+    width: min(100% - 32px, 880px);
+    margin-top: 24px;
+  }
+
+  .card {
+    padding: 20px;
   }
 
   .feed {

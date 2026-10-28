@@ -29,7 +29,7 @@
   overflow: hidden;
   padding: 0;
   border: 1.5px dashed #b9bcb9;
-  border-radius: 16px;
+  border-radius: 12px;
   background: #fff;
   color: var(--ink);
   font: inherit;
@@ -158,9 +158,9 @@ button.tile:disabled {
 .details {
   display: grid;
   gap: 16px;
-  padding: 22px;
+  padding: 18px 20px;
   border: 1px solid var(--line);
-  border-radius: 20px;
+  border-radius: 12px;
   background: #fff;
 }
 
@@ -183,10 +183,10 @@ button.tile:disabled {
 
 .addMany {
   justify-self: start;
-  min-height: 44px;
-  padding: 0 20px;
+  min-height: 40px;
+  padding: 0 16px;
   border: 1px solid var(--ink);
-  border-radius: 999px;
+  border-radius: 8px;
   background: transparent;
   color: var(--ink);
   font: inherit;
@@ -268,11 +268,11 @@ button.tile:disabled {
 }
 
 .remove {
-  min-height: 44px;
-  margin-bottom: 6px;
-  padding: 0 14px;
+  min-height: 36px;
+  margin-bottom: 8px;
+  padding: 0 12px;
   border: 0;
-  border-radius: 999px;
+  border-radius: 8px;
   background: transparent;
   color: var(--muted);
   font: inherit;
@@ -301,9 +301,9 @@ button.tile:disabled {
 
 .save,
 .cancel {
-  min-height: 48px;
-  padding: 0 24px;
-  border-radius: 999px;
+  min-height: 40px;
+  padding: 0 18px;
+  border-radius: 8px;
   font: inherit;
   font-size: 15px;
   font-weight: 700;
@@ -369,7 +369,7 @@ button.tile:disabled {
   }
 }
 
-@media (max-width: 420px) {
+@media (max-width: 520px) {
   .grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -392,4 +392,13 @@ button.tile:disabled {
   overflow: hidden;
   clip: rect(0 0 0 0);
   white-space: nowrap;
+}
+
+/* Foco visível em todos os controles do quadro (navegação por teclado). */
+.addMany:focus-visible,
+.save:focus-visible,
+.cancel:focus-visible,
+.remove:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
 }

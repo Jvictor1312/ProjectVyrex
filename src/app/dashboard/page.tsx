@@ -1,4 +1,5 @@
 import { requireUserFast } from "@/lib/auth";
+import { defaultRequiredEvidence } from "@/lib/labels";
 import { CreatorShell } from "./creator-shell";
 import { CreatorOverview, nextStepFor } from "./creator-overview";
 
@@ -65,7 +66,8 @@ export default async function CreatorDashboardPage() {
   const creatorProfile = profileResult.data;
   const accountCount = accountsResult.count ?? 0;
   const evidence = evidenceResult.data ?? [];
-  const requiredEvidence = settingsResult.data?.required_story_evidence ?? 5;
+  const requiredEvidence =
+    settingsResult.data?.required_story_evidence ?? defaultRequiredEvidence;
   const evidenceIssues = evidence.filter(
     (item) =>
       item.review_status === "rejected" ||

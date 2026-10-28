@@ -8,15 +8,21 @@ import {
 } from "@/app/components/creator-forms";
 import { EvidenceBoard } from "@/app/components/evidence-board";
 import { requireUserFast } from "@/lib/auth";
+import {
+  creatorStatusLabel,
+  defaultRequiredEvidence,
+  evidenceStatusLabels,
+  platformLabels,
+} from "@/lib/labels";
 import { CreatorShell } from "../creator-shell";
 
 export const metadata: Metadata = { title: "Completar perfil" };
 
+// Para o criador, "pendente" significa que a evidência foi enviada e espera
+// a conferência da equipe.
 const evidenceStatus: Record<string, string> = {
+  ...evidenceStatusLabels,
   pending: "Enviada",
-  approved: "Validada",
-  rejected: "Rejeitada",
-  changes_requested: "Correção solicitada",
 };
 
 export default async function CreatorProfilePage() {
@@ -81,7 +87,8 @@ export default async function CreatorProfilePage() {
     settingsResult.error;
   const minimumViews = settings?.minimum_story_views ?? 1000;
   const maxStoryAgeDays = settings ? settings.max_story_age_days : 7;
-  const requiredEvidence = settings?.required_story_evidence ?? 3;
+  const requiredEvidence =
+    settings?.required_story_evidence ?? defaultRequiredEvidence;
   const canEdit =
     Boolean(profile) &&
     ["incomplete", "changes_requested"].includes(profile?.status ?? "");
@@ -189,7 +196,7 @@ export default async function CreatorProfilePage() {
             ) : (
               <p className="field-hint">
                 Seu cadastro está em uma etapa que não permite edição. Consulte
-                o status e as mensagens da equipe no painel.
+                a situação e as mensagens da equipe na visão geral.
               </p>
             )}
           </section>
@@ -210,14 +217,8 @@ export default async function CreatorProfilePage() {
                   <article className="account-row" key={account.id}>
                     <div>
                       <strong>
-                        {account.platform === "instagram"
-                          ? "Instagram"
-                          : account.platform === "tiktok"
-                            ? "TikTok"
-                            : account.platform === "youtube"
-                              ? "YouTube"
-                              : "Outra rede"}{" "}
-                        · @{account.handle}
+                        {platformLabels[account.platform] ?? "Outra rede"} · @
+                        {account.handle}
                       </strong>
                       <span>
                         {account.followers_reported.toLocaleString("pt-BR")}{" "}
@@ -352,13 +353,11 @@ export default async function CreatorProfilePage() {
                 </dd>
               </div>
               <div>
-                <dt>Estado do cadastro</dt>
+                <dt>Situação do cadastro</dt>
                 <dd>
-                  {profile?.status === "changes_requested"
-                    ? "Correções solicitadas"
-                    : profile?.status === "incomplete"
-                      ? "Rascunho incompleto"
-                      : (profile?.status ?? "Indisponível")}
+                  {profile?.status
+                    ? creatorStatusLabel(profile.status)
+                    : "Indisponível no momento"}
                 </dd>
               </div>
             </dl>
@@ -372,7 +371,9 @@ export default async function CreatorProfilePage() {
                 </ul>
               </div>
             ) : (
-              <p className="field-hint">Tudo pronto para enviar.</p>
+              <p className="field-hint">
+                Nenhuma pendência: o cadastro pode ser enviado para análise.
+              </p>
             )}
           </section>
 

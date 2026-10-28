@@ -1,22 +1,10 @@
 import Link from "next/link";
+import {
+  creatorStatusLabel,
+  creatorStatusTone,
+  evidenceStatusLabels,
+} from "@/lib/labels";
 import styles from "./creator-overview.module.css";
-
-const statusLabels: Record<string, string> = {
-  incomplete: "Cadastro incompleto",
-  submitted: "Aguardando análise",
-  under_review: "Em análise",
-  changes_requested: "Correção solicitada",
-  approved: "Aprovado",
-  rejected: "Rejeitado",
-  suspended: "Suspenso",
-};
-
-const statusTones: Record<string, "good" | "alert" | "neutral"> = {
-  approved: "good",
-  changes_requested: "alert",
-  rejected: "alert",
-  suspended: "alert",
-};
 
 const historyLabels: Record<string, string> = {
   submitted: "Cadastro enviado",
@@ -94,7 +82,7 @@ export function nextStepFor(
       }
       return {
         title: "Envie para análise",
-        text: "Tudo pronto.",
+        text: "Perfil, rede social e evidências estão completos. Revise e envie.",
         href: "/dashboard/perfil#envio",
         cta: "Revisar e enviar",
       };
@@ -147,7 +135,7 @@ export function CreatorOverview({
   history,
   hasLoadError,
 }: CreatorOverviewProps) {
-  const tone = statusTones[status] ?? "neutral";
+  const tone = creatorStatusTone(status);
   const showSteps = status === "incomplete" || status === "changes_requested";
 
   return (
@@ -162,7 +150,7 @@ export function CreatorOverview({
 
       <section className={styles.card} aria-labelledby="next-step-title">
         <span className={`${styles.badge} ${styles[tone]}`}>
-          {statusLabels[status] ?? "Em atualização"}
+          {creatorStatusLabel(status)}
         </span>
         <h2 id="next-step-title">{nextStep.title}</h2>
         {nextStep.text && <p className={styles.cardText}>{nextStep.text}</p>}
@@ -174,9 +162,8 @@ export function CreatorOverview({
               <li key={item.position}>
                 <strong>Story {item.position}</strong>
                 {item.review_reason ??
-                  (item.review_status === "rejected"
-                    ? "Rejeitada"
-                    : "Correção solicitada")}
+                  evidenceStatusLabels[item.review_status] ??
+                  "Correção solicitada"}
               </li>
             ))}
           </ul>
@@ -187,7 +174,18 @@ export function CreatorOverview({
             {steps.map((step) => (
               <li key={step.label} className={step.done ? styles.done : ""}>
                 <span className={styles.stepMark} aria-hidden="true">
-                  {step.done ? "✓" : ""}
+                  {step.done && (
+                    <svg viewBox="0 0 12 12" width="11" height="11">
+                      <path
+                        d="M2.5 6.2 5 8.5l4.5-5"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="1.8"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  )}
                 </span>
                 {step.label}
                 <span className={styles.srOnly}>
@@ -207,7 +205,7 @@ export function CreatorOverview({
         <FeedSection
           title="Mensagens"
           href="/dashboard/mensagens"
-          empty="Nenhuma mensagem ainda."
+          empty="A equipe ainda não enviou mensagens. Quando enviar, elas aparecem aqui."
           items={messages.map((message) => ({
             id: message.id,
             body: message.body,
@@ -217,7 +215,7 @@ export function CreatorOverview({
         <FeedSection
           title="Notificações"
           href="/dashboard/mensagens#avisos"
-          empty="Nada novo por aqui."
+          empty="Nenhum aviso no momento. Mudanças no seu cadastro aparecem aqui."
           items={notifications.map((notification) => ({
             id: notification.id,
             title: notification.title,

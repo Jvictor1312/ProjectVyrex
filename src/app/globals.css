@@ -1479,12 +1479,15 @@ button.signup-showcase-toggle:focus-visible {
   line-height: 1.5;
 }
 .account-row > div {
+  display: grid;
+  gap: 5px;
+}
+/* No celular, a revisão do cadastro fica em uma coluna. (Esta regra estava
+   aninhada por engano dentro de .account-row e nunca era aplicada.) */
+@media (max-width: 760px) {
   .application-review {
     grid-template-columns: 1fr;
   }
-
-  display: grid;
-  gap: 5px;
 }
 .account-row > div span {
   color: var(--muted);
@@ -2033,4 +2036,98 @@ button.signup-showcase-toggle:focus-visible {
 }
 .autosave-error {
   color: #a64337;
+}
+
+/* ==========================================================================
+   Área do criador (/dashboard): mesma escala da área interna.
+   Vale só dentro de .dashboard-page, para não alterar login e cadastro.
+   Título 30px (serifado, marca da Vyrex) · seções 20px · texto 14–15px ·
+   apoio 13px · campos e botões de 40px · cantos de 8px (12px em painéis).
+   ========================================================================== */
+.dashboard-page .dashboard-content,
+.dashboard-page .profile-content {
+  width: min(100% - 40px, 880px);
+  margin: 36px auto 64px;
+}
+.dashboard-page .dashboard-content > h1,
+.dashboard-page .profile-content > h1 {
+  font-size: clamp(26px, 4vw, 32px);
+  line-height: 1.15;
+}
+.dashboard-page .profile-lede {
+  font-size: 15px;
+}
+.dashboard-page .profile-section {
+  padding: 24px 0 28px;
+}
+.dashboard-page .section-heading {
+  gap: 14px;
+  margin-bottom: 16px;
+}
+.dashboard-page .section-heading h2 {
+  font-size: 20px;
+  line-height: 1.25;
+}
+.dashboard-page .principle-number {
+  font-size: 13px;
+}
+.dashboard-page .button {
+  min-height: 40px;
+  gap: 10px;
+  padding: 0 18px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 650;
+}
+.dashboard-page .button:hover {
+  transform: none;
+}
+.dashboard-page .field input,
+.dashboard-page .editor-form input:not([type="checkbox"]),
+.dashboard-page .editor-form select,
+.dashboard-page .editor-form textarea {
+  min-height: 40px;
+  border-radius: 8px;
+  font-size: 14px;
+}
+/* Foco bem visível em todos os campos e controles da área do criador. */
+.dashboard-page .field input:focus-visible,
+.dashboard-page .editor-form input:focus-visible,
+.dashboard-page .editor-form select:focus-visible,
+.dashboard-page .editor-form textarea:focus-visible,
+.dashboard-page .category-option:has(input:focus-visible),
+.dashboard-page summary:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+.dashboard-page .wizard-step-group {
+  min-height: 44px;
+}
+.dashboard-page .wizard-step {
+  min-height: 42px;
+}
+.dashboard-page .wizard-step-number {
+  flex-basis: 24px;
+  width: 24px;
+  height: 24px;
+}
+.dashboard-page .category-option {
+  min-height: 34px;
+  border-radius: 8px;
+}
+.dashboard-page .form-message,
+.dashboard-page .setup-warning,
+.dashboard-page .decision-reason {
+  border-radius: 8px;
+}
+@media (max-width: 760px) {
+  .dashboard-page .dashboard-content > h1,
+  .dashboard-page .profile-content > h1 {
+    font-size: 26px;
+  }
+  .dashboard-page .dashboard-content,
+  .dashboard-page .profile-content {
+    width: min(100% - 32px, 880px);
+    margin-top: 24px;
+  }
 }

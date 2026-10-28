@@ -26,7 +26,7 @@ export default function CreatorDashboardPreview() {
         steps={[
           { label: "Perfil", done: true },
           { label: "Rede social", done: true },
-          { label: "Evidências 4/5", done: false },
+          { label: "Evidências 2/3", done: false },
         ]}
         evidenceIssues={[
           {

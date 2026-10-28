@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useEffect, useRef, useState, useTransition } from "react";
 import { uploadStoryEvidenceAction } from "@/app/actions/creator";
+import { platformLabels } from "@/lib/labels";
 import type { FormState } from "@/lib/validation/auth";
 import styles from "./evidence-board.module.css";
 
@@ -10,13 +11,6 @@ const initialState: FormState = { message: "", success: false };
 // Mesmo limite do servidor (src/lib/evidence/normalize.ts).
 const maximumBytes = 8 * 1024 * 1024;
 const acceptedTypes = ["image/jpeg", "image/png", "image/webp"];
-
-const platformLabels: Record<string, string> = {
-  instagram: "Instagram",
-  tiktok: "TikTok",
-  youtube: "YouTube",
-  other: "Outra rede",
-};
 
 export type EvidenceSlot = {
   position: number;
@@ -262,7 +256,7 @@ export function EvidenceBoard({
                 {draft
                   ? pending
                     ? "Enviando…"
-                    : "Não salva"
+                    : "Falta salvar"
                   : slot.uploaded
                     ? slot.statusLabel
                     : canEdit
