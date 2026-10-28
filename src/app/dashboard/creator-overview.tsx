@@ -28,6 +28,32 @@ const historyLabels: Record<string, string> = {
 
 type NextStep = { title: string; text?: string; href: string; cta: string };
 
+// Caminho completo do criador na Vyrex, para ele saber onde está e o que vem
+// depois.
+const journey = [
+  { title: "Preencha o cadastro", text: "Perfil, rede social e os prints dos Stories." },
+  { title: "Envie para análise", text: "Revise e envie. Dá para desfazer o envio enquanto a análise não começa." },
+  { title: "A equipe analisa", text: "Pessoas da equipe conferem sua rede e as visualizações dos Stories." },
+  { title: "Resultado", text: "Aprovação, pedido de correção ou resposta da equipe, sempre avisados aqui." },
+  { title: "Campanhas", text: "Perfis aprovados entram na rede que as marcas consultam." },
+];
+
+function journeyStage(status: string) {
+  switch (status) {
+    case "submitted":
+      return 1;
+    case "under_review":
+      return 2;
+    case "approved":
+      return 4;
+    case "rejected":
+    case "suspended":
+      return 3;
+    default:
+      return 0; // incompleto ou com correção pedida: o criador está preenchendo
+  }
+}
+
 export function nextStepFor(
   status: string,
   hasPublicName: boolean,
@@ -160,6 +186,10 @@ export function CreatorOverview({
         </p>
       )}
 
+      {/* No computador: próximo passo, jornada e histórico à esquerda;
+          mensagens e avisos à direita. No celular, uma coluna só. */}
+      <div className={styles.layout}>
+      <div className={styles.mainColumn}>
       <section className={styles.card} aria-labelledby="next-step-title">
         <span className={`${styles.badge} ${styles[tone]}`}>
           {creatorStatusLabel(status)}
@@ -215,7 +245,63 @@ export function CreatorOverview({
         {status === "submitted" && <WithdrawApplicationButton dark />}
       </section>
 
-      <div className={styles.feed}>
+      <section className={styles.journey} aria-labelledby="journey-title">
+        <h2 id="journey-title">Sua jornada na Vyrex</h2>
+        <ol>
+          {journey.map((stage, index) => {
+            const current = journeyStage(status);
+            const state =
+              index < current ? "past" : index === current ? "current" : "next";
+            return (
+              <li
+                key={stage.title}
+                className={styles[state]}
+                aria-current={state === "current" ? "step" : undefined}
+              >
+                <span className={styles.journeyMark} aria-hidden="true">
+                  {index + 1}
+                </span>
+                <span>
+                  <strong>
+                    {stage.title}
+                    {state === "current" && (
+                      <em className={styles.youAreHere}>Você está aqui</em>
+                    )}
+                  </strong>
+                  <small>{stage.text}</small>
+                </span>
+              </li>
+            );
+          })}
+        </ol>
+      </section>
+
+      <section className={styles.history} aria-labelledby="history-title">
+        <h2 id="history-title">Histórico</h2>
+        {history.length === 0 ? (
+          <p className={styles.empty}>
+            Cada etapa do seu cadastro (envio, análise, decisões) fica
+            registrada aqui.
+          </p>
+        ) : (
+          <ol>
+            {history.map((entry) => (
+              <li key={entry.id}>
+                <time dateTime={entry.created_at}>
+                  {shortDate(entry.created_at)}
+                </time>
+                <span>
+                  {historyLabels[entry.action] ?? "Atualização do cadastro"}
+                  {entry.reason && <small>{entry.reason}</small>}
+                </span>
+              </li>
+            ))}
+          </ol>
+        )}
+      </section>
+      </div>
+
+      <aside className={styles.feed} aria-label="Mensagens e avisos">
         <FeedSection
           title="Mensagens"
           href="/dashboard/mensagens"
@@ -237,26 +323,8 @@ export function CreatorOverview({
             date: notification.created_at,
           }))}
         />
+      </aside>
       </div>
-
-      {history.length > 0 && (
-        <section className={styles.history} aria-labelledby="history-title">
-          <h2 id="history-title">Histórico</h2>
-          <ol>
-            {history.map((entry) => (
-              <li key={entry.id}>
-                <time dateTime={entry.created_at}>
-                  {shortDate(entry.created_at)}
-                </time>
-                <span>
-                  {historyLabels[entry.action] ?? "Atualização do cadastro"}
-                  {entry.reason && <small>{entry.reason}</small>}
-                </span>
-              </li>
-            ))}
-          </ol>
-        </section>
-      )}
     </section>
   );
 }
