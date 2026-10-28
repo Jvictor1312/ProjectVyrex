@@ -435,7 +435,7 @@ test("upload quota blocks the eleventh direct Storage upload", async () => {
 
 test("assigned relationship manager can request corrections with an audit trail", async () => {
   await database.query(
-    "update public.creator_profiles set status = 'submitted' where user_id = $1",
+    "update public.creator_profiles set public_name = 'Creator One', status = 'submitted' where user_id = $1",
     [creatorOne],
   );
   await asUser(relationshipManager, () =>
