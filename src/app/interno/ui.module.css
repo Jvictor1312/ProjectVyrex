@@ -73,6 +73,7 @@
 
 /* Faixa de indicadores: números compactos, lado a lado */
 .stats {
+  margin: 0 0 16px;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   overflow: hidden;

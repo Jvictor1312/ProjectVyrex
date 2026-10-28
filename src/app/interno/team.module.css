@@ -389,6 +389,38 @@
   color: var(--text);
 }
 
+/* Pedidos de privacidade em aberto */
+.requestList {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.requestList > li {
+  display: grid;
+  gap: 8px;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--line);
+}
+
+.requestList > li:last-child {
+  border-bottom: 0;
+}
+
+.requestHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.requestText {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
 /* Histórico administrativo */
 .auditTable td:first-child {
   font-weight: 600;

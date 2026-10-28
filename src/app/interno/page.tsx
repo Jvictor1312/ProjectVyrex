@@ -1,38 +1,20 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { redirect } from "next/navigation";
 import { InternalShell } from "./internal-shell";
+import { CreatorQueue } from "./creator-queue";
 import { requireUserWithRoles } from "@/lib/auth";
+import {
+  creatorStatusKeys,
+  isInternalRole,
+  platformLabels,
+  roleLabels,
+  type CreatorStatus,
+  type InternalRole,
+} from "@/lib/labels";
 import styles from "./internal.module.css";
+import { PageHeader, Stats } from "./ui";
 
-export const metadata: Metadata = { title: "Painel interno" };
-
-const statusOptions = [
-  "incomplete",
-  "submitted",
-  "under_review",
-  "changes_requested",
-  "approved",
-  "rejected",
-  "suspended",
-] as const;
-
-const statusLabels: Record<(typeof statusOptions)[number], string> = {
-  incomplete: "Incompleto",
-  submitted: "Aguardando análise",
-  under_review: "Em análise",
-  changes_requested: "Correção solicitada",
-  approved: "Aprovado",
-  rejected: "Rejeitado",
-  suspended: "Suspenso",
-};
-
-const platformLabels: Record<string, string> = {
-  instagram: "Instagram",
-  tiktok: "TikTok",
-  youtube: "YouTube",
-  other: "Outra rede",
-};
+export const metadata: Metadata = { title: "Visão geral da operação" };
 
 function accountName(
   person: { full_name: string | null } | { full_name: string | null }[] | null,
@@ -40,13 +22,6 @@ function accountName(
   const value = Array.isArray(person) ? person[0] : person;
   return value?.full_name ?? null;
 }
-
-const roleLabels: Record<string, string> = {
-  admin: "Administrador",
-  recruiter: "Recrutador",
-  relationship_manager: "Relacionamento",
-  validator: "Validação",
-};
 
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;
 
@@ -58,6 +33,34 @@ function formatCount(count: number | null) {
   return count === null ? "—" : count.toLocaleString("pt-BR");
 }
 
+// Título e descrição de cada perfil: cada um vê a tela pelo próprio trabalho.
+const headings: Record<InternalRole, { title: string; description: string; list: string }> = {
+  admin: {
+    title: "Visão geral da operação",
+    description:
+      "Situação dos cadastros de criadores, distribuição entre responsáveis e redes declaradas.",
+    list: "Cadastros de criadores",
+  },
+  validator: {
+    title: "Fila de validação",
+    description:
+      "Cadastros encaminhados para conferência de redes e evidências, dos mais antigos para os mais recentes.",
+    list: "Cadastros para validar",
+  },
+  recruiter: {
+    title: "Triagem de criadores",
+    description:
+      "Cadastros da sua carteira. Confira os dados e encaminhe para validação os que estiverem completos.",
+    list: "Sua carteira",
+  },
+  relationship_manager: {
+    title: "Criadores acompanhados",
+    description:
+      "Criadores sob a sua responsabilidade: contatos, mensagens e pendências de cada cadastro.",
+    list: "Seus criadores",
+  },
+};
+
 export default async function InternalDashboard({
   searchParams,
 }: {
@@ -67,10 +70,8 @@ export default async function InternalDashboard({
   const params = await searchParams;
   const search = stringParam(params.q)?.trim().slice(0, 80) ?? "";
   const rawStatus = stringParam(params.status) ?? "all";
-  const selectedStatus = statusOptions.includes(
-    rawStatus as (typeof statusOptions)[number],
-  )
-    ? (rawStatus as (typeof statusOptions)[number])
+  const selectedStatus = creatorStatusKeys.includes(rawStatus as CreatorStatus)
+    ? (rawStatus as CreatorStatus)
     : "all";
   const rawPage = Number(stringParam(params.page) ?? "1");
   const page =
@@ -78,10 +79,10 @@ export default async function InternalDashboard({
   const pageSize = 25;
 
   if (rolesError) redirect("/dashboard");
-  const roles = roleKeys.filter((role) => role in roleLabels);
+  const roles = roleKeys.filter(isInternalRole);
   if (roles.length === 0) redirect("/acesso-negado");
 
-  const primaryRole = roles.includes("admin")
+  const primaryRole: InternalRole = roles.includes("admin")
     ? "admin"
     : roles.includes("validator")
       ? "validator"
@@ -89,85 +90,58 @@ export default async function InternalDashboard({
         ? "relationship_manager"
         : "recruiter";
 
+  // O analista só trabalha com cadastros em validação.
+  const validationStates: CreatorStatus[] = ["submitted", "under_review", "changes_requested"];
+  const statusOptions =
+    primaryRole === "validator" ? validationStates : [...creatorStatusKeys];
   const statuses =
-    selectedStatus === "all" ? [...statusOptions] : [selectedStatus];
-  let creatorsQuery = supabase
+    selectedStatus === "all"
+      ? statusOptions
+      : statusOptions.includes(selectedStatus)
+        ? [selectedStatus]
+        : [];
+
+  const creatorsQuery = supabase
     .from("creator_profiles")
     .select(
       "user_id, public_name, status, submitted_at, updated_at, account:profiles!creator_profiles_user_id_fkey(full_name)",
-      {
-        count: "exact",
-      },
+      { count: "exact" },
     )
     .in("status", statuses)
     .ilike("public_name", search ? `%${search}%` : "%")
-    .order("updated_at", { ascending: false })
+    .order(primaryRole === "validator" ? "submitted_at" : "updated_at", {
+      ascending: primaryRole === "validator",
+    })
     .range((page - 1) * pageSize, page * pageSize - 1);
 
-  if (primaryRole === "validator") {
-    const validationStates = ["submitted", "under_review", "changes_requested"];
-    const allowedStates =
-      selectedStatus === "all"
-        ? validationStates
-        : validationStates.includes(selectedStatus)
-          ? [selectedStatus]
-          : [];
-    creatorsQuery = supabase
+  const countByStatus = (status?: CreatorStatus) => {
+    const query = supabase
       .from("creator_profiles")
-      .select(
-        "user_id, public_name, status, submitted_at, updated_at, account:profiles!creator_profiles_user_id_fkey(full_name)",
-        {
-          count: "exact",
-        },
-      )
-      .in("status", allowedStates)
-      .ilike("public_name", search ? `%${search}%` : "%")
-      .order("submitted_at", { ascending: true })
-      .range((page - 1) * pageSize, page * pageSize - 1);
-  }
+      .select("user_id", { count: "exact", head: true });
+    return status ? query.eq("status", status) : query;
+  };
+  const adminOnly = <T, F>(promise: PromiseLike<T>, fallback: F): PromiseLike<T | F> =>
+    primaryRole === "admin" ? promise : Promise.resolve(fallback);
+  const noCount = { count: null, error: null } as const;
 
   const [
     creatorResult,
     totalResult,
     submittedResult,
+    reviewResult,
     correctionsResult,
     approvedResult,
-    rejectedResult,
     recruiterAssignmentsResult,
     managerAssignmentsResult,
     socialAccountsResult,
     decisionTimesResult,
   ] = await Promise.all([
     creatorsQuery,
-    primaryRole === "admin"
-      ? supabase
-          .from("creator_profiles")
-          .select("user_id", { count: "exact", head: true })
-      : Promise.resolve({ count: null, error: null }),
-    primaryRole === "admin"
-      ? supabase
-          .from("creator_profiles")
-          .select("user_id", { count: "exact", head: true })
-          .eq("status", "submitted")
-      : Promise.resolve({ count: null, error: null }),
-    primaryRole === "admin"
-      ? supabase
-          .from("creator_profiles")
-          .select("user_id", { count: "exact", head: true })
-          .eq("status", "changes_requested")
-      : Promise.resolve({ count: null, error: null }),
-    primaryRole === "admin"
-      ? supabase
-          .from("creator_profiles")
-          .select("user_id", { count: "exact", head: true })
-          .eq("status", "approved")
-      : Promise.resolve({ count: null, error: null }),
-    primaryRole === "admin"
-      ? supabase
-          .from("creator_profiles")
-          .select("user_id", { count: "exact", head: true })
-          .eq("status", "rejected")
-      : Promise.resolve({ count: null, error: null }),
+    adminOnly(countByStatus(), noCount),
+    adminOnly(countByStatus("submitted"), noCount),
+    adminOnly(countByStatus("under_review"), noCount),
+    adminOnly(countByStatus("changes_requested"), noCount),
+    adminOnly(countByStatus("approved"), noCount),
     supabase
       .from("recruiter_assignments")
       .select(
@@ -181,139 +155,67 @@ export default async function InternalDashboard({
       )
       .is("ended_at", null),
     supabase.from("social_accounts").select("platform"),
-    primaryRole === "admin"
-      ? supabase
-          .from("creator_profiles")
-          .select("submitted_at, decided_at")
-          .not("submitted_at", "is", null)
-          .not("decided_at", "is", null)
-      : Promise.resolve({ data: null, error: null }),
+    adminOnly(
+      supabase
+        .from("creator_profiles")
+        .select("submitted_at, decided_at")
+        .not("submitted_at", "is", null)
+        .not("decided_at", "is", null),
+      { data: null, error: null },
+    ),
   ]);
 
-  const recruiterCounts = new Map<string, number>();
-  for (const assignment of recruiterAssignmentsResult.data ?? []) {
-    recruiterCounts.set(
-      assignment.recruiter_id,
-      (recruiterCounts.get(assignment.recruiter_id) ?? 0) + 1,
-    );
-  }
-  const managerCounts = new Map<string, number>();
-  for (const assignment of managerAssignmentsResult.data ?? []) {
-    managerCounts.set(
-      assignment.manager_id,
-      (managerCounts.get(assignment.manager_id) ?? 0) + 1,
-    );
-  }
-  const socialCounts = new Map<string, number>();
-  for (const account of socialAccountsResult.data ?? []) {
-    socialCounts.set(
-      account.platform,
-      (socialCounts.get(account.platform) ?? 0) + 1,
-    );
-  }
-  const averageAnalysisDays = (decisionTimesResult.data ?? [])
-    .filter((entry) => entry.submitted_at && entry.decided_at)
-    .map(
-      (entry) =>
-        (new Date(entry.decided_at!).getTime() -
-          new Date(entry.submitted_at!).getTime()) /
-        (1000 * 60 * 60 * 24),
-    );
-  const averageAnalysisLabel =
-    averageAnalysisDays.length >= 5
-      ? `${(averageAnalysisDays.reduce((total, days) => total + days, 0) / averageAnalysisDays.length).toFixed(1)} dias`
-      : "—";
+  const countBy = <T,>(items: T[], key: (item: T) => string) => {
+    const counts = new Map<string, number>();
+    for (const item of items) counts.set(key(item), (counts.get(key(item)) ?? 0) + 1);
+    return counts;
+  };
+  const recruiterCounts = countBy(recruiterAssignmentsResult.data ?? [], (a) => a.recruiter_id);
+  const managerCounts = countBy(managerAssignmentsResult.data ?? [], (a) => a.manager_id);
+  const socialCounts = countBy(socialAccountsResult.data ?? [], (a) => a.platform);
+
   const staffNames = new Map<string, string>();
   for (const row of [
-    ...(recruiterAssignmentsResult.data ?? []).map((item) => ({
-      id: item.recruiter_id,
-      person: item.person,
-    })),
-    ...(managerAssignmentsResult.data ?? []).map((item) => ({
-      id: item.manager_id,
-      person: item.person,
-    })),
+    ...(recruiterAssignmentsResult.data ?? []).map((item) => ({ id: item.recruiter_id, person: item.person })),
+    ...(managerAssignmentsResult.data ?? []).map((item) => ({ id: item.manager_id, person: item.person })),
   ]) {
     const name = accountName(row.person);
     if (name) staffNames.set(row.id, name);
   }
-  const recruiterReport = [...recruiterCounts].map(([staffId, count]) => ({
-    name: staffNames.get(staffId) ?? "Sem nome",
-    count,
-  }));
-  const managerReport = [...managerCounts].map(([staffId, count]) => ({
-    name: staffNames.get(staffId) ?? "Sem nome",
-    count,
-  }));
+  const toReport = (counts: Map<string, number>, label: (key: string) => string) =>
+    [...counts]
+      .map(([key, count]) => ({ name: label(key), count }))
+      .sort((a, b) => b.count - a.count);
+
+  const analysisDays = (decisionTimesResult.data ?? [])
+    .filter((entry) => entry.submitted_at && entry.decided_at)
+    .map(
+      (entry) =>
+        (new Date(entry.decided_at!).getTime() - new Date(entry.submitted_at!).getTime()) /
+        86_400_000,
+    );
+  // Média só com amostra mínima, para não exibir um número enganoso.
+  const averageAnalysis =
+    analysisDays.length >= 5
+      ? `${(analysisDays.reduce((total, days) => total + days, 0) / analysisDays.length).toLocaleString("pt-BR", { maximumFractionDigits: 1 })} dias`
+      : "—";
 
   const creators = creatorResult.data ?? [];
-  const totalPages = Math.max(
-    1,
-    Math.ceil((creatorResult.count ?? 0) / pageSize),
-  );
-  const pageLink = (targetPage: number) => {
-    const nextParams = new URLSearchParams();
-    if (search) nextParams.set("q", search);
-    if (selectedStatus !== "all") nextParams.set("status", selectedStatus);
-    nextParams.set("page", String(targetPage));
-    return `/interno?${nextParams.toString()}`;
+  const totalPages = Math.max(1, Math.ceil((creatorResult.count ?? 0) / pageSize));
+  const pageHref = (targetPage: number) => {
+    const next = new URLSearchParams();
+    if (search) next.set("q", search);
+    if (selectedStatus !== "all") next.set("status", selectedStatus);
+    next.set("page", String(targetPage));
+    return `/interno?${next.toString()}`;
   };
 
-  const summary =
-    primaryRole === "admin"
-      ? [
-          {
-            label: "Total de cadastros",
-            value: formatCount(totalResult.count),
-          },
-          {
-            label: "Aguardando análise",
-            value: formatCount(submittedResult.count),
-          },
-          { label: "Em correção", value: formatCount(correctionsResult.count) },
-          { label: "Aprovados", value: formatCount(approvedResult.count) },
-          { label: "Rejeitados", value: formatCount(rejectedResult.count) },
-          { label: "Tempo médio de análise", value: averageAnalysisLabel },
-        ]
-      : [
-          {
-            label:
-              primaryRole === "validator"
-                ? "Na fila de validação"
-                : "Cadastros acessíveis",
-            value: formatCount(creatorResult.count),
-          },
-        ];
-
-  const headings: Record<string, { title: string; description: string }> = {
-    admin: {
-      title: "Visão geral",
-      description: "Indicadores e cadastros da base Vyrex.",
-    },
-    validator: {
-      title: "Fila de validação",
-      description: "Cadastros encaminhados para análise manual.",
-    },
-    recruiter: {
-      title: "Triagem de criadores",
-      description: "Acompanhe os cadastros atribuídos à sua fila.",
-    },
-    relationship_manager: {
-      title: "Relacionamento",
-      description: "Acompanhe os criadores e pendências atribuídos a você.",
-    },
-  };
   const heading = headings[primaryRole];
   const hasQueryError =
     Boolean(creatorResult.error) ||
-    (primaryRole === "admin" &&
-      [
-        totalResult,
-        submittedResult,
-        correctionsResult,
-        approvedResult,
-        rejectedResult,
-      ].some((result) => result.error));
+    [totalResult, submittedResult, reviewResult, correctionsResult, approvedResult].some(
+      (result) => result.error,
+    );
 
   return (
     <InternalShell
@@ -323,171 +225,91 @@ export default async function InternalDashboard({
       email={user.email}
     >
       <section className={styles.main}>
-        <header className={styles.pageHeader}>
-          <div>
-            <p className={styles.eyebrow}>
-              {roleLabels[primaryRole].toUpperCase()}
-            </p>
-            <h1>{heading.title}</h1>
-            <p>{heading.description}</p>
-          </div>
-        </header>
-
-        <div className={styles.summary}>
-          {summary.map((metric) => (
-            <article className={styles.metric} key={metric.label}>
-              <span>{metric.label}</span>
-              <strong>{metric.value}</strong>
-            </article>
-          ))}
-        </div>
+        <PageHeader title={heading.title} description={heading.description} />
 
         {primaryRole === "admin" && (
-          <div className={styles.reports}>
-            <section className={styles.report}>
-              <h2>Por recrutador</h2>
-              {recruiterReport.length === 0 ? (
-                <p>Nenhuma atribuição ativa.</p>
-              ) : (
-                recruiterReport.map((item) => (
-                  <div className={styles.reportRow} key={item.name}>
-                    <span>{item.name}</span>
-                    <strong>{item.count}</strong>
-                  </div>
-                ))
-              )}
-            </section>
-            <section className={styles.report}>
-              <h2>Por relacionamento</h2>
-              {managerReport.length === 0 ? (
-                <p>Nenhuma atribuição ativa.</p>
-              ) : (
-                managerReport.map((item) => (
-                  <div className={styles.reportRow} key={item.name}>
-                    <span>{item.name}</span>
-                    <strong>{item.count}</strong>
-                  </div>
-                ))
-              )}
-            </section>
-            <section className={styles.report}>
-              <h2>Por rede social</h2>
-              {socialCounts.size === 0 ? (
-                <p>Nenhuma rede social cadastrada.</p>
-              ) : (
-                [...socialCounts].map(([platform, count]) => (
-                  <div className={styles.reportRow} key={platform}>
-                    <span>{platformLabels[platform] ?? platform}</span>
-                    <strong>{count}</strong>
-                  </div>
-                ))
-              )}
-            </section>
-          </div>
-        )}
-
-        <form className={styles.filters} method="get">
-          <label>
-            <span>Buscar criador</span>
-            <input
-              name="q"
-              maxLength={80}
-              defaultValue={search}
-              placeholder="Nome público"
+          <>
+            <Stats
+              label="Indicadores dos cadastros"
+              items={[
+                { label: "Cadastros no total", value: formatCount(totalResult.count) },
+                { label: "Aguardando análise", value: formatCount(submittedResult.count) },
+                { label: "Em análise", value: formatCount(reviewResult.count) },
+                { label: "Com correção pendente", value: formatCount(correctionsResult.count) },
+                { label: "Aprovados", value: formatCount(approvedResult.count) },
+                {
+                  label: "Tempo médio de análise",
+                  value: averageAnalysis,
+                  hint: analysisDays.length < 5 ? "(a partir de 5 decisões)" : undefined,
+                },
+              ]}
             />
-          </label>
-          <label>
-            <span>Status</span>
-            <select name="status" defaultValue={selectedStatus}>
-              <option value="all">Todos os status</option>
-              {statusOptions.map((status) => (
-                <option value={status} key={status}>
-                  {statusLabels[status]}
-                </option>
-              ))}
-            </select>
-          </label>
-          <button type="submit">Aplicar filtros</button>
-        </form>
-
-        {hasQueryError && (
-          <p className={styles.error} role="alert">
-            Não foi possível carregar os dados. Confirme se as migrations foram
-            aplicadas.
-          </p>
+            <div className={styles.reports}>
+              <Report
+                title="Carteira por recrutador"
+                empty="Nenhum criador atribuído a recrutadores."
+                rows={toReport(recruiterCounts, (id) => staffNames.get(id) ?? "Sem nome")}
+              />
+              <Report
+                title="Carteira por gestor de relacionamento"
+                empty="Nenhum criador atribuído a gestores."
+                rows={toReport(managerCounts, (id) => staffNames.get(id) ?? "Sem nome")}
+              />
+              <Report
+                title="Redes declaradas"
+                empty="Nenhuma rede social cadastrada ainda."
+                rows={toReport(socialCounts, (key) => platformLabels[key] ?? key)}
+              />
+            </div>
+          </>
         )}
 
-        <div className={styles.tableWrap}>
-          <table className={styles.table}>
-            <thead>
-              <tr>
-                <th>Criador</th>
-                <th>Status</th>
-                <th>Atualizado</th>
-                <th />
-              </tr>
-            </thead>
-            <tbody>
-              {creators.map((creator) => (
-                <tr key={creator.user_id}>
-                  <td>
-                    <strong>
-                      {creator.public_name ||
-                        accountName(creator.account) ||
-                        "Sem nome"}
-                    </strong>
-                  </td>
-                  <td>
-                    <span className={styles.status}>
-                      {statusLabels[
-                        creator.status as keyof typeof statusLabels
-                      ] ?? creator.status}
-                    </span>
-                  </td>
-                  <td>
-                    {new Date(creator.updated_at).toLocaleDateString("pt-BR")}
-                  </td>
-                  <td>
-                    <Link href={`/interno/${creator.user_id}`}>
-                      Abrir cadastro
-                    </Link>
-                  </td>
-                </tr>
-              ))}
-              {creators.length === 0 && !hasQueryError && (
-                <tr>
-                  <td colSpan={4} className={styles.empty}>
-                    Nenhum cadastro visível com esses filtros.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-
-        <footer className={styles.pagination}>
-          <span>{formatCount(creatorResult.count)} cadastro(s)</span>
-          {totalPages > 1 && (
-            <div>
-              <Link
-                aria-disabled={page <= 1}
-                href={pageLink(Math.max(1, page - 1))}
-              >
-                Anterior
-              </Link>
-              <span>
-                Página {page} de {totalPages}
-              </span>
-              <Link
-                aria-disabled={page >= totalPages}
-                href={pageLink(Math.min(totalPages, page + 1))}
-              >
-                Próxima
-              </Link>
-            </div>
-          )}
-        </footer>
+        <CreatorQueue
+          title={heading.list}
+          rows={creators.map((creator) => ({
+            id: creator.user_id,
+            name: creator.public_name || accountName(creator.account) || "Sem nome público",
+            status: creator.status,
+            submittedAt: creator.submitted_at,
+            updatedAt: creator.updated_at,
+            href: `/interno/${creator.user_id}`,
+          }))}
+          total={creatorResult.count ?? null}
+          search={search}
+          status={selectedStatus}
+          statusOptions={statusOptions}
+          page={page}
+          totalPages={totalPages}
+          pageHref={pageHref}
+          loadError={hasQueryError}
+        />
       </section>
     </InternalShell>
+  );
+}
+
+function Report({
+  title,
+  empty,
+  rows,
+}: {
+  title: string;
+  empty: string;
+  rows: { name: string; count: number }[];
+}) {
+  return (
+    <section className={styles.report}>
+      <h2>{title}</h2>
+      {rows.length === 0 ? (
+        <p>{empty}</p>
+      ) : (
+        rows.map((row) => (
+          <div className={styles.reportRow} key={row.name}>
+            <span>{row.name}</span>
+            <strong>{row.count.toLocaleString("pt-BR")}</strong>
+          </div>
+        ))
+      )}
+    </section>
   );
 }

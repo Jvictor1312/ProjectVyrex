@@ -275,9 +275,15 @@ export async function inviteInternalUserAction(
 ): Promise<FormState> {
   const parsed = z
     .object({
-      fullName: z.string().trim().min(2).max(120),
-      email: z.email().max(254),
-      role: z.enum(internalRoles),
+      fullName: z
+        .string("Informe o nome completo.")
+        .trim()
+        .min(2, "O nome precisa ter pelo menos 2 letras.")
+        .max(120, "O nome pode ter até 120 caracteres."),
+      email: z
+        .email("Informe um e-mail válido, como nome@empresa.com.")
+        .max(254, "O e-mail é longo demais."),
+      role: z.enum(internalRoles, "Escolha a função inicial."),
     })
     .safeParse({
       fullName: formData.get("fullName"),
@@ -296,7 +302,8 @@ export async function inviteInternalUserAction(
   const adminClient = createSupabaseAdminClient();
   if (!adminClient) {
     return {
-      message: "Convites exigem SUPABASE_SERVICE_ROLE_KEY somente no servidor.",
+      message:
+        "O envio de convites ainda não está disponível: falta configurar a chave de serviço do Supabase no servidor.",
       success: false,
     };
   }
@@ -312,7 +319,7 @@ export async function inviteInternalUserAction(
   if (error || !data.user) {
     return {
       message:
-        "Não foi possível enviar o convite. Verifique o e-mail e a configuração de Auth.",
+        "Não foi possível enviar o convite. Confira o e-mail; se ele já tiver conta na Vyrex, atribua a função pela lista de colaboradores.",
       success: false,
     };
   }
@@ -326,12 +333,28 @@ export async function inviteInternalUserAction(
   if (roleError) {
     return {
       message:
-        "Convite enviado, mas a função não foi atribuída. Atribua-a pela lista da equipe.",
+        "Convite enviado, mas a função não foi atribuída. Abra a pessoa em Gerenciar e marque a função.",
       success: false,
     };
   }
 
-  return { message: "Convite enviado e função atribuída.", success: true };
+  return {
+    message: `Convite enviado para ${parsed.data.email}. A pessoa entra com a função escolhida depois de criar a senha.`,
+    success: true,
+  };
+}
+
+// Regras de proteção da equipe aplicadas pelo banco (set_user_role e
+// set_user_active), traduzidas para quem está usando a tela.
+function teamRuleError(message: string): FormState | null {
+  const rules: [string, string][] = [
+    ["last active administrator", "A Vyrex precisa de pelo menos um administrador ativo. Dê a função a outra pessoa antes."],
+    ["own admin role", "Você não pode remover a sua própria função de administrador."],
+    ["own account", "Você não pode desativar a própria conta."],
+    ["reason is required", "Informe o motivo para desativar a conta."],
+  ];
+  const match = rules.find(([needle]) => message.includes(needle));
+  return match ? { message: match[1], success: false } : null;
 }
 
 export async function manageInternalRoleAction(
@@ -357,10 +380,10 @@ export async function manageInternalRoleAction(
     role_key: parsed.data.role,
     enabled: parsed.data.enabled,
   });
-  if (error) return denied;
+  if (error) return teamRuleError(error.message) ?? denied;
   revalidatePath("/interno/equipe");
   return {
-    message: "Função atualizada com trilha de auditoria.",
+    message: "Função atualizada e registrada no histórico.",
     success: true,
   };
 }
@@ -392,7 +415,7 @@ export async function setInternalUserActiveAction(
     enabled: parsed.data.enabled,
     reason: parsed.data.reason || null,
   });
-  if (error) return denied;
+  if (error) return teamRuleError(error.message) ?? denied;
   revalidatePath("/interno/equipe");
   return {
     message: parsed.data.enabled ? "Conta reativada." : "Conta desativada.",

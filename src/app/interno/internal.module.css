@@ -396,6 +396,42 @@
   font-size: 13px;
 }
 
+/* Lista de cadastros (CreatorQueue) dentro de um painel */
+.queueFilters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 10px;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--line);
+}
+.queueFilters > label:first-child {
+  flex: 1 1 260px;
+}
+.queueFilters select {
+  min-width: 210px;
+}
+.queueNotice {
+  padding: 14px 20px 0;
+}
+.queueTable {
+  overflow-x: auto;
+}
+.queueTable .table td:first-child strong {
+  font-size: 14px;
+}
+.rowAction {
+  width: 1%;
+  text-align: right;
+  white-space: nowrap;
+}
+.queueTable + .pagination,
+.panelFooter {
+  padding: 12px 20px;
+  border-top: 1px solid var(--line);
+  margin-top: 0;
+}
+
 /* Tabelas */
 .tableWrap {
   width: 100%;

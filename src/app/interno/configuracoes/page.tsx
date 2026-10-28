@@ -1,14 +1,14 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
-import { InfoHelp } from "@/app/components/info-help";
 import { PresentationVideoForm } from "@/app/components/presentation-video-form";
 import { EligibilitySettingsForm } from "@/app/components/team-management";
 import { InternalShell } from "../internal-shell";
 import { auditDetailsSummary } from "@/lib/audit-labels";
 import { requireUserFast } from "@/lib/auth";
 import { getPresentationVideoUrl } from "@/lib/site-media";
-import internalStyles from "../internal.module.css";
-import styles from "../team-management.module.css";
+import styles from "../internal.module.css";
+import teamStyles from "../team.module.css";
+import { EmptyState, Notice, PageHeader, Panel } from "../ui";
 
 export const metadata: Metadata = { title: "Configurações" };
 
@@ -39,88 +39,91 @@ export default async function EligibilitySettingsPage() {
   if (permission.error || !permission.data) redirect("/acesso-negado");
 
   const history = auditResult.data ?? [];
+  const settings = settingsResult.data;
 
   return (
     <InternalShell active="criterios" isAdmin={true} email={user.email}>
-      <section className={internalStyles.main}>
-        <header className={internalStyles.pageHeader}>
-          <div>
-            <h1>Configurações</h1>
-            <p>Vídeo de apresentação e critérios de elegibilidade.</p>
-          </div>
-        </header>
+      <section className={styles.main}>
+        <PageHeader
+          title="Configurações"
+          description="Critérios que um cadastro de criador precisa cumprir e o vídeo de apresentação exibido no cadastro."
+        />
 
-        <section className={internalStyles.section}>
-          <h2>Vídeo de apresentação</h2>
-          <p className={internalStyles.empty}>
-            Aparece na tela de cadastro, ao clicar na esfera Vyrex.
-          </p>
-          <PresentationVideoForm currentUrl={videoUrl} />
-        </section>
-
-        {settingsResult.error || !settingsResult.data ? (
-          <p className={internalStyles.error} role="alert">
-            Não foi possível carregar os critérios. Confirme se a migration foi
-            aplicada.
-          </p>
+        {settingsResult.error || !settings ? (
+          <Notice tone="danger" role="alert">
+            Não foi possível carregar os critérios de elegibilidade. Atualize a
+            página; se o erro continuar, verifique a conexão com o banco de dados.
+          </Notice>
         ) : (
-          <section className={internalStyles.section}>
-            <div className="section-heading">
-              <div>
-                <h2>Requisitos atuais</h2>
-                <p className={internalStyles.empty}>
-                  Os valores afetam novos envios; alterações ficam registradas
-                  na auditoria.
-                </p>
-              </div>
-              <InfoHelp title="Como os critérios funcionam">
-                Não existe corte mínimo de seguidores. Use a referência apenas
-                para orientar a prioridade de acordo com cada campanha; não
-                exclua quem está começando. As cinco evidências devem ter ao
-                menos 1.000 views cada e continuam sujeitas à conferência
-                manual.
-              </InfoHelp>
-            </div>
-            <p className={internalStyles.empty}>
-              Atualizados em{" "}
-              {new Date(settingsResult.data.updated_at).toLocaleString("pt-BR")}
-              .
+          <Panel
+            title="Critérios de elegibilidade"
+            description={`Valem para os próximos envios. Última alteração em ${new Date(settings.updated_at).toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" })}.`}
+          >
+            <p className={teamStyles.hint}>
+              Hoje cada criador envia {settings.required_story_evidence}{" "}
+              {settings.required_story_evidence === 1 ? "Story obrigatório" : "Stories obrigatórios"}, cada um com
+              pelo menos {settings.minimum_story_views.toLocaleString("pt-BR")} visualizações.
+              Não existe corte por número de seguidores: a referência só ajuda a
+              priorizar conforme a campanha, sem excluir quem está começando. Toda
+              evidência continua passando por conferência manual.
             </p>
             <EligibilitySettingsForm
-              minimumFollowers={settingsResult.data.minimum_followers}
-              requiredEvidence={settingsResult.data.required_story_evidence}
-              minimumViews={settingsResult.data.minimum_story_views}
-              maxStoryAgeDays={settingsResult.data.max_story_age_days}
+              minimumFollowers={settings.minimum_followers}
+              requiredEvidence={settings.required_story_evidence}
+              minimumViews={settings.minimum_story_views}
+              maxStoryAgeDays={settings.max_story_age_days}
             />
-          </section>
+          </Panel>
         )}
 
-        <section className={internalStyles.section}>
-          <h2>Histórico de alterações</h2>
+        <Panel
+          title="Vídeo de apresentação"
+          description="Aparece na tela de cadastro quando a pessoa clica na esfera Vyrex."
+        >
+          <PresentationVideoForm currentUrl={videoUrl} />
+        </Panel>
+
+        <Panel title="Histórico de alterações dos critérios" flush>
           {auditResult.error ? (
-            <p className={internalStyles.error} role="alert">
-              Não foi possível carregar a auditoria.
-            </p>
-          ) : history.length === 0 ? (
-            <p className={internalStyles.empty}>
-              Nenhuma alteração registrada.
-            </p>
-          ) : (
-            <div className={styles.auditList}>
-              {history.map((entry) => (
-                <article className={styles.auditRow} key={entry.id}>
-                  <strong>
-                    {auditDetailsSummary(entry.details) ??
-                      "Critérios alterados"}
-                  </strong>
-                  <span>
-                    {new Date(entry.created_at).toLocaleString("pt-BR")}
-                  </span>
-                </article>
-              ))}
+            <div style={{ padding: 16 }}>
+              <Notice tone="danger" role="alert">
+                Não foi possível carregar o histórico agora. Atualize a página
+                para tentar de novo.
+              </Notice>
             </div>
+          ) : history.length === 0 ? (
+            <EmptyState
+              title="Nenhuma alteração registrada"
+              text="Cada vez que os critérios forem salvos, a mudança aparece aqui."
+            />
+          ) : (
+            <table className={teamStyles.table}>
+              <thead>
+                <tr>
+                  <th scope="col">Alteração</th>
+                  <th scope="col">Data</th>
+                </tr>
+              </thead>
+              <tbody>
+                {history.map((entry) => (
+                  <tr key={entry.id}>
+                    <td data-label="Alteração">
+                      {auditDetailsSummary(entry.details) ?? "Critérios alterados"}
+                    </td>
+                    <td data-label="Data">
+                      <span className={teamStyles.date}>
+                        {new Date(entry.created_at).toLocaleString("pt-BR", {
+                          dateStyle: "short",
+                          timeStyle: "short",
+                        })}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           )}
-        </section>
+        </Panel>
       </section>
     </InternalShell>
   );

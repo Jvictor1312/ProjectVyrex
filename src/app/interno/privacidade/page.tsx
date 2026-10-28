@@ -7,10 +7,16 @@ import {
   dataRequestKindLabels,
   dataRequestStatusLabels,
 } from "@/lib/validation/privacy";
-import internalStyles from "../internal.module.css";
-import styles from "../team-management.module.css";
+import styles from "../internal.module.css";
+import teamStyles from "../team.module.css";
+import { Badge, EmptyState, Notice, PageHeader, Panel, Stats } from "../ui";
 
-export const metadata: Metadata = { title: "Solicitações de privacidade" };
+export const metadata: Metadata = { title: "Pedidos de privacidade" };
+
+const when = (value: string | null) =>
+  value
+    ? new Date(value).toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" })
+    : "—";
 
 export default async function PrivacyRequestsPage() {
   const { supabase, user, activeCheck, ensureActive } = await requireUserFast();
@@ -31,16 +37,14 @@ export default async function PrivacyRequestsPage() {
   await ensureActive(activeResult);
   if (permission.error || !permission.data) redirect("/acesso-negado");
   const requests = requestsResult.data ?? [];
-  const names = new Map(
-    requests.map((request) => {
-      const person = Array.isArray(request.person)
-        ? request.person[0]
-        : request.person;
-      return [request.user_id, person?.full_name ?? "Usuário"];
-    }),
-  );
+  const nameOf = (request: (typeof requests)[number]) => {
+    const person = Array.isArray(request.person) ? request.person[0] : request.person;
+    return person?.full_name ?? "Usuário sem nome";
+  };
+  const kindOf = (kind: string) =>
+    dataRequestKindLabels[kind as keyof typeof dataRequestKindLabels] ?? kind;
 
-  const active = requests.filter(
+  const open = requests.filter(
     (request) => request.status === "open" || request.status === "in_progress",
   );
   const closed = requests.filter(
@@ -49,82 +53,94 @@ export default async function PrivacyRequestsPage() {
 
   return (
     <InternalShell active="privacidade" isAdmin={true} email={user.email}>
-      <section className={internalStyles.main}>
-        <header className={internalStyles.pageHeader}>
-          <div>
-            <p className={internalStyles.eyebrow}>ADMINISTRAÇÃO</p>
-            <h1>Solicitações de privacidade</h1>
-            <p>Pedidos dos usuários sobre os próprios dados.</p>
-          </div>
-        </header>
+      <section className={styles.main}>
+        <PageHeader
+          title="Pedidos de privacidade"
+          description="Pedidos de criadores e colaboradores sobre os próprios dados (acesso, correção, exclusão). Cada resposta fica registrada."
+        />
 
         {requestsResult.error ? (
-          <p className={internalStyles.error} role="alert">
-            Não foi possível carregar as solicitações. Confirme se a migration
-            202610150001 foi aplicada.
-          </p>
+          <Notice tone="danger" role="alert">
+            Não foi possível carregar os pedidos agora. Atualize a página; se o
+            erro continuar, verifique a conexão com o banco de dados.
+          </Notice>
         ) : (
           <>
-            <section className={internalStyles.section}>
-              <h2>Em aberto ({active.length})</h2>
-              {active.length === 0 ? (
-                <p className={internalStyles.empty}>
-                  Nenhuma solicitação pendente.
-                </p>
-              ) : (
-                <div className={styles.auditList}>
-                  {active.map((request) => (
-                    <article className={styles.auditRow} key={request.id}>
-                      <strong>
-                        {names.get(request.user_id)} ·{" "}
-                        {dataRequestKindLabels[
-                          request.kind as keyof typeof dataRequestKindLabels
-                        ] ?? request.kind}
-                      </strong>
-                      <span>
-                        {dataRequestStatusLabels[request.status]} ·{" "}
-                        {new Date(request.created_at).toLocaleString("pt-BR")}
-                      </span>
-                      {request.details && <p>{request.details}</p>}
-                      <ResolveDataRequestForm requestId={request.id} />
-                    </article>
-                  ))}
-                </div>
-              )}
-            </section>
+            <Stats
+              label="Resumo dos pedidos"
+              items={[
+                { label: "Aguardando resposta", value: open.length.toLocaleString("pt-BR") },
+                { label: "Encerrados", value: closed.length.toLocaleString("pt-BR") },
+              ]}
+            />
 
-            <section className={internalStyles.section}>
-              <h2>Encerradas ({closed.length})</h2>
-              {closed.length === 0 ? (
-                <p className={internalStyles.empty}>
-                  Nenhuma solicitação encerrada.
-                </p>
+            <Panel
+              title="Aguardando resposta"
+              description="Responda cada pedido e registre o que foi feito."
+              flush
+            >
+              {open.length === 0 ? (
+                <EmptyState
+                  title="Nenhum pedido em aberto"
+                  text="Quando alguém pedir acesso, correção ou exclusão de dados, o pedido aparece aqui."
+                />
               ) : (
-                <div className={styles.auditList}>
-                  {closed.map((request) => (
-                    <article className={styles.auditRow} key={request.id}>
-                      <strong>
-                        {names.get(request.user_id)} ·{" "}
-                        {dataRequestKindLabels[
-                          request.kind as keyof typeof dataRequestKindLabels
-                        ] ?? request.kind}
-                      </strong>
-                      <span>
-                        {dataRequestStatusLabels[request.status]} ·{" "}
-                        {request.resolved_at
-                          ? new Date(request.resolved_at).toLocaleString(
-                              "pt-BR",
-                            )
-                          : ""}
-                      </span>
-                      {request.resolution_note && (
-                        <p>{request.resolution_note}</p>
-                      )}
-                    </article>
+                <ul className={teamStyles.requestList}>
+                  {open.map((request) => (
+                    <li key={request.id}>
+                      <div className={teamStyles.requestHead}>
+                        <strong>{kindOf(request.kind)}</strong>
+                        <Badge tone={request.status === "open" ? "warning" : "info"}>
+                          {dataRequestStatusLabels[request.status]}
+                        </Badge>
+                      </div>
+                      <p className={teamStyles.hint}>
+                        {nameOf(request)} · pedido em {when(request.created_at)}
+                      </p>
+                      {request.details && <p className={teamStyles.requestText}>{request.details}</p>}
+                      <ResolveDataRequestForm requestId={request.id} />
+                    </li>
                   ))}
-                </div>
+                </ul>
               )}
-            </section>
+            </Panel>
+
+            <Panel title="Encerrados" flush>
+              {closed.length === 0 ? (
+                <EmptyState title="Nenhum pedido encerrado ainda" />
+              ) : (
+                <table className={teamStyles.table}>
+                  <thead>
+                    <tr>
+                      <th scope="col">Pedido</th>
+                      <th scope="col">Pessoa</th>
+                      <th scope="col">Resultado</th>
+                      <th scope="col">Resposta</th>
+                      <th scope="col">Encerrado em</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {closed.map((request) => (
+                      <tr key={request.id}>
+                        <td data-label="Pedido">{kindOf(request.kind)}</td>
+                        <td data-label="Pessoa">{nameOf(request)}</td>
+                        <td data-label="Resultado">
+                          <Badge tone={request.status === "resolved" ? "success" : "danger"}>
+                            {dataRequestStatusLabels[request.status]}
+                          </Badge>
+                        </td>
+                        <td data-label="Resposta">
+                          <span className={teamStyles.muted}>{request.resolution_note ?? "—"}</span>
+                        </td>
+                        <td data-label="Encerrado em">
+                          <span className={teamStyles.date}>{when(request.resolved_at)}</span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </Panel>
           </>
         )}
       </section>

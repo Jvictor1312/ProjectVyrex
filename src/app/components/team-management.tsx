@@ -173,18 +173,15 @@ export function MemberRolesForm({
         body.set("enabled", String(selected.has(key)));
         try {
           const response = await manageInternalRoleAction(emptyState, body);
-          if (!response.success) failed.push(roleLabels[key]);
+          if (!response.success) failed.push(`${roleLabels[key]}: ${response.message}`);
         } catch {
-          failed.push(roleLabels[key]);
+          failed.push(`${roleLabels[key]}: falha de conexão, tente de novo.`);
         }
       }
       setResult(
         failed.length
-          ? {
-              message: `Não foi possível alterar: ${failed.join(", ")}. Confira sua permissão e tente de novo.`,
-              success: false,
-            }
-          : { message: "Funções atualizadas.", success: true },
+          ? { message: `Não foi possível alterar. ${failed.join(" ")}`, success: false }
+          : { message: "Funções atualizadas e registradas no histórico.", success: true },
       );
     });
   }
