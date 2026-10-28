@@ -1,207 +1,38 @@
 # Vyrex - acompanhamento de tarefas
 
-Atualizado em: 2026-10-15 (sessão 4)
+Atualizado em: 2026-10-28. Reescrito para mostrar só o estado atual e as pendências reais; o registro detalhado das sessões anteriores está no histórico do git (`git log -- docs/TASKS.md`).
 
-## Sessão 2026-10-27 (Claude Code)
+## Estado atual (verificado)
 
-- [x] Indicador "N" do Next.js desligado em desenvolvimento (`devIndicators: false`).
-- [x] Cadastro com e-mail já existente agora mostra "Este e-mail já está cadastrado" (o Supabase devolve um usuário sem identidades em vez de erro).
-- [x] Apresentação do cadastro: um único puxador na própria barra preta recolhe e abre; recolhida, a barra vira uma faixa clicável. Verificado em navegador (computador e celular), com prints.
-- [x] `loading.tsx` em `/dashboard`, `/interno` e `/interno/[creatorId]`: a troca de tela agora é imediata, com tela de carregamento enquanto o Supabase responde.
-- [x] Esfera do cadastro move sem re-renderizar o componente a cada movimento do mouse.
-- [x] Cadastro: botão "Recolher" pequeno, na base da barra e à direita; logo duplicado e textos pequenos removidos.
-- [x] Visão geral do criador redesenhada (`dashboard/creator-overview.tsx`): cartão preto com o próximo passo, trilha de etapas e botão; mensagens, notificações e histórico em cartões. A preview `/preview/criador` usa o mesmo componente.
-- [x] Envio de evidências refeito (`components/evidence-board.tsx`): cada quadro é clicável, a imagem aparece borrada no quadro e um formulário curto pede rede, data e visualizações. Preview em `/preview/criador/evidencias`. Verificado no navegador com Playwright.
-- [x] Causa do "envio que não funciona": salvar rede social e evidência não atualizava a página (faltava `revalidatePath`), então a seção de evidências continuava sem rede e o envio ficava travado.
-- [x] Painel da equipe: menu lateral, filtros, tabela e paginação com fontes legíveis e retorno ao clique; a linha inteira da tabela abre o cadastro.
-- [x] Funções do usuário buscadas em uma consulta e junto com o perfil (`requireUserWithRoles`), cortando 2 idas ao banco em `/interno`, `/interno/[creatorId]` e no login.
-- [x] Fontes de 9–12 px aumentadas nas áreas de formulário e painel; textos longos encurtados nas abas do criador.
-- [x] Favicon (`src/app/icon.svg`).
-- [x] Teste `assigned relationship manager can request corrections` corrigido (preenche o nome público). 35/35 testes passam.
-- [ ] Telas com login não verificadas no navegador: não há conta de teste (o usuário precisa criá-las; ver CLAUDE.md).
-- [ ] `Public/image.png` e `Public/image2.png` estão corrompidos (não são imagens válidas). Não são usados no código. Pasta `Public` com P maiúsculo quebra em Linux (deploy).
+- **Ambiente:** Supabase na nuvem (`zofxrohoilwjtzbcruse`) com as 8 migrations aplicadas; `.env.local` com URL, chave pública (formato antigo `eyJ`) e chave de serviço nova (`sb_secret_`). Servidor local em `localhost:3000`.
+- **Verificações:** `npm run typecheck`, `npm run lint`, `npm test` (35/35, PGlite) e `npm run build` passam.
+- **Área do criador (`/dashboard`):** visão geral, meu cadastro (wizard, perfil com salvamento automático, redes, evidências, revisão e envio), mensagens e configurações (dados, senha, privacidade). Menu no topo. Evidências: vários prints de uma vez, dados por Story, um botão salva todos; os que falham ficam marcados ("Não foi salvo") e o botão vira "Tentar enviar de novo".
+- **Área interna (`/interno`):** visão geral adaptada a cada função (indicadores sem as contas da equipe; busca por nome público ou do cadastro; filtros por situação, responsável e período), ficha do criador (conferência de redes e evidências, decisão, responsáveis, histórico), gestão de colaboradores (convite, funções, desativação com confirmação, histórico), configurações (critérios e vídeo) e pedidos de privacidade.
+- **Padrões:** vocabulário único em `src/lib/labels.ts`; componentes da área interna em `src/app/interno/ui.tsx`; escala visual (título 24–32px, seção 16–20px, texto 14px, campos e botões 38–40px).
+- **Prévias sem login (só em desenvolvimento):** `/preview/criador`, `/preview/criador/evidencias`, `/preview/equipe`, `/preview/equipe/colaboradores`.
+- **Conferido com login real (conta +adm, só leitura):** visão geral, colaboradores (com e-mails e último acesso), configurações, privacidade e ficha do criador.
 
-## Sessão 2026-10-28 (Claude Code)
+## Pendências
 
-- [x] Borrado da prévia de evidências mais leve.
-- [x] Área da equipe: layout único (`interno/internal-shell.tsx`), visual corporativo, modo escuro opcional (tema claro é o padrão; escolha salva no cookie `vyrex-internal-theme`). A ficha do criador também usa o layout.
-- [x] Vídeo de apresentação: admin envia em Configurações (upload direto ao Storage, bucket público `site-media`, até 50 MB); abre grande na tela de cadastro. Migration `202610280001_presentation_video.sql` aplicada no Supabase.
-- [x] Padrão visual único: botões em pílula com resposta ao toque, campos arredondados, links da home com sublinhado animado, esfera da home reativa. Login e recuperação sem barra preta (só o cadastro tem).
-- [x] Conta `+adm` recebeu a função admin; `+user` é criadora. As duas confirmadas.
-- [x] Só as 3 primeiras evidências são obrigatórias (migration `202610280002`, aplicada). Corrige também a brecha em que qualquer evidência aprovada contava na aprovação.
-- [x] Celular opcional no cadastro (convite com seta abre o campo); validado no servidor com `libphonenumber-js/max` e salvo em E.164 (migration `202610280003`, aplicada).
-- [x] Recuperação de senha em 2 passos: e-mail → escolha do canal mascarado. SMS aparece como "em breve".
-- [x] Home redesenhada: menos texto, passos, públicos, critérios atualizados, dúvidas e chamada final.
-- [ ] E-mails em português e remetente próprio: bloqueado até o usuário configurar SMTP (o Supabase recusa alterar os textos no plano gratuito sem SMTP). Modelos prontos em `supabase/templates/`.
-- [ ] SMS de recuperação e verificação de posse do celular: exige um provedor de SMS (Twilio, MessageBird ou Vonage) configurado no Supabase.
-- [ ] Testar as telas logadas com dados reais: o usuário precisa entrar no Chrome.
+### Decisões do usuário
+- [ ] **Fonte "Avenir Next":** declarada, mas não carregada (no Windows aparece outra). Hospedar uma fonte própria ou assumir a do sistema.
+- [ ] **"Desfazer envio":** permitir que o criador retire um cadastro enviado por engano enquanto ninguém começou a análise.
+- [ ] **Apagar evidência já salva:** hoje só dá para trocar o print. Apagar exige nova regra no banco (política de exclusão em `metric_evidence`) e contraria a regra de nunca apagar dados; só fazer com autorização.
+- [ ] **Home, apontamentos de estilo do inspetor** (`design-taste-frontend`): texto de 14px (sugere 16px+), muitos tamanhos de fonte, sombras e linhas finas. O contraste já foi corrigido.
+- [ ] **Link "Área do criador"** no menu da equipe foi removido; recolocar se for útil.
 
-## Próxima sessão
+### Dependem do usuário ou de serviços externos
+- [ ] **Testes com contas reais de todas as funções:** convidar recrutador, gestor de relacionamento e analista de validação pela tela de colaboradores; criar uma conta de criador em rascunho para testar o salvamento real das evidências e o fluxo completo (envio, triagem, validação, correção, decisão).
+- [ ] **E-mails em português** com remetente da Vyrex: exige SMTP próprio no Supabase. Modelos prontos em `supabase/templates/`.
+- [ ] **SMS** (recuperação por celular): exige provedor (Twilio, MessageBird ou Vonage).
+- [ ] **Termos e política de privacidade:** rascunhos; precisam de revisão jurídica.
+- [ ] **Publicação:** só com autorização. Antes: configurar as variáveis de ambiente na hospedagem, Site URL e callbacks do Auth.
+- [ ] **Segurança das chaves (fim do projeto, decisão do usuário):** a chave secreta e a `service_role` antiga foram coladas na conversa em 2026-10-28. Trocar a secreta; migrar a chave pública para `sb_publishable_` e então desativar as chaves antigas (JWT).
 
-- [x] Revisar as skills de `.claude/skills/`: quais foram usadas e quais estão paradas, para remover as que só ocupam espaço (pedido do usuário em 2026-10-28).
-
-## Sessão 2026-10-28, fluxo do administrador (Claude Code)
-
-- [x] Fluxo completo testado com a conta +adm: rede verificada, 3 evidências aprovadas, mensagem enviada, cadastro de teste APROVADO, contato registrado, vídeo de apresentação enviado e exibido no cadastro.
-- [x] Janela de confirmação do navegador (travava a tela) trocada por confirmação na página (decisão final e desativação de conta).
-- [x] Ficha do criador: de até 6 rodadas para 1 (+ links das imagens); Stories inteiros (9:16) com opção de abrir em tamanho real; histórico com nomes.
-- [x] Ações (botões) só conferem o login; o banco já exige conta ativa (has_permission/RLS).
-- [x] Painel, Equipe, Configurações e Privacidade: permissão e dados numa rodada; nomes no lugar de códigos; auditoria legível (`src/lib/audit-labels.ts`); estilo `.section` criado.
-- [x] Produção: telas da equipe 0,32–0,72 s; salvar ~1,1 s.
-- [ ] Chave de serviço (SUPABASE_SERVICE_ROLE_KEY) ainda é exemplo no .env.local: sem ela, a Equipe não mostra e-mails e o convite de colaboradores fica desativado. O usuário precisa colar a chave (a cópia automática foi bloqueada pelo sistema de permissões).
-- [ ] Busca do painel procura só pelo nome público (não pelo nome do cadastro).
-
-## Sessão 2026-10-28, fluxo do criador (Claude Code)
-
-- [x] Corrigido: nenhuma evidência salvava (ação enviava `id`, sem permissão de coluna). Conta +user com perfil, rede e 3 evidências, cadastro ENVIADO (status submitted), pronto para o teste do admin.
-- [x] Login conferido localmente (getClaims/ES256) e checagem de conta ativa junto com as consultas (`requireUserFast`): telas do criador em produção ~0,42–0,69 s (antes ~0,75–1,2 s).
-- [x] Abas do criador: Visão geral, Meu cadastro, Mensagens (com avisos), Configurações (com privacidade).
-- [x] Segundo envio do cadastro é bloqueado pelo banco e pela tela.
-- [ ] Decidir com o usuário: como o criador corrige um cadastro enviado por engano (ex.: "desfazer envio" enquanto ninguém começou a análise).
-- [ ] Próximo: teste do fluxo de administrador com a conta +adm.
-
-## Sessão 2026-10-28, skills (Claude Code)
-
-- [x] Instaladas `design-taste-frontend`, `grilling`, `agent-browser`, `find-skills` (e `hyperframes`, removida em seguida por ser de vídeo). CLI `agent-browser` 0.40 instalado globalmente; testado em janela visível em localhost:3000.
-- [x] Inspetor da `design-taste-frontend` testado na home: roda e gera prints. Removidas `frontend-design`, `webapp-testing`, `using-git-worktrees`, `requesting-code-review`. Guia de uso em `CLAUDE.md` > "Skills do projeto".
-- [ ] Decidir com o usuário quais apontamentos do inspetor na home valem para a Vyrex: corpo de texto 14px (sugere 16px+), contraste 4,2:1 nos subtítulos do hero e no rodapé (mínimo 4,5:1), fontes "Avenir Next"/"Arial Black" declaradas mas não carregadas (o navegador usa substitutas), 11 tamanhos de fonte diferentes.
-- [x] Pasta reconectada ao GitHub (`origin/main`) e alterações enviadas.
-
-## Sessão 2026-10-28, menu e evidências do criador (Claude Code)
-
-- [x] Menu do criador (Visão geral, Meu cadastro, Mensagens, Configurações) foi para dentro da barra do topo, que fica fixa ao rolar. No celular, desce para uma segunda linha da barra.
-- [x] Evidências: dá para escolher vários prints de uma vez (preenchem os quadros vazios em ordem), preencher rede/data/visualizações de cada um numa lista e salvar tudo com um botão. Cada Story vai num envio próprio (limite de 10 MB por envio mantido); se algum falhar, os outros ficam salvos e o que falhou continua na tela.
-- [x] Verificado no navegador (preview, computador e celular), typecheck, lint e `npm test` (35/35). O lint passou a ignorar `.claude/` (scripts das skills).
-- [ ] Testar o salvamento real com login: a conta +user já enviou o cadastro (não editável). Testar quando houver uma conta em rascunho ou com correção pedida.
-
-## Sessão 2026-10-28, reformulação da área interna (Claude Code)
-
-- [x] Skills `security-and-hardening` e `ui-ux-pro-max` instaladas.
-- [x] Base comum: `src/lib/labels.ts` (nomes oficiais de funções, situações e redes), `src/app/interno/ui.tsx` (cabeçalho, painel, indicadores, etiqueta com cor + texto, avatar, aviso, estado vazio, botões, campos). CSS interno reescrito sem duplicações; escala 24/16/14/13px.
-- [x] Gestão de colaboradores (`/interno/equipe`): busca sem acento, filtros por função e situação, tabela (cartões no celular), janela Gerenciar com funções em caixas de marcar e desativação com motivo e confirmação, explicação das funções, histórico em tabela. Prévia: `/preview/equipe/colaboradores`.
-- [x] Corrigido: desativar enviava o formulário sem passar pela confirmação (botão trocava de tipo durante o clique). Mensagens das regras do banco (último administrador, própria conta) agora específicas.
-- [x] Visão geral (`/interno`): títulos por perfil, indicadores compactos, lista de cadastros como componente único (`creator-queue.tsx`, usado também pela prévia), etiquetas coloridas, estados vazios orientando o próximo passo.
-- [x] Configurações e Pedidos de privacidade no novo padrão; textos técnicos ("migration…") e desatualizados ("cinco evidências", "views") trocados pelos valores reais.
-- [x] Ficha do criador: escala de texto corrigida (antes 9–12px), nomes de funções e redes padronizados.
-- [x] Menu lateral agrupado (Operação / Administração); no celular ele aparecia escondido e agora vira barra no topo.
-- [x] Verificado: typecheck, lint, `npm test` 35/35, `npm run build`; navegador em 1366, 1920 e 390 px (sem rolagem lateral) nas prévias.
-- [x] Conferido com login de administrador (conta +adm, só leitura): visão geral, colaboradores, configurações, privacidade e ficha do criador.
-- [x] Ajustes vistos com dados reais: contas da equipe com etiqueta "Equipe" e fora dos indicadores (decisão do usuário); rodapé do menu com nome (do token) e funções; justificativa da decisão com o tom certo; categorias e verificação com rótulos; vídeo de apresentação compacto e remoção com confirmação.
-- [x] Área do criador revisada: vocabulário único (`labels.ts`), tamanhos no padrão (bloco `.dashboard-page` no fim de `globals.css`), regra quebrada de `.application-review` corrigida, mínimo de evidências com reserva única (3), textos ("Link do perfil", "situação", "Falta salvar", datas sem segundos), foco visível, classes sem uso removidas. Inspetor `--app`: 7 tamanhos de fonte, sem aviso de contraste.
-- [ ] Fonte "Avenir Next" é declarada mas não carregada (no Windows aparece outra). Decidir com o usuário: hospedar uma fonte própria ou assumir a do sistema.
-- [ ] Removido do menu da equipe o link "Área do criador" (levava ao painel de criador, que a equipe não usa). Recolocar se for necessário.
-- [x] `SUPABASE_SERVICE_ROLE_KEY` configurada no `.env.local` (chave secreta nova, `sb_secret_`): colaboradores mostram e-mails e último acesso; convites liberados (não testados para não enviar e-mail real).
-- [ ] Segurança: a chave secreta e a `service_role` antiga foram coladas na conversa em 2026-10-28. Trocar a secreta e desativar as chaves antigas (JWT) depois de migrar o site para a chave publicável (`sb_publishable_`), já que a chave pública atual também é do tipo antigo.
-
-## Critério de status
-
-- **Concluída:** comportamento verificado e a verificação está descrita.
-- **Escrita, não executada:** código escrito, mas typecheck/lint/build/testes NÃO foram executados no ambiente em que foi criado. Precisa de `npm run typecheck && npm run lint && npm test && npm run build` na máquina de desenvolvimento.
-- **Parcial:** código existe, mas falta cobertura ou integração real.
-- **Pendente:** ainda não implementada.
-- **Bloqueada:** depende de configuração ou acesso externo.
-
-Uma tela ou migration existente, isoladamente, não comprova que o fluxo está pronto para uso real.
-
-## Concluídas e verificadas (sessões anteriores, 2026-10-14/15, na máquina do desenvolvedor)
-
-- [x] Build de produção, `tsc --noEmit`, ESLint e `npm audit` passaram em 2026-10-14 (ver `QA_REPORT.txt`).
-- [x] 26 testes passaram em 2026-10-15 (PGlite + validação). Eles cobrem a migration inicial, RLS, RPCs de decisão, quotas de upload, desativação de conta, roteamento por papel, schemas Zod e normalização de imagem.
-- [x] Autenticação (login, cadastro, confirmação, recuperação, redefinição, callback), cadastro do criador (perfil, redes, 5 evidências com upload normalizado para WebP em bucket privado), submissão, painéis por função em `/interno`, equipe, critérios de elegibilidade, auditoria, mensagens e notificações.
-
-## Verificadas nesta sessão (2026-10-15, sessão 2)
-
-- [x] Migration `202610150001_data_requests.sql` aplicada sobre a migration inicial em **PostgreSQL 16 real** (com substitutos mínimos de `auth`/`storage`, os mesmos do teste existente). Verificado por script: criação do pedido, duplicado ativo bloqueado, tipo inválido recusado, escrita direta negada, criador/recrutador sem acesso a pedidos alheios, admin vê todos, encerramento exige justificativa e é definitivo, notificações e auditoria gravadas.
-- [x] Checagem de **sintaxe** (TypeScript 6.0.3, erros TS1xxx) de todos os `.ts`/`.tsx` de `src/`: 0 erros. Isto NÃO é um typecheck completo.
-
-## Escritas nesta sessão, ainda não executadas pelo projeto
-
-Motivo: o ambiente da sessão não alcança o registro do npm (bloqueio de rede), então `node_modules` não pôde ser instalado e `typecheck`, `lint`, `npm test` (PGlite) e `build` não rodaram.
-
-- [ ] `supabase/migrations/202610150001_data_requests.sql` (validada em PG16; falta rodar no PGlite/Supabase do projeto).
-- [ ] `supabase/migrations/202610150002_social_account_updates.sql` (reset e auditoria da verificação após edição da rede; teste PGlite adicionado, ainda não executado).
-- [ ] `supabase/migrations/202610150003_submission_profile_name.sql` (exige nome público no banco antes da submissão; teste PGlite adicionado, ainda não executado).
-- [ ] Categorias do criador, critérios dinâmicos na tela de cadastro, edição de rede social e revisão pré-envio; diagnósticos do editor limpos, mas typecheck/lint/testes/build ainda não executados.
-- [ ] `supabase/tests/data-requests.test.mjs` (espelha as verificações feitas em PG16; adicionado ao script `npm test`; `node --check` ok, mas não executado com PGlite).
-- [ ] Páginas do criador: `/dashboard/privacidade`, `/dashboard/configuracoes`; navegação `CreatorNav` em todas as páginas do painel; progresso, pendências de evidência e "próximo passo" por estado em `/dashboard`; âncoras e atalhos em `/dashboard/perfil`.
-- [ ] Ações `src/app/actions/privacy.ts` (solicitação de privacidade, resolução por admin, dados da conta, troca de senha).
-- [ ] Admin: `/interno/privacidade` (permissão nova `privacy.requests.manage`, atribuída ao papel admin).
-- [ ] Páginas `not-found` (404), `error` (erro inesperado) e `/acesso-negado` (403); `/interno`, `/interno/equipe` e `/interno/configuracoes` agora levam a `/acesso-negado` quando falta permissão.
-
-## Parciais
-
-- [ ] Cadastro em etapas: wizard de quatro etapas, ajuda contextual e salvamento automático do perfil implementados. Redes e evidências ainda exigem ações explícitas; persistência real e retomada ainda precisam de teste com Supabase.
-- [ ] Painéis por função: existe um painel `/interno` único que se adapta ao papel (admin, validador, relacionamento, recrutador). Não há painéis visualmente separados por função.
-- [ ] Upload: há pré-visualização local removível antes do envio; faltam progresso, retentativa/retomada e remoção persistente de evidências. O servidor valida tipo real, tamanho e reencoda para WebP.
-- [ ] Termos e política de privacidade são rascunhos; precisam de revisão jurídica.
-- [ ] Fluxo ponta a ponta com contas reais dos cinco papéis nunca foi exercitado.
-- [ ] Cadastro: tela `/cadastro` usa painel preto de 24% no desktop, esfera interativa e diálogo de vídeo futuro. Desktop e mobile foram conferidos no navegador local; o vídeo final ainda depende de produção de conteúdo.
-- [ ] Senhas novas: 11 caracteres mínimos com maiúscula, minúscula e especial; botão mostrar/ocultar nos campos de cadastro, redefinição e troca de senha. Testes foram adicionados, mas ainda não executados.
-
-## Bloqueios externos
-
-- [ ] Criar/selecionar projeto Supabase de staging e preencher `.env.local` (URL, chave pública, Site URL).
-- [ ] Aplicar **as quatro** migrations em staging e validar Auth, RLS e Storage remotos.
-- [ ] Configurar Auth: Site URL, allowlist de callback, confirmação de e-mail e SMTP.
-- [ ] `SUPABASE_SERVICE_ROLE_KEY` somente no servidor, se convites internos forem usados.
-- [ ] Criar o primeiro administrador (procedimento no README).
-- [ ] Revisão jurídica de termos/privacidade; definir procedimento humano para atender pedidos de privacidade (exportar/eliminar dados).
-
-## Pendências de produto e qualidade
-
-- [ ] Testes ponta a ponta (Playwright) do cadastro, upload, encaminhamento, triagem, decisão e correção. Não há Playwright configurado no projeto.
-- [ ] Testar o wizard e persistência automática contra Supabase; adicionar autosave ao restante dos dados apenas com confirmação real de cada gravação.
-- [ ] Painéis separados por função (recrutador, relacionamento, validação) com filtros por responsável, etapa e data.
-- [ ] Revisão completa de responsividade e acessibilidade em navegador real das telas; a nova tela de cadastro foi inspecionada em desktop/mobile, mas as demais continuam pendentes.
-- [ ] Preparar configuração de produção, retenção de dados e monitoramento. Não publicar sem autorização.
-
-## Auditoria da especificação central (sessão 3)
-
-### Coberto pela implementação existente, ainda sem validação ponta a ponta real
-
-- [x] Auth Supabase, cadastro, confirmação, login, recuperação, redefinição, logout e roteamento por papel estão implementados. A integração remota ainda depende de configuração e não foi testada nesta sessão.
-- [x] RLS e RPCs protegem perfis, atribuições, estados, decisões, auditoria e permissões; o Storage foi definido como privado. Testes locais usam PGlite e substitutos de Auth/Storage, não um projeto Supabase real.
-- [x] Critérios de seguidores, cinco evidências, visualizações e idade máxima são armazenados/configurados no banco e verificados ao submeter/analisar. Números continuam declarados pelo criador e precisam de validação humana.
-- [x] Perfil do criador, redes, evidências, mensagens, notificações, privacidade e configurações possuem persistência/ações no código; páginas 403/404/erro existem.
-- [x] Equipe tem convites, papéis, ativações, atribuições com histórico e ações de triagem, relacionamento e validação protegidas por RPC/RLS. A experiência continua concentrada em um painel interno comum.
-
-### Corrigido nesta auditoria, aguardando execução dos testes
-
-- [ ] Acrescentadas as categorias Moda, Viagens, Educação, Música e Outros ao schema/formulário, conforme a especificação, com teste de regressão ainda não executado.
-- [ ] O formulário do criador lê e apresenta os critérios ativos de seguidores, visualizações e idade, incluindo o caso sem limite de idade.
-- [ ] Redes sociais existentes têm edição explícita; a migration nova permite a correção e remove/audita uma verificação anterior quando dados relevantes mudam.
-- [ ] Revisão pré-envio mostra resumo e pendências por perfil, rede e evidência; ações de edição/envio são ocultadas fora de rascunho/correção.
-- [ ] Página inicial agora posiciona a VYREX como operação de marketing de influência apoiada por tecnologia, apresenta marcas e criadores e explica estratégia/execução sem prometer resultados; critérios seguem configuráveis.
-- [ ] Evidência selecionada agora pode ser pré-visualizada e removida antes do upload; comportamento ainda não foi testado em navegador.
-- [ ] Diagnósticos do editor não apontaram erros nos arquivos alterados. Isso não substitui typecheck, lint, testes ou build.
-
-### Lacunas confirmadas pela auditoria
-
-- [ ] Cadastro agora usa wizard com quatro etapas, conclusão por etapa, ajuda contextual e revisão antes do envio; perfil tem autosave server-side. Falta testar retomada e persistência no Supabase e cobrir testes automatizados.
-- [ ] Painéis de recrutamento, relacionamento e validação ainda usam `/interno` com variações por papel; faltam experiências separadas e filtros operacionais por responsável/período.
-- [ ] A home reflete o posicionamento do manual; o arquivo de logo com o desenho tipográfico original não está válido no workspace, então foi mantido um wordmark textual uniforme, não uma reprodução da arte.
-- [ ] Upload tem prévia local e remoção antes do envio, mas falta barra de progresso, retomada de falha e fluxo para excluir arquivo persistido.
-- [ ] Não há E2E Playwright nem verificação visual atual de responsividade/acessibilidade.
-- [ ] Pedidos de privacidade são registrados e respondidos manualmente; exportação e eliminação continuam procedimento externo, sem automação.
-- [ ] Termos e política são rascunhos e exigem revisão jurídica. Campanhas, marcas, contratos e pagamentos permanecem fora do MVP.
-
-### Bloqueio de execução atualizado
-
-- [ ] O usuário inicializou `supabase/config.toml` e instalou/invocou a CLI via `npx`, mas `supabase start` falhou porque Docker/Podman não está instalado ou disponível no PATH. Portanto, `db reset`, `status -o env` e o seed ainda não foram concluídos; `.env.local` copiado do exemplo contém placeholders e precisa ser preenchido somente após iniciar o Supabase local.
-- [ ] O executor desta sessão também não possui `node`/`npm` disponíveis, então não foi possível executar `npm run typecheck`, `npm run lint`, `npm test` ou `npm run build` após as mudanças.
-- [ ] O servidor de desenvolvimento já estava acessível no navegador compartilhado em `http://localhost:3000`; o executor isolado não consegue iniciá-lo no caminho `C:\Users\Joaov\OneDrive\Desktop\Vyrex`.
-
-## Erros conhecidos e limitações
-
-- Supabase remoto não configurado nem exercitado.
-- Testes de banco usam PGlite com substitutos de Auth/Storage; não substituem teste em Supabase de staging.
-- Seguidores e visualizações são declarados pelo criador; não há integração oficial de métricas.
-- A plataforma registra solicitações de privacidade, mas não exporta nem elimina dados automaticamente.
-- Não há campanhas, marcas, contratos ou pagamentos.
-- A migration inicial gera um aviso inofensivo do Postgres: o nome da política `contact history visible to assigned staff or creator when shared` excede 63 caracteres e é truncado.
-
-## Próxima prioridade
-
-1. Na máquina de desenvolvimento: `npm install`, depois `npm run typecheck`, `npm run lint`, `npm test` e `npm run build`; corrigir qualquer falha nos arquivos listados em "Escritas nesta sessão".
-2. Criar o projeto Supabase de staging, aplicar as quatro migrations e validar o fluxo ponta a ponta.
-3. Executar typecheck, lint, testes e build na máquina de desenvolvimento; revisar as novas telas em desktop/mobile.
+### Técnicas (podem ser feitas sem o usuário)
+- [ ] **Testes automáticos de navegador** (cadastro, envio, análise, correção). Fora do escopo por decisão do usuário em 2026-10-28.
+- [ ] **Busca sem acento:** "joao" não encontra "João". Exige a extensão `unaccent` (migration aditiva) ou uma coluna normalizada.
+- [ ] **Barra de progresso por arquivo** no envio de evidências: as Server Actions não informam o progresso do upload; exigiria enviar direto ao Storage pelo navegador.
+- [ ] **Painéis separados por função:** hoje `/interno` é um painel único que se adapta à função; avaliar se a operação precisa de telas próprias.
+- [ ] **Pedidos de privacidade:** exportação e exclusão de dados continuam manuais.
+- [ ] **Monitoramento e retenção de dados** para produção.
