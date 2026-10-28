@@ -36,6 +36,17 @@ Atualizado em: 2026-10-15 (sessão 4)
 - [ ] SMS de recuperação e verificação de posse do celular: exige um provedor de SMS (Twilio, MessageBird ou Vonage) configurado no Supabase.
 - [ ] Testar as telas logadas com dados reais: o usuário precisa entrar no Chrome.
 
+## Sessão 2026-10-28, fluxo do administrador (Claude Code)
+
+- [x] Fluxo completo testado com a conta +adm: rede verificada, 3 evidências aprovadas, mensagem enviada, cadastro de teste APROVADO, contato registrado, vídeo de apresentação enviado e exibido no cadastro.
+- [x] Janela de confirmação do navegador (travava a tela) trocada por confirmação na página (decisão final e desativação de conta).
+- [x] Ficha do criador: de até 6 rodadas para 1 (+ links das imagens); Stories inteiros (9:16) com opção de abrir em tamanho real; histórico com nomes.
+- [x] Ações (botões) só conferem o login; o banco já exige conta ativa (has_permission/RLS).
+- [x] Painel, Equipe, Configurações e Privacidade: permissão e dados numa rodada; nomes no lugar de códigos; auditoria legível (`src/lib/audit-labels.ts`); estilo `.section` criado.
+- [x] Produção: telas da equipe 0,32–0,72 s; salvar ~1,1 s.
+- [ ] Chave de serviço (SUPABASE_SERVICE_ROLE_KEY) ainda é exemplo no .env.local: sem ela, a Equipe não mostra e-mails e o convite de colaboradores fica desativado. O usuário precisa colar a chave (a cópia automática foi bloqueada pelo sistema de permissões).
+- [ ] Busca do painel procura só pelo nome público (não pelo nome do cadastro).
+
 ## Sessão 2026-10-28, fluxo do criador (Claude Code)
 
 - [x] Corrigido: nenhuma evidência salvava (ação enviava `id`, sem permissão de coluna). Conta +user com perfil, rede e 3 evidências, cadastro ENVIADO (status submitted), pronto para o teste do admin.
