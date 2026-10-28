@@ -272,8 +272,9 @@ export default async function CreatorProfilePage() {
               <div>
                 <h2>Evidências</h2>
                 <p>
-                  Toque em cada quadro e envie o print do Story. Os marcados com
-                  * são obrigatórios.
+                  Escolha os prints dos Stories (pode selecionar vários de uma
+                  vez), preencha os dados de cada um e salve tudo junto. Os
+                  marcados com * são obrigatórios.
                 </p>
               </div>
             </div>

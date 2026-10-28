@@ -174,19 +174,122 @@ button.tile:disabled {
   font-weight: 700;
 }
 
-.detailsTitle span {
-  overflow: hidden;
-  max-width: 100%;
+.detailsHint {
+  margin: 4px 0 0;
   color: var(--muted);
-  font-size: 14px;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.addMany {
+  justify-self: start;
+  min-height: 44px;
+  padding: 0 20px;
+  border: 1px solid var(--ink);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    background-color 140ms ease,
+    color 140ms ease,
+    transform 120ms ease;
+}
+
+.addMany:hover {
+  background: var(--ink);
+  color: #fff;
+}
+
+.addMany:active {
+  transform: scale(0.97);
+}
+
+.addMany:disabled {
+  cursor: progress;
+  opacity: 0.6;
+}
+
+/* Uma linha por Story escolhido, com os dados obrigatórios lado a lado. */
+.rows {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 170px minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 16px;
+  padding: 14px 0 0;
+  border-top: 1px solid var(--line);
+}
+
+.rowHead {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  padding-bottom: 12px;
+}
+
+.rowNumber {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--ink);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.rowName {
+  display: grid;
+  min-width: 0;
+  font-weight: 700;
+}
+
+.rowName span {
+  overflow: hidden;
+  color: var(--muted);
+  font-size: 13px;
   font-weight: 400;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
+.remove {
+  min-height: 44px;
+  margin-bottom: 6px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.remove:hover {
+  background: #f0f0ee;
+  color: var(--ink);
+}
+
 .fields {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
   gap: 14px;
 }
 
@@ -246,8 +349,23 @@ button.tile:disabled {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
+  .row {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .rowHead {
+    padding-bottom: 0;
+  }
+
   .fields {
-    grid-template-columns: 1fr;
+    grid-column: 1 / -1;
+    grid-row: 2;
+    grid-auto-flow: row;
+  }
+
+  .remove {
+    grid-column: 2;
+    grid-row: 1;
   }
 }
 

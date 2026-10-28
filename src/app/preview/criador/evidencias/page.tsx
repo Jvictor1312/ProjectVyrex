@@ -17,7 +17,10 @@ export default function EvidencePreview() {
             <span className="principle-number">03</span>
             <div>
               <h2>Evidências</h2>
-              <p>Toque em cada quadro e envie o print do Story.</p>
+              <p>
+                Escolha os prints dos Stories (pode selecionar vários de uma
+                vez), preencha os dados de cada um e salve tudo junto.
+              </p>
             </div>
           </div>
           <EvidenceBoard

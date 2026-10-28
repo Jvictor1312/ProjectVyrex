@@ -1,12 +1,15 @@
 "use client";
 
 import Image from "next/image";
-import { useActionState, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { uploadStoryEvidenceAction } from "@/app/actions/creator";
 import type { FormState } from "@/lib/validation/auth";
 import styles from "./evidence-board.module.css";
 
 const initialState: FormState = { message: "", success: false };
+// Mesmo limite do servidor (src/lib/evidence/normalize.ts).
+const maximumBytes = 8 * 1024 * 1024;
+const acceptedTypes = ["image/jpeg", "image/png", "image/webp"];
 
 const platformLabels: Record<string, string> = {
   instagram: "Instagram",
@@ -25,7 +28,12 @@ export type EvidenceSlot = {
   needsAttention: boolean;
 };
 
-type Draft = { position: number; url: string; name: string };
+type Draft = { position: number; file: File; url: string };
+
+const listPositions = (positions: number[]) =>
+  positions.length === 1
+    ? `Story ${positions[0]}`
+    : `Stories ${positions.slice(0, -1).join(", ")} e ${positions.at(-1)}`;
 
 export function EvidenceBoard({
   slots,
@@ -42,31 +50,27 @@ export function EvidenceBoard({
   maxStoryAgeDays: number | null;
   canEdit: boolean;
 }) {
-  const [state, action, pending] = useActionState(
-    uploadStoryEvidenceAction,
-    initialState,
-  );
   const fileInput = useRef<HTMLInputElement>(null);
   const pickingFor = useRef<number | null>(null);
-  const [draft, setDraft] = useState<Draft | null>(null);
+  const [drafts, setDrafts] = useState<Draft[]>([]);
   const [notice, setNotice] = useState("");
+  const [result, setResult] = useState<FormState>(initialState);
+  const [progress, setProgress] = useState("");
+  const [pending, startTransition] = useTransition();
   const hasAccounts = socialAccounts.length > 0;
+  const singleAccount = socialAccounts.length === 1 ? socialAccounts[0] : null;
 
-  // Depois de salvar, a página é atualizada pelo servidor e a prévia local sai.
+  // As prévias locais ocupam memória: são liberadas quando a tela fecha.
+  const draftsRef = useRef(drafts);
   useEffect(() => {
-    if (state.success) {
-      setDraft(null);
-      if (fileInput.current) fileInput.current.value = "";
-    }
-  }, [state]);
+    draftsRef.current = drafts;
+  }, [drafts]);
+  useEffect(
+    () => () => draftsRef.current.forEach((draft) => URL.revokeObjectURL(draft.url)),
+    [],
+  );
 
-  useEffect(() => {
-    return () => {
-      if (draft) URL.revokeObjectURL(draft.url);
-    };
-  }, [draft]);
-
-  function pick(position: number) {
+  function pick(position: number | null) {
     if (!hasAccounts) {
       setNotice("Cadastre uma rede social antes de enviar as evidências.");
       return;
@@ -76,9 +80,120 @@ export function EvidenceBoard({
     fileInput.current?.click();
   }
 
-  function cancel() {
-    setDraft(null);
-    if (fileInput.current) fileInput.current.value = "";
+  function removeDraft(position: number) {
+    setDrafts((current) => {
+      current
+        .filter((draft) => draft.position === position)
+        .forEach((draft) => URL.revokeObjectURL(draft.url));
+      return current.filter((draft) => draft.position !== position);
+    });
+  }
+
+  function cancelAll() {
+    drafts.forEach((draft) => URL.revokeObjectURL(draft.url));
+    setDrafts([]);
+    setResult(initialState);
+  }
+
+  // Os arquivos escolhidos vão para o quadro tocado e, em seguida, para os
+  // quadros vazios, em ordem. Assim dá para escolher vários prints de uma vez.
+  function receiveFiles(files: File[]) {
+    const valid = files.filter(
+      (file) => acceptedTypes.includes(file.type) && file.size <= maximumBytes,
+    );
+    const skipped = files.length - valid.length;
+    const taken = new Set(drafts.map((draft) => draft.position));
+    const free = slots
+      .filter((slot) => !slot.uploaded && !taken.has(slot.position))
+      .map((slot) => slot.position);
+    const first = pickingFor.current;
+    const targets =
+      first === null ? free : [first, ...free.filter((p) => p !== first)];
+
+    const added: Draft[] = valid
+      .slice(0, targets.length)
+      .map((file, index) => ({
+        position: targets[index],
+        file,
+        url: URL.createObjectURL(file),
+      }));
+    const leftOut = valid.length - added.length;
+
+    setDrafts((current) => {
+      const replaced = new Set(added.map((draft) => draft.position));
+      current
+        .filter((draft) => replaced.has(draft.position))
+        .forEach((draft) => URL.revokeObjectURL(draft.url));
+      return [...current.filter((draft) => !replaced.has(draft.position)), ...added]
+        .sort((a, b) => a.position - b.position);
+    });
+    setResult(initialState);
+
+    const warnings = [];
+    if (skipped > 0)
+      warnings.push(
+        `${skipped} arquivo(s) ignorado(s): use JPEG, PNG ou WebP de até 8 MB.`,
+      );
+    if (leftOut > 0)
+      warnings.push(`Não há quadro livre para ${leftOut} arquivo(s).`);
+    setNotice(warnings.join(" "));
+  }
+
+  // Um clique salva todos os Stories. Cada um vai em um envio próprio (o
+  // servidor aceita até 10 MB por envio) e, se algum falhar, os outros ficam
+  // salvos e o que falhou continua na tela para corrigir.
+  function saveAll(form: HTMLFormElement) {
+    const data = new FormData(form);
+    const queue = [...drafts];
+    startTransition(async () => {
+      const saved: number[] = [];
+      const failed: string[] = [];
+      for (const [index, draft] of queue.entries()) {
+        setProgress(`Enviando ${index + 1} de ${queue.length}…`);
+        const body = new FormData();
+        body.set("evidence", draft.file);
+        body.set("position", String(draft.position));
+        body.set(
+          "socialAccountId",
+          String(data.get(`socialAccountId-${draft.position}`) ?? ""),
+        );
+        body.set(
+          "storyPublishedOn",
+          String(data.get(`storyPublishedOn-${draft.position}`) ?? ""),
+        );
+        body.set(
+          "viewsReported",
+          String(data.get(`viewsReported-${draft.position}`) ?? ""),
+        );
+        try {
+          const response = await uploadStoryEvidenceAction(initialState, body);
+          if (response.success) saved.push(draft.position);
+          else failed.push(`Story ${draft.position}: ${response.message}`);
+        } catch {
+          failed.push(
+            `Story ${draft.position}: falha de conexão. Tente de novo.`,
+          );
+        }
+      }
+
+      setProgress("");
+      const savedSet = new Set(saved);
+      setDrafts((current) => {
+        current
+          .filter((draft) => savedSet.has(draft.position))
+          .forEach((draft) => URL.revokeObjectURL(draft.url));
+        return current.filter((draft) => !savedSet.has(draft.position));
+      });
+      if (fileInput.current) fileInput.current.value = "";
+
+      const parts = [];
+      if (saved.length)
+        parts.push(
+          `${listPositions(saved)} ${saved.length === 1 ? "salvo" : "salvos"}.`,
+        );
+      parts.push(...failed);
+      setResult({ message: parts.join(" "), success: failed.length === 0 });
+    });
   }
 
   // Datas no fuso de quem está usando (toISOString usaria o horário UTC e,
@@ -94,13 +209,23 @@ export function EvidenceBoard({
     maxStoryAgeDays === null
       ? undefined
       : localDate(Date.now() - maxStoryAgeDays * 86_400_000);
+  const draftByPosition = new Map(drafts.map((draft) => [draft.position, draft]));
+  const freeCount = slots.filter(
+    (slot) => !slot.uploaded && !draftByPosition.has(slot.position),
+  ).length;
 
   return (
-    <form action={action} className={styles.board}>
+    <form
+      className={styles.board}
+      onSubmit={(event) => {
+        event.preventDefault();
+        if (!pending && drafts.length) saveAll(event.currentTarget);
+      }}
+    >
       <ol className={styles.grid} aria-label="Evidências dos Stories">
         {slots.map((slot) => {
-          const isDraft = draft?.position === slot.position;
-          const imageUrl = isDraft ? draft.url : slot.imageUrl;
+          const draft = draftByPosition.get(slot.position);
+          const imageUrl = draft ? draft.url : slot.imageUrl;
           const content = (
             <>
               {imageUrl ? (
@@ -125,7 +250,7 @@ export function EvidenceBoard({
               )}
               <span
                 className={`${styles.status} ${
-                  isDraft
+                  draft
                     ? styles.statusDraft
                     : slot.needsAttention
                       ? styles.statusAlert
@@ -134,7 +259,7 @@ export function EvidenceBoard({
                         : ""
                 }`}
               >
-                {isDraft
+                {draft
                   ? pending
                     ? "Enviando…"
                     : "Não salva"
@@ -152,11 +277,11 @@ export function EvidenceBoard({
               {canEdit ? (
                 <button
                   type="button"
-                  className={`${styles.tile} ${isDraft ? styles.tileActive : ""}`}
+                  className={`${styles.tile} ${draft ? styles.tileActive : ""}`}
                   onClick={() => pick(slot.position)}
                   disabled={pending}
                   aria-label={`Story ${slot.position}: ${
-                    slot.uploaded ? "trocar imagem" : "adicionar imagem"
+                    slot.uploaded || draft ? "trocar imagem" : "adicionar imagem"
                   }`}
                 >
                   {content}
@@ -164,36 +289,47 @@ export function EvidenceBoard({
               ) : (
                 <div className={styles.tile}>{content}</div>
               )}
-              {slot.meta && <span className={styles.meta}>{slot.meta}</span>}
-              {slot.reason && <p className={styles.reason}>{slot.reason}</p>}
+              {slot.meta && !draft && (
+                <span className={styles.meta}>{slot.meta}</span>
+              )}
+              {slot.reason && !draft && (
+                <p className={styles.reason}>{slot.reason}</p>
+              )}
             </li>
           );
         })}
       </ol>
 
+      {canEdit && freeCount > 1 && (
+        <button
+          type="button"
+          className={styles.addMany}
+          onClick={() => pick(null)}
+          disabled={pending}
+        >
+          Escolher vários prints de uma vez
+        </button>
+      )}
+
       <input
         ref={fileInput}
         className={styles.fileInput}
-        name="evidence"
         type="file"
-        accept="image/jpeg,image/png,image/webp"
+        accept={acceptedTypes.join(",")}
+        multiple
         tabIndex={-1}
         aria-hidden="true"
         onChange={(event) => {
-          const file = event.currentTarget.files?.[0];
-          // Sem quadro escolhido, a imagem vai para o primeiro quadro vazio.
-          const position =
-            pickingFor.current ??
-            slots.find((slot) => !slot.uploaded)?.position ??
-            null;
-          if (!file || position === null) return;
-          setDraft({ position, url: URL.createObjectURL(file), name: file.name });
+          const files = Array.from(event.currentTarget.files ?? []);
+          event.currentTarget.value = "";
+          if (files.length) receiveFiles(files);
         }}
       />
 
       {notice && (
         <p className="form-message error" role="status">
-          {notice} <a href="#redes">Ir para redes sociais</a>
+          {notice}{" "}
+          {!hasAccounts && <a href="#redes">Ir para redes sociais</a>}
         </p>
       )}
 
@@ -203,65 +339,112 @@ export function EvidenceBoard({
         </p>
       )}
 
-      {draft && (
+      {drafts.length > 0 && (
         <div className={styles.details}>
-          <input type="hidden" name="position" value={draft.position} />
-          <p className={styles.detailsTitle}>
-            Story {draft.position}
-            <span>{draft.name}</span>
-          </p>
-          <div className={styles.fields}>
-            <label className="field">
-              <span>Rede</span>
-              <select
-                name="socialAccountId"
-                defaultValue={socialAccounts.length === 1 ? socialAccounts[0].id : ""}
-                required
-              >
-                <option value="" disabled>
-                  Selecione
-                </option>
-                {socialAccounts.map((account) => (
-                  <option value={account.id} key={account.id}>
-                    {platformLabels[account.platform] ?? account.platform} @
-                    {account.handle}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label className="field">
-              <span>Data do Story</span>
-              <input
-                name="storyPublishedOn"
-                type="date"
-                required
-                defaultValue={today}
-                min={earliest}
-                max={today}
-              />
-            </label>
-            <label className="field">
-              <span>Visualizações</span>
-              <input
-                name="viewsReported"
-                type="number"
-                inputMode="numeric"
-                min={0}
-                max={2147483647}
-                step={1}
-                required
-                placeholder={`Mínimo ${minimumViews.toLocaleString("pt-BR")}`}
-              />
-            </label>
+          <div>
+            <p className={styles.detailsTitle}>Dados de cada Story</p>
+            <p className={styles.detailsHint}>
+              Preencha a data e as visualizações que aparecem em cada print
+              {minimumViews > 0 &&
+                ` (mínimo de ${minimumViews.toLocaleString("pt-BR")})`}
+              . Tudo é salvo de uma vez.
+            </p>
           </div>
+
+          <ul className={styles.rows}>
+            {drafts.map((draft) => (
+              <li key={draft.position} className={styles.row}>
+                <div className={styles.rowHead}>
+                  <span className={styles.rowNumber}>{draft.position}</span>
+                  <span className={styles.rowName}>
+                    Story {draft.position}
+                    <span>{draft.file.name}</span>
+                  </span>
+                </div>
+                <div className={styles.fields}>
+                  {singleAccount ? (
+                    <input
+                      type="hidden"
+                      name={`socialAccountId-${draft.position}`}
+                      value={singleAccount.id}
+                    />
+                  ) : (
+                    <label className="field">
+                      <span>Rede</span>
+                      <select
+                        name={`socialAccountId-${draft.position}`}
+                        defaultValue=""
+                        required
+                      >
+                        <option value="" disabled>
+                          Selecione
+                        </option>
+                        {socialAccounts.map((account) => (
+                          <option value={account.id} key={account.id}>
+                            {platformLabels[account.platform] ?? account.platform}{" "}
+                            @{account.handle}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                  )}
+                  <label className="field">
+                    <span>Data do Story</span>
+                    <input
+                      name={`storyPublishedOn-${draft.position}`}
+                      type="date"
+                      required
+                      defaultValue={today}
+                      min={earliest}
+                      max={today}
+                    />
+                  </label>
+                  <label className="field">
+                    <span>Visualizações</span>
+                    <input
+                      name={`viewsReported-${draft.position}`}
+                      type="number"
+                      inputMode="numeric"
+                      min={0}
+                      max={2147483647}
+                      step={1}
+                      required
+                      placeholder={`Mínimo ${minimumViews.toLocaleString("pt-BR")}`}
+                    />
+                  </label>
+                </div>
+                <button
+                  type="button"
+                  className={styles.remove}
+                  onClick={() => removeDraft(draft.position)}
+                  disabled={pending}
+                  aria-label={`Remover o Story ${draft.position}`}
+                >
+                  Remover
+                </button>
+              </li>
+            ))}
+          </ul>
+
+          {singleAccount && (
+            <p className={styles.detailsHint}>
+              Rede: {platformLabels[singleAccount.platform] ?? singleAccount.platform}{" "}
+              @{singleAccount.handle}
+            </p>
+          )}
+
           <div className={styles.actions}>
             <button className={styles.save} type="submit" disabled={pending}>
-              {pending ? "Enviando…" : "Salvar evidência"}
+              {pending
+                ? progress || "Enviando…"
+                : drafts.length === 1
+                  ? "Salvar evidência"
+                  : `Salvar ${drafts.length} evidências`}
             </button>
             <button
               className={styles.cancel}
               type="button"
-              onClick={cancel}
+              onClick={cancelAll}
               disabled={pending}
             >
               Cancelar
@@ -270,13 +453,13 @@ export function EvidenceBoard({
         </div>
       )}
 
-      {state.message && (
+      {result.message && (
         <p
-          className={state.success ? "form-message success" : "form-message error"}
+          className={result.success ? "form-message success" : "form-message error"}
           role="status"
           aria-live="polite"
         >
-          {state.message}
+          {result.message}
         </p>
       )}
     </form>
