@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { BrandContact } from "./components/brand-contact";
 import styles from "./home.module.css";
 
 const facts = [
@@ -154,13 +155,7 @@ export default function HomePage() {
             Planejamos a campanha a partir do seu público e selecionamos
             criadores compatíveis, com entregas acompanhadas.
           </p>
-          <a
-            className={styles.linkDark}
-            href="mailto:suportevyrex@gmail.com?subject=Vyrex%20para%20marcas"
-          >
-            Fale com a gente →
-          </a>
-          <span className={styles.contact}>suportevyrex@gmail.com</span>
+          <BrandContact className={styles.linkDark} />
         </article>
       </section>
 

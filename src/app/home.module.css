@@ -454,8 +454,11 @@
   }
 }
 
-.contact {
-  color: var(--muted);
-  font-size: 14px;
-  user-select: all;
+button.linkDark {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--ink);
+  font-family: inherit;
+  cursor: pointer;
 }
