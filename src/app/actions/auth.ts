@@ -2,6 +2,8 @@
 
 import { redirect } from "next/navigation";
 import { fetchActiveRoleKeys } from "@/lib/auth";
+import { rateLimit, tooManyAttempts } from "@/lib/rate-limit";
+import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { invalidPhoneMessage, normalizePhone } from "@/lib/validation/phone";
 import { dashboardPathForRoles } from "@/lib/auth-routing";
 import {
@@ -37,6 +39,12 @@ export async function loginAction(
 
   if (!parsed.success) return invalidForm;
   if (!isSupabaseConfigured()) return setupMessage;
+  if (
+    !(await rateLimit("login-email", 8, 900, parsed.data.email)).allowed ||
+    !(await rateLimit("login-ip", 30, 900)).allowed
+  ) {
+    return tooManyAttempts;
+  }
 
   const supabase = await createSupabaseServerClient();
   const { data: signIn, error } = await supabase.auth.signInWithPassword(
@@ -87,6 +95,7 @@ export async function signupAction(
     return { message: invalidPhoneMessage, success: false };
   }
   if (!isSupabaseConfigured()) return setupMessage;
+  if (!(await rateLimit("signup", 5, 3600)).allowed) return tooManyAttempts;
 
   const supabase = await createSupabaseServerClient();
   const { data, error } = await supabase.auth.signUp({
@@ -154,10 +163,17 @@ export async function recoveryOptionsAction(
     return { status: "error", message: setupMessage.message };
   }
 
-  const supabase = await createSupabaseServerClient();
-  const { data } = await supabase.rpc("recovery_phone_hint", {
-    lookup_email: parsed.data.email,
-  });
+  if (!(await rateLimit("recovery-lookup", 10, 900)).allowed) {
+    return { status: "error", message: tooManyAttempts.message };
+  }
+
+  // A dica do celular só pode ser lida pelo servidor (chave de serviço).
+  const admin = createSupabaseAdminClient();
+  const { data } = admin
+    ? await admin.rpc("recovery_phone_hint", {
+        lookup_email: parsed.data.email,
+      })
+    : { data: null };
   return {
     status: "options",
     email: parsed.data.email,
@@ -176,6 +192,9 @@ export async function recoveryAction(
   if (!parsed.success) return invalidForm;
   if (!isSupabaseConfigured()) return setupMessage;
 
+  if (!(await rateLimit("recovery-send", 3, 3600, parsed.data.email)).allowed) {
+    return tooManyAttempts;
+  }
   if (formData.get("channel") === "phone") {
     return {
       message: "O envio por SMS ainda não está disponível. Use o e-mail.",

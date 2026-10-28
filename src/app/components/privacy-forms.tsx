@@ -134,11 +134,16 @@ export function PasswordForm() {
   return (
     <form action={action} className="editor-form">
       <PasswordField
+        name="currentPassword"
+        label="Senha atual"
+        autoComplete="current-password"
+      />
+      <PasswordField
         name="password"
         label="Nova senha"
         autoComplete="new-password"
         minLength={11}
-        description="Mínimo de 11 caracteres, incluindo maiúscula, minúscula e caractere especial."
+        description="Mínimo de 11 caracteres, com maiúscula, minúscula, número e símbolo."
       />
       <PasswordField
         name="passwordConfirmation"

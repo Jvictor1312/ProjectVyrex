@@ -6,6 +6,7 @@ const strongPasswordSchema = z
   .max(128, "Use no máximo 128 caracteres.")
   .regex(/\p{Lu}/u, "Inclua pelo menos uma letra maiúscula.")
   .regex(/\p{Ll}/u, "Inclua pelo menos uma letra minúscula.")
+  .regex(/\p{N}/u, "Inclua pelo menos um número.")
   .regex(/[^\p{L}\p{N}\s]/u, "Inclua pelo menos um caractere especial.");
 
 export const loginSchema = z.object({

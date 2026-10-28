@@ -1,5 +1,6 @@
 "use server";
 
+import { rateLimit, tooManyAttempts } from "@/lib/rate-limit";
 import { invalidPhoneMessage, normalizePhone } from "@/lib/validation/phone";
 import { revalidatePath } from "next/cache";
 import { requireSession } from "@/lib/auth";
@@ -139,12 +140,30 @@ export async function changePasswordAction(
     return {
       message:
         parsed.error.issues[0]?.message ??
-        "Use 11 ou mais caracteres, incluindo maiúscula, minúscula e caractere especial.",
+        "Mínimo de 11 caracteres, com maiúscula, minúscula, número e símbolo.",
       success: false,
     };
   }
 
-  const { supabase } = await requireSession();
+  const currentPassword = formData.get("currentPassword");
+  if (typeof currentPassword !== "string" || !currentPassword) {
+    return { message: "Informe a senha atual.", success: false };
+  }
+
+  const { supabase, user } = await requireSession();
+  if (!(await rateLimit("password-change", 5, 900, user.id)).allowed) {
+    return tooManyAttempts;
+  }
+  // Confirma que quem está trocando a senha conhece a senha atual: uma sessão
+  // aberta (computador compartilhado, cookie roubado) não basta.
+  const { error: currentError } = await supabase.auth.signInWithPassword({
+    email: user.email ?? "",
+    password: currentPassword,
+  });
+  if (currentError) {
+    return { message: "A senha atual não confere.", success: false };
+  }
+
   const { error } = await supabase.auth.updateUser({
     password: parsed.data.password,
   });

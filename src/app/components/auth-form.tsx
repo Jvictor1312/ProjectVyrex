@@ -14,7 +14,7 @@ type AuthMode = "login" | "signup" | "recovery" | "reset";
 
 const initialState: FormState = { message: "", success: false };
 const passwordRequirements =
-  "Mínimo de 11 caracteres, com maiúscula, minúscula e símbolo.";
+  "Mínimo de 11 caracteres, com maiúscula, minúscula, número e símbolo.";
 
 export function PasswordField({
   name,

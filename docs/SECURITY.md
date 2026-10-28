@@ -24,3 +24,23 @@
 - Cabeçalhos de segurança (CSP, HSTS etc.) não estão configurados em `next.config.ts`; definir na publicação.
 - A confirmação de e-mail depende de configuração do Supabase (SMTP).
 - Textos jurídicos são rascunhos.
+
+## Revisão de segurança de 2026-10-28
+
+Aplicado:
+
+- **Banco:** a tabela interna de cota (`evidence_upload_events`) não tem mais permissões para `anon`/`authenticated` (o TRUNCATE ignorava RLS); funções de gatilho não podem ser chamadas pela API; `recovery_phone_hint` só é executada pelo servidor (chave de serviço). Migration `202610280004_security_hardening.sql`. Nenhuma função fica aberta ao público.
+- **Isolamento verificado:** um criador só lê os próprios perfil, redes, evidências, funções e mensagens; não lê auditoria nem arquivos de outros.
+- **Senhas:** o Supabase passou a exigir 11 caracteres com minúscula, maiúscula, número e símbolo (antes aceitava 6 pela API). A troca de senha exige a senha atual.
+- **Limite de tentativas** (`src/lib/rate-limit.ts`): login (8 por e-mail e 30 por endereço a cada 15 min), cadastro (5 por hora), recuperação (10 consultas a cada 15 min e 3 envios por hora por e-mail), troca de senha (5 a cada 15 min).
+- **Sessão:** `src/proxy.ts` renova o token antes das telas com login. O login é conferido pela assinatura ES256 (`getClaims`).
+- **Cabeçalhos:** Content-Security-Policy (scripts, imagens, vídeos e conexões só do site e do Supabase; `frame-ancestors 'none'`), X-Frame-Options DENY, nosniff, Referrer-Policy, Permissions-Policy e HSTS.
+- **Ferramentas:** aprovação automática de comandos do assistente do VS Code desligada.
+
+Pendente (depende de plano pago, conta externa ou publicação):
+
+- Bloqueio de senhas vazadas (HaveIBeenPwned) exige plano pago do Supabase.
+- CAPTCHA no cadastro/login (ex.: Cloudflare Turnstile) exige uma conta no provedor.
+- SMTP próprio, para os e-mails de autenticação.
+- Ao publicar: trocar `site_url` e a lista de redirecionamentos do Supabase para o domínio real e cadastrar as chaves nas variáveis de ambiente da hospedagem.
+- O aviso "e-mail já cadastrado" no cadastro revela se um e-mail existe (pedido do produto). A dica do celular na recuperação revela os 4 últimos dígitos (pedido do produto), agora com limite de tentativas.
