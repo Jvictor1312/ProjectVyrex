@@ -30,9 +30,6 @@ export default function HomePage() {
 
       <section className="hero" aria-labelledby="hero-title">
         <div className="hero-copy">
-          <p className="eyebrow">
-            <span /> MARKETING DE INFLUÊNCIA
-          </p>
           <h1 id="hero-title">
             Marketing de influência <em>com estratégia.</em>
           </h1>
@@ -49,10 +46,6 @@ export default function HomePage() {
               Conheça a Vyrex <span aria-hidden="true">↓</span>
             </a>
           </div>
-          <p className="hero-note">
-            Estamos estruturando a operação e formando a rede de criadores. O
-            cadastro é gratuito e não garante campanha, contratação ou renda.
-          </p>
         </div>
         <div className="hero-art" aria-label="Identidade Vyrex">
           <div className="orbit orbit-one" />
@@ -70,7 +63,6 @@ export default function HomePage() {
 
       <section className="principles" id="como-funciona">
         <div className="principles-intro">
-          <p className="eyebrow">A PROPOSTA VYREX</p>
           <h2>Tecnologia própria. Estratégia e execução.</h2>
         </div>
         <article className="principle">
@@ -101,7 +93,6 @@ export default function HomePage() {
 
       <section className="public-info audience-section" id="publicos">
         <div>
-          <p className="eyebrow">DOIS LADOS, UMA OPERAÇÃO</p>
           <h2>Conexões que começam com compatibilidade.</h2>
           <p>
             A plataforma está sendo construída para organizar a rede e apoiar a
@@ -128,7 +119,6 @@ export default function HomePage() {
 
       <section className="public-info eligibility-section" id="criterios">
         <div>
-          <p className="eyebrow">CRITÉRIOS DE ELEGIBILIDADE</p>
           <h2>Uma análise humana, com critérios claros.</h2>
           <p>
             Seguidores ajudam a orientar a prioridade conforme cada campanha,
@@ -175,7 +165,6 @@ export default function HomePage() {
 
       <section className="public-info faq-section" id="perguntas">
         <div>
-          <p className="eyebrow">PERGUNTAS FREQUENTES</p>
           <h2>O que esperar do processo.</h2>
         </div>
         <div className="faq-list">

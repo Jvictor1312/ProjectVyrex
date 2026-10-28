@@ -112,11 +112,6 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
       className={mode === "signup" ? "auth-form signup-auth-form" : "auth-form"}
     >
       <div className="auth-heading">
-        {mode !== "signup" && (
-          <p className="eyebrow">
-            <span /> VYREX / CRIADORES
-          </p>
-        )}
         <h1>{copy.title}</h1>
         <p>{copy.description}</p>
       </div>

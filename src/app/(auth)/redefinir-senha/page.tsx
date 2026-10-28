@@ -12,7 +12,6 @@ export default function ResetPasswordPage() {
         <span>VYREX</span>
       </Link>
       <AuthForm mode="reset" />
-      <p className="auth-footer">Sua presença, novas possibilidades.</p>
     </main>
   );
 }

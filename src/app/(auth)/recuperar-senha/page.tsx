@@ -12,7 +12,6 @@ export default function RecoveryPage() {
         <span>VYREX</span>
       </Link>
       <AuthForm mode="recovery" />
-      <p className="auth-footer">Sua presença, novas possibilidades.</p>
     </main>
   );
 }

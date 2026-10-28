@@ -45,7 +45,6 @@ export default async function LoginPage({
         </p>
       )}
       <AuthForm mode="login" />
-      <p className="auth-footer">Sua presença, novas possibilidades.</p>
     </main>
   );
 }
