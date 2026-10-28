@@ -133,15 +133,26 @@ export async function uploadStoryEvidenceAction(
     viewsReported: Number(formData.get("viewsReported")),
     creatorNotes: formData.get("creatorNotes") || undefined,
   });
-  if (
-    !parsed.success ||
-    !(file instanceof File) ||
-    file.size === 0 ||
-    file.size > maximumEvidenceBytes
-  ) {
+  // Mensagens separadas para arquivo e dados, para a pessoa saber o que corrigir.
+  if (!(file instanceof File) || file.size === 0 || file.size > maximumEvidenceBytes) {
+    return {
+      message: "Use uma imagem JPEG, PNG ou WebP de até 8 MB.",
+      success: false,
+    };
+  }
+  if (!parsed.success) {
+    const field = parsed.error.issues[0]?.path[0];
+    const messages: Record<string, string> = {
+      socialAccountId: "Escolha a rede social em que o Story foi publicado.",
+      position: "Quadro de evidência inválido. Recarregue a página e tente de novo.",
+      storyPublishedOn: "Informe a data em que o Story foi publicado.",
+      viewsReported: "Informe as visualizações com números inteiros.",
+      creatorNotes: "A observação pode ter até 500 caracteres.",
+    };
     return {
       message:
-        "Selecione uma imagem JPEG, PNG ou WebP de até 8 MB e confira os campos.",
+        (typeof field === "string" && messages[field]) ||
+        "Confira os dados do Story e tente de novo.",
       success: false,
     };
   }

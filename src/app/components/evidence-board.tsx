@@ -49,6 +49,14 @@ export function EvidenceBoard({
   const [drafts, setDrafts] = useState<Draft[]>([]);
   const [notice, setNotice] = useState("");
   const [result, setResult] = useState<FormState>(initialState);
+  // Stories que o servidor recusou ou que perderam a conexão no último envio.
+  const [failed, setFailed] = useState<Set<number>>(new Set());
+  const forgetFailed = (positions: number[]) =>
+    setFailed((current) => {
+      const next = new Set(current);
+      positions.forEach((position) => next.delete(position));
+      return next;
+    });
   const [progress, setProgress] = useState("");
   const [pending, startTransition] = useTransition();
   const hasAccounts = socialAccounts.length > 0;
@@ -81,11 +89,13 @@ export function EvidenceBoard({
         .forEach((draft) => URL.revokeObjectURL(draft.url));
       return current.filter((draft) => draft.position !== position);
     });
+    forgetFailed([position]);
   }
 
   function cancelAll() {
     drafts.forEach((draft) => URL.revokeObjectURL(draft.url));
     setDrafts([]);
+    setFailed(new Set());
     setResult(initialState);
   }
 
@@ -121,6 +131,8 @@ export function EvidenceBoard({
       return [...current.filter((draft) => !replaced.has(draft.position)), ...added]
         .sort((a, b) => a.position - b.position);
     });
+    // Um print novo no lugar de um que falhou recomeça sem a marca de erro.
+    forgetFailed(added.map((draft) => draft.position));
     setResult(initialState);
 
     const warnings = [];
@@ -142,6 +154,7 @@ export function EvidenceBoard({
     startTransition(async () => {
       const saved: number[] = [];
       const failed: string[] = [];
+      const failedPositions: number[] = [];
       for (const [index, draft] of queue.entries()) {
         setProgress(`Enviando ${index + 1} de ${queue.length}…`);
         const body = new FormData();
@@ -162,15 +175,20 @@ export function EvidenceBoard({
         try {
           const response = await uploadStoryEvidenceAction(initialState, body);
           if (response.success) saved.push(draft.position);
-          else failed.push(`Story ${draft.position}: ${response.message}`);
+          else {
+            failed.push(`Story ${draft.position}: ${response.message}`);
+            failedPositions.push(draft.position);
+          }
         } catch {
           failed.push(
             `Story ${draft.position}: falha de conexão. Tente de novo.`,
           );
+          failedPositions.push(draft.position);
         }
       }
 
       setProgress("");
+      setFailed(new Set(failedPositions));
       const savedSet = new Set(saved);
       setDrafts((current) => {
         current
@@ -244,7 +262,9 @@ export function EvidenceBoard({
               )}
               <span
                 className={`${styles.status} ${
-                  draft
+                  draft && failed.has(slot.position) && !pending
+                    ? styles.statusAlert
+                    : draft
                     ? styles.statusDraft
                     : slot.needsAttention
                       ? styles.statusAlert
@@ -256,7 +276,9 @@ export function EvidenceBoard({
                 {draft
                   ? pending
                     ? "Enviando…"
-                    : "Falta salvar"
+                    : failed.has(slot.position)
+                      ? "Não foi salvo"
+                      : "Falta salvar"
                   : slot.uploaded
                     ? slot.statusLabel
                     : canEdit
@@ -431,7 +453,11 @@ export function EvidenceBoard({
             <button className={styles.save} type="submit" disabled={pending}>
               {pending
                 ? progress || "Enviando…"
-                : drafts.length === 1
+                : failed.size > 0
+                  ? drafts.length === 1
+                    ? "Tentar enviar de novo"
+                    : `Tentar enviar de novo (${drafts.length})`
+                  : drafts.length === 1
                   ? "Salvar evidência"
                   : `Salvar ${drafts.length} evidências`}
             </button>
