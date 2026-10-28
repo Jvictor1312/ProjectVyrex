@@ -576,7 +576,8 @@ td.empty {
    numa linha que rola de lado (antes ele sumia e não havia como navegar). */
 @media (max-width: 860px) {
   .shell {
-    grid-template-columns: 1fr;
+    /* minmax(0, …) impede que uma tabela larga estique a página inteira. */
+    grid-template-columns: minmax(0, 1fr);
   }
   .sidebar {
     position: sticky;
@@ -627,5 +628,59 @@ td.empty {
   .filters label {
     flex: 1 1 100%;
     min-width: 0;
+  }
+  .queueFilters select {
+    min-width: 0;
+  }
+  .queueFilters > label {
+    flex: 1 1 100%;
+  }
+}
+
+/* No celular, a lista de cadastros vira cartões: cada valor com o rótulo
+   da coluna, sem rolagem lateral. */
+@media (max-width: 760px) {
+  .queueTable .table {
+    min-width: 0;
+  }
+  .queueTable .table thead {
+    display: none;
+  }
+  .queueTable .table,
+  .queueTable .table tbody,
+  .queueTable .table tr,
+  .queueTable .table td {
+    display: block;
+    width: 100%;
+  }
+  .queueTable .table tr {
+    padding: 12px 20px;
+    border-bottom: 1px solid var(--line);
+  }
+  .queueTable .table tbody tr:last-child {
+    border-bottom: 0;
+  }
+  .queueTable .table td {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 3px 0;
+    border: 0;
+  }
+  .queueTable .table td::before {
+    color: var(--muted);
+    font-size: 12px;
+    content: attr(data-label);
+  }
+  .queueTable .table td:first-child::before,
+  .queueTable .rowAction::before {
+    display: none;
+  }
+  .queueTable .rowAction {
+    width: 100%;
+    padding-top: 6px;
+  }
+  .queueTable .table tbody tr:hover td {
+    background: transparent;
   }
 }

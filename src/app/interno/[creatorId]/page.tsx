@@ -12,6 +12,8 @@ import {
 } from "@/app/components/internal-actions";
 import { InternalShell } from "../internal-shell";
 import { fetchActiveRoleKeys, requireUserFast } from "@/lib/auth";
+import { creatorStatusTone, platformLabels, roleLabels } from "@/lib/labels";
+import { Badge } from "../ui";
 import styles from "../internal-detail.module.css";
 
 export const metadata: Metadata = { title: "Ficha do criador" };
@@ -41,12 +43,7 @@ const historyLabels: Record<string, string> = {
   reinstated: "Cadastro reativado",
 };
 
-const roleNames: Record<string, string> = {
-  admin: "Administrador",
-  recruiter: "Recrutamento",
-  relationship_manager: "Relacionamento",
-  validator: "Validação",
-};
+const roleNames: Record<string, string> = roleLabels;
 
 function actorName(
   actor: { full_name: string | null } | { full_name: string | null }[] | null,
@@ -239,7 +236,7 @@ export default async function CreatorInternalDetail({
     >
       <div className={styles.page}>
         <Link className={styles.back} href="/interno">
-          ← Voltar à fila
+          ← Voltar aos cadastros
         </Link>
         <section className={styles.heading}>
           <h1>{creator.public_name || "Perfil sem nome público"}</h1>
@@ -247,9 +244,9 @@ export default async function CreatorInternalDetail({
             {creator.city || "Cidade não informada"}
             {creator.region ? `, ${creator.region.trim()}` : ""}
           </p>
-          <span className={styles.status}>
+          <Badge tone={creatorStatusTone(creator.status)}>
             {statusLabels[creator.status] ?? creator.status}
-          </span>
+          </Badge>
         </section>
 
         <section className={styles.section}>
@@ -283,7 +280,8 @@ export default async function CreatorInternalDetail({
                 <article className={styles.account} key={account.id}>
                   <div>
                     <strong>
-                      {account.platform} · @{account.handle}
+                      {platformLabels[account.platform] ?? account.platform} · @
+                      {account.handle}
                     </strong>
                     <span>
                       {account.followers_reported.toLocaleString("pt-BR")}{" "}

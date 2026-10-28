@@ -129,16 +129,16 @@ export function CreatorQueue({
               <tbody>
                 {rows.map((row) => (
                   <tr key={row.id}>
-                    <td>
+                    <td data-label="Criador">
                       <strong>{row.name}</strong>
                     </td>
-                    <td>
+                    <td data-label="Situação">
                       <Badge tone={creatorStatusTone(row.status)}>
                         {creatorStatusLabel(row.status)}
                       </Badge>
                     </td>
-                    <td>{shortDate(row.submittedAt)}</td>
-                    <td>{shortDate(row.updatedAt)}</td>
+                    <td data-label="Enviado em">{shortDate(row.submittedAt)}</td>
+                    <td data-label="Última atualização">{shortDate(row.updatedAt)}</td>
                     <td className={styles.rowAction}>
                       <Link href={row.href} aria-label={`Abrir ficha de ${row.name}`}>
                         Abrir ficha

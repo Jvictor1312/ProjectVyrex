@@ -498,8 +498,10 @@
   .roles {
     justify-content: flex-end;
   }
-  .toolbar select {
+  .toolbar > label {
     flex: 1 1 100%;
+  }
+  .toolbar select {
     min-width: 0;
   }
   .resultCount {

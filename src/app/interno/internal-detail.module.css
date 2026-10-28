@@ -1,92 +1,111 @@
+/* Ficha do criador. Mesma escala da área interna: título 24px, seções 16px,
+   texto 14px, apoio 13px. Cada seção é um painel. */
 .page {
-  width: min(100% - 36px, 980px);
+  width: 100%;
+  max-width: 1080px;
   min-width: 0;
-  margin: 40px auto 80px;
+  padding: 24px clamp(20px, 3vw, 40px) 48px;
+}
+
+.back {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  margin-bottom: 16px;
+  padding: 0 12px;
+  border: 1px solid var(--line-strong);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 600;
+  transition: background-color 120ms ease;
+}
+.back:hover {
+  background: var(--hover);
 }
 
 .heading {
-  position: relative;
-  padding-bottom: 27px;
-  border-bottom: 1px solid var(--line);
-}
-
-.heading :global(.eyebrow) {
-  margin-bottom: 14px;
+  display: grid;
+  justify-items: start;
+  gap: 6px;
+  margin-bottom: 8px;
 }
 .heading h1 {
   margin: 0;
-  font-size: 32px;
+  font-size: 24px;
   font-weight: 650;
+  letter-spacing: -0.01em;
 }
-.heading > p:not(.eyebrow) {
-  margin: 9px 0 0;
+.heading > p {
+  margin: 0;
   color: var(--muted);
-  font-size: 13px;
+  font-size: 14px;
 }
 
 .status {
   display: inline-flex;
-  margin-top: 17px;
-  padding: 6px 9px;
-  border: 1px solid var(--line);
-  color: var(--text);
-  font-size: 10px;
-  font-weight: 700;
 }
 
 .section,
 .actionSection {
-  padding: 26px 0 30px;
-  border-bottom: 1px solid var(--line);
+  display: grid;
+  gap: 12px;
+  margin-top: 16px;
+  padding: 18px 20px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
 }
 
 .section h2,
 .actionSection h2 {
-  margin: 0 0 15px;
-  font-size: 25px;
+  margin: 0;
+  font-size: 16px;
   font-weight: 650;
 }
 
 .section > p {
-  max-width: 720px;
+  max-width: 72ch;
+  margin: 0;
   color: var(--muted);
-  font-size: 12px;
-  line-height: 1.7;
+  font-size: 14px;
+  line-height: 1.6;
 }
+
 .categories {
   display: flex;
   flex-wrap: wrap;
-  gap: 7px;
-  margin-top: 14px;
+  gap: 6px;
 }
 .categories span {
-  padding: 5px 8px;
+  padding: 2px 9px;
   border: 1px solid var(--line);
-  color: var(--muted);
-  font-size: 10px;
+  border-radius: 999px;
+  color: var(--text);
+  font-size: 13px;
 }
 
 .account {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(300px, 0.9fr);
   align-items: center;
-  gap: 18px;
-  padding: 16px 0;
+  gap: 16px;
+  padding: 14px 0 0;
   border-top: 1px solid var(--line);
 }
-
 .account > div {
   display: grid;
-  gap: 7px;
+  gap: 4px;
 }
 .account > div strong {
   color: var(--text);
-  font-size: 12px;
+  font-size: 14px;
 }
 .account > div span,
 .account > div a {
   color: var(--muted);
-  font-size: 10px;
+  font-size: 13px;
 }
 .account > div a {
   width: fit-content;
@@ -97,38 +116,44 @@
 
 .evidenceGrid {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 13px;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 14px;
 }
 .evidenceCard {
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
   color: var(--muted);
-  font-size: 10px;
+  font-size: 13px;
   line-height: 1.5;
 }
+.evidenceCard :global(.evidence-index) {
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 650;
+}
 .evidenceCard img,
-.evidenceCard > .emptyPreview {
+.evidenceCard > :global(.evidence-empty) {
   width: 100%;
+  height: auto;
   aspect-ratio: 9 / 16;
   object-fit: contain;
-  background: #000;
-  border-radius: 12px;
-  cursor: zoom-in;
   border: 1px solid var(--line);
-  background: var(--line);
+  border-radius: 10px;
+  background: var(--hover);
+  cursor: zoom-in;
 }
 .evidenceCard > :global(.evidence-empty) {
   display: grid;
   place-items: center;
   padding: 10px;
   text-align: center;
+  cursor: default;
 }
 .evidenceCard > strong {
   color: var(--text);
-  font-size: 11px;
+  font-size: 13px;
 }
 .evidenceCard > p {
   margin: 0;
@@ -137,40 +162,31 @@
   display: grid;
 }
 
-.actionSection {
-  background: transparent;
-}
-.actionSection :global(.internal-action-form) {
-  max-width: 620px;
-  display: grid;
-  gap: 8px;
-  margin: 18px 0 26px;
-}
+.actionSection :global(.internal-action-form),
 .actionSection :global(.internal-inline-form) {
-  max-width: 620px;
+  max-width: 640px;
   display: grid;
   gap: 10px;
-  margin: 18px 0;
+  margin: 4px 0 8px;
 }
 .reviewForm {
   display: grid;
-  gap: 7px;
+  gap: 8px;
 }
 .actionForm {
-  max-width: 620px;
+  max-width: 640px;
   display: grid;
-  gap: 8px;
-  margin: 18px 0 26px;
+  gap: 10px;
+  margin: 4px 0 8px;
 }
 .criticalAction {
-  padding-top: 16px;
+  padding-top: 14px;
   border-top: 1px solid var(--line);
 }
 
 .history,
 .communications {
   display: grid;
-  gap: 0;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -178,20 +194,20 @@
 .history li,
 .communications article {
   display: grid;
-  gap: 6px;
-  padding: 13px 0;
+  gap: 4px;
+  padding: 12px 0;
   border-top: 1px solid var(--line);
-  font-size: 11px;
+  font-size: 14px;
 }
 .history li strong,
 .communications article strong {
   color: var(--text);
-  font-size: 11px;
+  font-size: 14px;
 }
 .history li span,
 .communications article span {
   color: var(--muted);
-  font-size: 9px;
+  font-size: 13px;
 }
 .history li p,
 .communications article p {
@@ -200,61 +216,26 @@
   line-height: 1.6;
 }
 
-@media (max-width: 760px) {
-  .page {
-    width: min(100% - 32px, 980px);
-    margin-top: 30px;
-  }
-  .heading h1 {
-    font-size: 36px;
-  }
-  .account {
-    grid-template-columns: 1fr;
-  }
-  .evidenceGrid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-.back {
-  display: inline-flex;
-  margin-bottom: 18px;
-  padding: 8px 14px;
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  color: var(--text);
-  font-size: 14px;
-  font-weight: 600;
-  transition:
-    background-color 140ms ease,
-    transform 100ms ease;
-}
-.back:hover {
-  background: var(--hover);
-}
-.back:active {
-  transform: scale(0.97);
-}
-
 /* Confirmação dentro da página para decisões que não podem ser desfeitas. */
 .confirmBox {
   display: grid;
   gap: 12px;
-  padding: 16px 18px;
-  border: 2px solid var(--text);
-  border-radius: 14px;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--tone-danger);
+  border-radius: 8px;
   background: var(--surface);
   animation: confirm-in 140ms ease-out;
 }
 .confirmBox p {
   margin: 0;
-  font-size: 15px;
-  font-weight: 650;
+  font-size: 14px;
+  font-weight: 600;
 }
 .confirmBox div {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 8px;
 }
 @keyframes confirm-in {
   from {
@@ -265,5 +246,17 @@
 @media (prefers-reduced-motion: reduce) {
   .confirmBox {
     animation: none;
+  }
+}
+
+@media (max-width: 760px) {
+  .page {
+    padding: 20px 16px 40px;
+  }
+  .account {
+    grid-template-columns: 1fr;
+  }
+  .evidenceGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
