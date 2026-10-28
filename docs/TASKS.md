@@ -38,7 +38,7 @@ Atualizado em: 2026-10-15 (sessão 4)
 
 ## Próxima sessão
 
-- [ ] Revisar as skills de `.claude/skills/`: quais foram usadas e quais estão paradas, para remover as que só ocupam espaço (pedido do usuário em 2026-10-28).
+- [x] Revisar as skills de `.claude/skills/`: quais foram usadas e quais estão paradas, para remover as que só ocupam espaço (pedido do usuário em 2026-10-28).
 
 ## Sessão 2026-10-28, fluxo do administrador (Claude Code)
 
@@ -59,6 +59,13 @@ Atualizado em: 2026-10-15 (sessão 4)
 - [x] Segundo envio do cadastro é bloqueado pelo banco e pela tela.
 - [ ] Decidir com o usuário: como o criador corrige um cadastro enviado por engano (ex.: "desfazer envio" enquanto ninguém começou a análise).
 - [ ] Próximo: teste do fluxo de administrador com a conta +adm.
+
+## Sessão 2026-10-28, skills (Claude Code)
+
+- [x] Instaladas `design-taste-frontend`, `grilling`, `agent-browser`, `find-skills` (e `hyperframes`, removida em seguida por ser de vídeo). CLI `agent-browser` 0.40 instalado globalmente; testado em janela visível em localhost:3000.
+- [x] Inspetor da `design-taste-frontend` testado na home: roda e gera prints. Removidas `frontend-design`, `webapp-testing`, `using-git-worktrees`, `requesting-code-review`. Guia de uso em `CLAUDE.md` > "Skills do projeto".
+- [ ] Decidir com o usuário quais apontamentos do inspetor na home valem para a Vyrex: corpo de texto 14px (sugere 16px+), contraste 4,2:1 nos subtítulos do hero e no rodapé (mínimo 4,5:1), fontes "Avenir Next"/"Arial Black" declaradas mas não carregadas (o navegador usa substitutas), 11 tamanhos de fonte diferentes.
+- [ ] A pasta do projeto não tem `.git` nesta máquina: commit e push pendentes até reconectar ao repositório.
 
 ## Critério de status
 

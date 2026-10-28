@@ -25,18 +25,35 @@ As diretrizes não são uma ordem para recomeçar a auditoria a cada sessão. Tr
 O usuário acompanha tudo pelo VS Code, com o site aberto. **Dê mais empenho a mostrar o que foi feito do que só fazer.**
 
 - **Site sempre rodando:** o VS Code liga o servidor sozinho ao abrir a pasta (tarefa "Vyrex: servidor local" em `.vscode/tasks.json`). Antes de iniciar um servidor, verifique se http://localhost:3000 já responde. Se responder, use esse servidor e não abra outro. Se não responder, inicie `npm run dev` e mantenha-o ligado durante todo o trabalho.
-- **Tela por tela:** depois de cada alteração visível, abra o site num navegador **visível** e percorra as telas afetadas uma por uma, no ritmo em que o usuário consiga acompanhar. Use o Claude in Chrome quando estiver conectado; senão, use o Playwright com `headless=False` (skill `webapp-testing`).
+- **Tela por tela:** depois de cada alteração visível, abra o site num navegador **visível** e percorra as telas afetadas uma por uma, no ritmo em que o usuário consiga acompanhar. Use o Claude in Chrome quando estiver conectado; senão, use a skill `agent-browser` com janela visível (veja "Skills do projeto").
 - **Prova do resultado:** tire prints das telas alteradas e mostre ao usuário. Diga em qual endereço (por exemplo, `localhost:3000/dashboard`) ele pode ver cada mudança e o que mudou ali.
 - Se não houver como abrir um navegador visível, diga isso claramente e mostre a verificação alternativa que foi feita. Nunca afirme que mostrou uma tela que não foi aberta.
 
 ## Ambiente local
 
 - Node.js 24 LTS instalado em `C:\Program Files\nodejs`. Se o shell não encontrar `node`/`npm`, adicione esse caminho ao PATH do comando.
-- Python 3.13 instalado (`%LOCALAPPDATA%\Programs\Python\Python313`), com `playwright` e Chromium para a skill `webapp-testing`.
+- Python 3.13 instalado (`%LOCALAPPDATA%\Programs\Python\Python313`), usado pela skill `graphify`.
+- `agent-browser` 0.40 instalado globalmente (`npm i -g agent-browser`, em `%APPDATA%\npm`). Chrome em `C:\Program Files\Google\Chrome\Application\chrome.exe`.
 - Claude in Chrome está conectado: prefira-o para mostrar as telas ao usuário no Chrome dele.
 - Servidor de desenvolvimento: `npm run dev` → http://localhost:3000 (hot reload).
 - Verificações: `npm run typecheck`, `npm run lint`, `npm test` (PGlite + validação), `npm run build`.
 - Next.js desta versão tem mudanças em relação ao que você conhece: consulte `node_modules/next/dist/docs/` antes de escrever código Next (ver `AGENTS.md`).
+
+## Skills do projeto (`.claude/skills/`)
+
+Instaladas pelo `npx skills add` (registradas em `skills-lock.json`; atualize com `npx skills update -p -y`) ou copiadas à mão.
+
+- **`agent-browser`**: navegador automatizado para ver e testar telas. Antes do primeiro uso na sessão, leia o guia com `agent-browser skills get core`. Use sempre uma sessão própria (`$env:AGENT_BROWSER_SESSION = "vyrex-<tarefa>"`) e, para mostrar ao usuário, janela visível com o Chrome instalado: `agent-browser --headed --executable-path "C:\Program Files\Google\Chrome\Application\chrome.exe" open http://localhost:3000`. Depois `snapshot -i`, `click @eN` e `screenshot <arquivo>`. Para caçar bugs pelas telas: `agent-browser skills get dogfood`. Feche com `agent-browser close` ao terminar.
+- **`design-taste-frontend`**: direção de arte e inspeção visual. O inspetor `node .claude/skills/design-taste-frontend/scripts/inspect.mjs <url> [--app]` mede a página em 1440/768/390 px e salva prints em `.taste-skill/inspect/` (ignorado pelo git). Use `--app` nos painéis (`/dashboard`, `/equipe`, previews). As "regras da casa" dela (sem linhas finas, sem caixas com borda, mais fotos etc.) são sugestões: **a identidade preto e branco e minimalista da Vyrex vale mais** (seção 9 das diretrizes). Não rode `assets.mjs` (baixa imagens da internet) sem o usuário pedir.
+- **`web-design-guidelines`**, **`vercel-react-best-practices`**: revisão de interface/acessibilidade e de desempenho React/Next.
+- **`supabase`**, **`supabase-postgres-best-practices`**: qualquer trabalho com banco, RLS, Auth ou Storage.
+- **`systematic-debugging`**, **`test-driven-development`**, **`verification-before-completion`**: processo para corrigir bugs, escrever testes e só declarar pronto com prova.
+- **`git-commit`**: commits em Conventional Commits (português).
+- **`graphify`**: perguntas sobre a estrutura do código (usa `graphify-out/`).
+- **`grilling`**: quando o usuário quiser "ser sabatinado" sobre um plano ou ideia antes de construir.
+- **`find-skills`**: procurar novas skills quando faltar alguma capacidade. Instale no projeto com `npx skills add <repo> --skill <nome> -a claude-code --copy -y`.
+
+Removidas por não servirem a este projeto: `hyperframes` (vídeo), `frontend-design` (substituída pela `design-taste-frontend`), `webapp-testing` (substituída pela `agent-browser`), `using-git-worktrees` (o projeto trabalha direto na `main`) e `requesting-code-review` (o Claude Code já tem `/code-review`).
 
 ## Supabase
 
