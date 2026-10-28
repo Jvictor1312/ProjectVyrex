@@ -36,7 +36,14 @@ export function CreatorQueue({
   pageHref,
   loadError,
   title,
+  responsibleOptions,
+  responsible = "",
+  period = "",
 }: {
+  // Só o administrador filtra por responsável (os demais já veem a própria carteira).
+  responsibleOptions?: { id: string; name: string }[];
+  responsible?: string;
+  period?: string;
   rows: QueueRow[];
   total: number | null;
   search: string;
@@ -48,7 +55,8 @@ export function CreatorQueue({
   loadError: boolean;
   title: string;
 }) {
-  const filtered = search !== "" || status !== "all";
+  const filtered =
+    search !== "" || status !== "all" || responsible !== "" || period !== "";
   const staffOnPage = rows.filter((row) => row.isStaff).length;
 
   return (
@@ -72,8 +80,31 @@ export function CreatorQueue({
             type="search"
             maxLength={80}
             defaultValue={search}
-            placeholder="Nome público"
+            placeholder="Nome público ou nome do cadastro"
           />
+        </label>
+        {responsibleOptions && (
+          <label className={ui.field}>
+            <span>Responsável</span>
+            <select name="resp" defaultValue={responsible}>
+              <option value="">Todos</option>
+              <option value="none">Sem responsável</option>
+              {responsibleOptions.map((option) => (
+                <option value={option.id} key={option.id}>
+                  {option.name}
+                </option>
+              ))}
+            </select>
+          </label>
+        )}
+        <label className={ui.field}>
+          <span>Atualizados</span>
+          <select name="periodo" defaultValue={period}>
+            <option value="">Em qualquer data</option>
+            <option value="7">Nos últimos 7 dias</option>
+            <option value="30">Nos últimos 30 dias</option>
+            <option value="90">Nos últimos 90 dias</option>
+          </select>
         </label>
         <label className={ui.field}>
           <span>Situação</span>

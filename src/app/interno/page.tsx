@@ -102,14 +102,69 @@ export default async function InternalDashboard({
         ? [selectedStatus]
         : [];
 
-  const creatorsQuery = supabase
+  // Filtros extras: responsável (só administrador) e período da última atualização.
+  const rawResponsible = stringParam(params.resp) ?? "";
+  const responsible =
+    primaryRole === "admin" &&
+    (rawResponsible === "none" || /^[0-9a-f-]{36}$/i.test(rawResponsible))
+      ? rawResponsible
+      : "";
+  const periodOptions = { "7": 7, "30": 30, "90": 90 } as const;
+  const rawPeriod = stringParam(params.periodo) ?? "";
+  const period = rawPeriod in periodOptions ? (rawPeriod as keyof typeof periodOptions) : "";
+  // Caracteres com significado na sintaxe de filtros do banco viram espaço.
+  const safeSearch = search.replace(/[,()*%\\"'.:]/g, " ").replace(/\s+/g, " ").trim();
+
+  // Pré-consultas só quando há busca ou filtro de responsável.
+  const assignmentIds = async (table: "recruiter_assignments" | "relationship_assignments") => {
+    const column = table === "recruiter_assignments" ? "recruiter_id" : "manager_id";
+    let query = supabase.from(table).select("creator_id").is("ended_at", null);
+    if (responsible !== "none") query = query.eq(column, responsible);
+    const { data } = await query;
+    return (data ?? []).map((row) => row.creator_id as string);
+  };
+  const [nameMatches, assigned] = await Promise.all([
+    safeSearch
+      ? supabase.from("profiles").select("id").ilike("full_name", `%${safeSearch}%`).limit(200)
+      : Promise.resolve({ data: [] as { id: string }[] }),
+    responsible
+      ? Promise.all([
+          assignmentIds("recruiter_assignments"),
+          assignmentIds("relationship_assignments"),
+        ]).then(([a, b]) => [...new Set([...a, ...b])])
+      : Promise.resolve(null),
+  ]);
+
+  let creatorsQuery = supabase
     .from("creator_profiles")
     .select(
       "user_id, public_name, status, submitted_at, updated_at, account:profiles!creator_profiles_user_id_fkey(full_name)",
       { count: "exact" },
     )
-    .in("status", statuses)
-    .ilike("public_name", search ? `%${search}%` : "%")
+    .in("status", statuses);
+  if (safeSearch) {
+    // Nome público OU nome do cadastro.
+    const ids = (nameMatches.data ?? []).map((row) => row.id);
+    creatorsQuery = creatorsQuery.or(
+      [`public_name.ilike.%${safeSearch}%`, ...(ids.length ? [`user_id.in.(${ids.join(",")})`] : [])].join(","),
+    );
+  }
+  if (assigned) {
+    if (responsible === "none") {
+      if (assigned.length) creatorsQuery = creatorsQuery.not("user_id", "in", `(${assigned.join(",")})`);
+    } else {
+      // Sem nenhum cadastro atribuído, a lista fica vazia de propósito.
+      creatorsQuery = creatorsQuery.in(
+        "user_id",
+        assigned.length ? assigned : ["00000000-0000-0000-0000-000000000000"],
+      );
+    }
+  }
+  if (period) {
+    const since = new Date(Date.now() - periodOptions[period] * 86_400_000).toISOString();
+    creatorsQuery = creatorsQuery.gte("updated_at", since);
+  }
+  const pagedCreatorsQuery = creatorsQuery
     .order(primaryRole === "validator" ? "submitted_at" : "updated_at", {
       ascending: primaryRole === "validator",
     })
@@ -137,8 +192,9 @@ export default async function InternalDashboard({
     socialAccountsResult,
     decisionTimesResult,
     staffResult,
+    responsibleResult,
   ] = await Promise.all([
-    creatorsQuery,
+    pagedCreatorsQuery,
     adminOnly(countByStatus(), noCount),
     adminOnly(countByStatus("submitted"), noCount),
     adminOnly(countByStatus("under_review"), noCount),
@@ -174,7 +230,31 @@ export default async function InternalDashboard({
       )
       .is("revoked_at", null)
       .in("roles.key", [...internalRoleKeys]),
+    // Opções do filtro "Responsável": recrutadores e gestores de relacionamento.
+    adminOnly(
+      supabase
+        .from("user_roles")
+        .select(
+          "user_id, roles!inner(key), person:profiles!user_roles_user_id_fkey(full_name)",
+        )
+        .is("revoked_at", null)
+        .in("roles.key", ["recruiter", "relationship_manager"]),
+      { data: null, error: null },
+    ),
   ]);
+
+  type ResponsibleRow = {
+    user_id: string;
+    person: { full_name: string | null } | { full_name: string | null }[] | null;
+  };
+  const responsibleOptions = [
+    ...new Map(
+      ((responsibleResult.data ?? []) as ResponsibleRow[]).map((row) => [
+        row.user_id,
+        { id: row.user_id, name: accountName(row.person) ?? "Sem nome" },
+      ]),
+    ).values(),
+  ].sort((a, b) => a.name.localeCompare(b.name, "pt-BR"));
 
   type StaffRow = {
     user_id: string;
@@ -247,6 +327,8 @@ export default async function InternalDashboard({
     const next = new URLSearchParams();
     if (search) next.set("q", search);
     if (selectedStatus !== "all") next.set("status", selectedStatus);
+    if (responsible) next.set("resp", responsible);
+    if (period) next.set("periodo", period);
     next.set("page", String(targetPage));
     return `/interno?${next.toString()}`;
   };
@@ -333,6 +415,9 @@ export default async function InternalDashboard({
           search={search}
           status={selectedStatus}
           statusOptions={statusOptions}
+          responsibleOptions={primaryRole === "admin" ? responsibleOptions : undefined}
+          responsible={responsible}
+          period={period}
           page={page}
           totalPages={totalPages}
           pageHref={pageHref}
