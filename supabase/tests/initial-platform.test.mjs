@@ -129,6 +129,12 @@ before(async () => {
       "utf8",
     ),
   );
+  await database.exec(
+    await readFile(
+      new URL("../migrations/202610280006_decision_notification_titles.sql", import.meta.url),
+      "utf8",
+    ),
+  );
   await database.query(
     "insert into auth.users (id, raw_user_meta_data) values ($1, '{}'::jsonb), ($2, '{}'::jsonb), ($3, '{}'::jsonb)",
     [creatorOne, creatorTwo, creatorThree],
@@ -926,4 +932,12 @@ test("creator withdraws a sent application before any review and it returns to d
     asUser(creatorThree, () => database.query("select public.withdraw_creator_application()")),
     /only be withdrawn while awaiting review/i,
   );
+});
+test("decision notifications carry a title that says what was decided", async () => {
+  const titles = await database.query(
+    "select title from public.notifications where kind = 'status' order by created_at",
+  );
+  const all = titles.rows.map((row) => row.title);
+  assert.ok(all.includes("Cadastro não aprovado"), `títulos: ${all.join(", ")}`);
+  assert.ok(!all.includes("Atualização do cadastro"));
 });

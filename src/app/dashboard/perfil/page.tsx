@@ -93,6 +93,22 @@ export default async function CreatorProfilePage() {
   const canEdit =
     Boolean(profile) &&
     ["incomplete", "changes_requested"].includes(profile?.status ?? "");
+  // Por que a edição está bloqueada e o que a pessoa pode fazer.
+  const lockedMessages: Record<string, string> = {
+    submitted:
+      "Seu cadastro foi enviado e aguarda a equipe. Enquanto a análise não começar, você pode desfazer o envio na visão geral e voltar a editar.",
+    under_review:
+      "Seu cadastro está em análise. Se a equipe pedir alguma correção, a edição é liberada de novo.",
+    approved:
+      "Seu cadastro foi aprovado. Para alterar algum dado, fale com a equipe pela página Mensagens.",
+    rejected:
+      "Seu cadastro não foi aprovado e não pode ser editado. Veja a resposta da equipe na página Mensagens.",
+    suspended:
+      "Seu cadastro está suspenso. Veja a orientação da equipe na página Mensagens.",
+  };
+  const lockedMessage =
+    lockedMessages[profile?.status ?? ""] ??
+    "Seu cadastro não pode ser editado agora. Veja a situação na visão geral.";
   const reviewIssues: string[] = [];
   if (!settings) {
     reviewIssues.push(
@@ -132,7 +148,11 @@ export default async function CreatorProfilePage() {
     <CreatorShell>
       <section className="profile-content">
         <h1>Meu cadastro</h1>
-        <p className="profile-lede">Tudo é salvo enquanto você preenche.</p>
+        <p className="profile-lede">
+          {canEdit
+            ? "Tudo é salvo enquanto você preenche."
+            : `Situação: ${creatorStatusLabel(profile?.status ?? "")}. A edição está bloqueada nesta etapa.`}
+        </p>
         {hasLoadError && (
           <div className="setup-warning" role="alert">
             Não foi possível carregar seus dados. Recarregue a página.
@@ -195,10 +215,7 @@ export default async function CreatorProfilePage() {
                 }}
               />
             ) : (
-              <p className="field-hint">
-                Seu cadastro está em uma etapa que não permite edição. Consulte
-                a situação e as mensagens da equipe na visão geral.
-              </p>
+              <p className="field-hint">{lockedMessage}</p>
             )}
           </section>
 

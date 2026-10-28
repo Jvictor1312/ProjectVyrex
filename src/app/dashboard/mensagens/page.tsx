@@ -42,9 +42,9 @@ export default async function CreatorMessagesPage() {
         )}
 
         <section className={styles.historySection} aria-labelledby="equipe">
-          <h2 id="equipe">Da equipe</h2>
+          <h2 id="equipe">Mensagens da equipe</h2>
           {messages.length === 0 ? (
-            <p className={styles.empty}>Nenhuma mensagem ainda.</p>
+            <p className={styles.empty}>A equipe ainda não enviou mensagens. Quando enviar, elas aparecem aqui.</p>
           ) : (
             <div className={styles.notificationList}>
               {messages.map((message) => (
@@ -62,7 +62,7 @@ export default async function CreatorMessagesPage() {
         <section className={styles.historySection} aria-labelledby="avisos">
           <h2 id="avisos">Avisos</h2>
           {notifications.length === 0 ? (
-            <p className={styles.empty}>Nada novo por aqui.</p>
+            <p className={styles.empty}>Nenhum aviso no momento. Mudanças na situação do seu cadastro aparecem aqui.</p>
           ) : (
             <div className={styles.notificationList}>
               {notifications.map((notification) => (

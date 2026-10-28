@@ -7,11 +7,20 @@ import {
 } from "@/lib/labels";
 import styles from "./creator-overview.module.css";
 
+// Cada etapa da análise com um nome que o criador entende (antes, as
+// conferências de evidência e de rede apareciam como "Atualização do cadastro").
 const historyLabels: Record<string, string> = {
   submitted: "Cadastro enviado",
+  withdrawn: "Envio desfeito por você",
   forwarded: "Encaminhado para validação",
+  review_started: "Análise iniciada",
+  evidence_approved: "Evidência aprovada",
+  evidence_rejected: "Evidência recusada",
+  evidence_changes_requested: "Correção pedida em uma evidência",
+  social_account_verified: "Rede social conferida",
+  social_account_rejected: "Rede social precisa de ajuste",
   approved: "Cadastro aprovado",
-  rejected: "Cadastro rejeitado",
+  rejected: "Cadastro não aprovado",
   changes_requested: "Correção solicitada",
   suspended: "Cadastro suspenso",
   reinstated: "Cadastro reativado",
@@ -39,21 +48,22 @@ export function nextStepFor(
     case "under_review":
       return {
         title: "Seu cadastro está em análise",
-        text: "Avisaremos por aqui quando houver novidade.",
+        text: "A equipe está conferindo seus dados e evidências. Você recebe um aviso aqui quando houver novidade.",
         href: "/dashboard/mensagens",
         cta: "Ver mensagens",
       };
     case "approved":
       return {
         title: "Seu perfil foi aprovado",
-        text: "Mantenha seus dados atualizados.",
-        href: "/dashboard/perfil",
-        cta: "Ver meu cadastro",
+        text: "Você já faz parte da rede Vyrex. A equipe entra em contato por aqui quando surgir uma campanha compatível com o seu perfil.",
+        href: "/dashboard/mensagens",
+        cta: "Ver mensagens",
       };
     case "rejected":
     case "suspended":
       return {
         title: "Veja a resposta da equipe",
+        text: "A equipe explicou o motivo na página Mensagens.",
         href: "/dashboard/mensagens",
         cta: "Ver mensagens",
       };
@@ -69,6 +79,7 @@ export function nextStepFor(
       if (accountCount === 0) {
         return {
           title: "Adicione sua rede social",
+          text: "Informe a rede em que você publica e quantos seguidores tem.",
           href: "/dashboard/perfil#redes",
           cta: "Adicionar rede",
         };
@@ -76,7 +87,7 @@ export function nextStepFor(
       if (evidenceCount < requiredEvidence || hasEvidenceIssues) {
         return {
           title: "Envie as evidências dos Stories",
-          text: `${evidenceCount} de ${requiredEvidence} enviadas.`,
+          text: `${evidenceCount} de ${requiredEvidence} obrigatórias enviadas. Envie prints recentes que mostrem as visualizações.`,
           href: "/dashboard/perfil#evidencias",
           cta: "Enviar evidências",
         };

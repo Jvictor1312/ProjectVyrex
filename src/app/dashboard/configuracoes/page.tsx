@@ -40,7 +40,9 @@ export default async function CreatorSettingsPage() {
     <CreatorShell>
       <section className="dashboard-content">
         <h1>Configurações</h1>
-        <p className="dashboard-email">{user.email}</p>
+        <p className="dashboard-email">
+          Conta de acesso: {user.email}. O e-mail não pode ser alterado por aqui.
+        </p>
         {profileResult.error || !profile ? (
           <p className="setup-warning" role="alert">
             Não foi possível carregar os dados da conta.
