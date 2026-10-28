@@ -408,7 +408,7 @@ export async function updateEligibilitySettingsAction(
   const parsed = z
     .object({
       minimumFollowers: z.number().int().min(0).max(2_147_483_647),
-      requiredEvidence: z.literal(5),
+      requiredEvidence: z.number().int().min(1).max(5),
       minimumViews: z.number().int().min(0).max(2_147_483_647),
       maxStoryAgeDays: z.number().int().min(1).max(365).nullable(),
     })

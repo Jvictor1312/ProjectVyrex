@@ -46,7 +46,9 @@ export default async function CreatorProfilePage() {
         .order("position"),
       supabase
         .from("eligibility_settings")
-        .select("minimum_followers, minimum_story_views, max_story_age_days")
+        .select(
+          "minimum_followers, minimum_story_views, max_story_age_days, required_story_evidence",
+        )
         .eq("singleton", true)
         .maybeSingle(),
     ]);
@@ -72,6 +74,7 @@ export default async function CreatorProfilePage() {
     settingsResult.error;
   const minimumViews = settings?.minimum_story_views ?? 1000;
   const maxStoryAgeDays = settings ? settings.max_story_age_days : 7;
+  const requiredEvidence = settings?.required_story_evidence ?? 3;
   const canEdit =
     Boolean(profile) &&
     ["incomplete", "changes_requested"].includes(profile?.status ?? "");
@@ -93,7 +96,9 @@ export default async function CreatorProfilePage() {
   for (const position of [1, 2, 3, 4, 5]) {
     const item = evidenceSlots.get(position);
     if (!item) {
-      reviewIssues.push(`Envie a evidência ${position}.`);
+      if (position <= requiredEvidence) {
+        reviewIssues.push(`Envie a evidência ${position}.`);
+      }
     } else {
       if (item.views_reported < minimumViews) {
         reviewIssues.push(
@@ -147,14 +152,16 @@ export default async function CreatorProfilePage() {
               title: "Evidências",
               panelId: "evidencias",
               complete:
-                evidence.length === 5 &&
+                [...Array(requiredEvidence)].every((_, index) =>
+                  evidenceSlots.has(index + 1),
+                ) &&
                 evidence.every(
                   (item) =>
                     item.views_reported >= minimumViews &&
                     (!earliestStoryDate ||
                       item.story_published_on >= earliestStoryDate),
                 ),
-              help: "Os 5 Stories mais recentes, do mais novo (1) ao mais antigo (5).",
+              help: `Os Stories mais recentes, do mais novo (1) ao mais antigo. Os ${requiredEvidence} primeiros são obrigatórios.`,
             },
             {
               title: "Revisão e envio",
@@ -259,7 +266,10 @@ export default async function CreatorProfilePage() {
               <span className="principle-number">03</span>
               <div>
                 <h2>Evidências</h2>
-                <p>Toque em cada quadro e envie o print do Story.</p>
+                <p>
+                  Toque em cada quadro e envie o print do Story. Os marcados
+                  com * são obrigatórios.
+                </p>
               </div>
             </div>
             <EvidenceBoard
@@ -286,6 +296,7 @@ export default async function CreatorProfilePage() {
               minimumViews={minimumViews}
               maxStoryAgeDays={maxStoryAgeDays}
               canEdit={canEdit}
+              requiredCount={requiredEvidence}
             />
           </section>
 
@@ -326,7 +337,8 @@ export default async function CreatorProfilePage() {
               <div>
                 <dt>Evidências</dt>
                 <dd>
-                  {evidence.length} de 5 enviadas; mínimo de{" "}
+                  {evidence.length} enviadas ({requiredEvidence} obrigatórias);
+                  mínimo de{" "}
                   {minimumViews.toLocaleString("pt-BR")} visualizações
                   {maxStoryAgeDays === null
                     ? ""

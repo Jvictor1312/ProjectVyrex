@@ -96,6 +96,15 @@ before(async () => {
       "utf8",
     ),
   );
+  await database.exec(
+    await readFile(
+      new URL(
+        "../migrations/202610280002_three_required_evidence.sql",
+        import.meta.url,
+      ),
+      "utf8",
+    ),
+  );
   await database.query(
     "insert into auth.users (id, raw_user_meta_data) values ($1, '{}'::jsonb), ($2, '{}'::jsonb), ($3, '{}'::jsonb)",
     [creatorOne, creatorTwo, creatorThree],
@@ -159,7 +168,7 @@ test("migration creates five distinct roles and default eligibility criteria", a
   );
   assert.deepEqual(settings.rows[0], {
     minimum_followers: 0,
-    required_story_evidence: 5,
+    required_story_evidence: 3,
     minimum_story_views: 1000,
     max_story_age_days: 7,
   });
@@ -494,7 +503,7 @@ test("rejection records the authorized reviewer, date, and reason", async () => 
   });
 });
 
-test("approval is blocked until five recent evidence items are manually approved", async () => {
+test("approval is blocked until the three required evidence items are manually approved", async () => {
   await database.query(
     "update public.creator_profiles set status = 'under_review' where user_id = $1",
     [creatorOne],
@@ -510,7 +519,7 @@ test("approval is blocked until five recent evidence items are manually approved
   );
   const socialAccountId = rows[0].id;
 
-  for (let position = 1; position <= 4; position += 1) {
+  for (let position = 1; position <= 2; position += 1) {
     const storagePath = `${creatorOne}/review-${position}.webp`;
     await database.query(
       "insert into storage.objects (bucket_id, name) values ('story-evidence', $1)",
@@ -535,7 +544,7 @@ test("approval is blocked until five recent evidence items are manually approved
     /all required evidence must be manually approved/i,
   );
 
-  const finalStoragePath = `${creatorOne}/review-5.webp`;
+  const finalStoragePath = `${creatorOne}/review-3.webp`;
   await database.query(
     "insert into storage.objects (bucket_id, name) values ('story-evidence', $1)",
     [finalStoragePath],
@@ -544,7 +553,7 @@ test("approval is blocked until five recent evidence items are manually approved
     `insert into public.metric_evidence (
        creator_id, social_account_id, position, storage_path, content_type,
        size_bytes, story_published_on, views_reported, review_status, reviewed_by, reviewed_at
-     ) values ($1, $2, 5, $3, 'image/webp', 100, current_date, 999, 'approved', $4, now())
+     ) values ($1, $2, 3, $3, 'image/webp', 100, current_date, 999, 'approved', $4, now())
      returning id`,
     [creatorOne, socialAccountId, finalStoragePath, validator],
   );
@@ -569,7 +578,7 @@ test("approval is blocked until five recent evidence items are manually approved
   );
   await asUser(validator, () =>
     database.query(
-      "select public.record_review_decision($1, 'approved', 'Cinco evidências conferidas manualmente')",
+      "select public.record_review_decision($1, 'approved', 'Três evidências conferidas manualmente')",
       [creatorOne],
     ),
   );
@@ -581,11 +590,11 @@ test("approval is blocked until five recent evidence items are manually approved
   assert.deepEqual(decision.rows[0], {
     status: "approved",
     decided_by: validator,
-    decision_reason: "Cinco evidências conferidas manualmente",
+    decision_reason: "Três evidências conferidas manualmente",
   });
 });
 
-test("submission requires five in-order Stories within the configured age window", async () => {
+test("submission requires the first three Stories, in order and within the age window", async () => {
   const account = await database.query(
     `insert into public.social_accounts (
        creator_id, platform, handle, profile_url, followers_reported
@@ -651,17 +660,17 @@ test("submission requires five in-order Stories within the configured age window
     [creatorThree],
   );
   await database.query(
-    "update public.metric_evidence set views_reported = 999 where creator_id = $1 and position = 5",
+    "update public.metric_evidence set views_reported = 999 where creator_id = $1 and position = 2",
     [creatorThree],
   );
   await assert.rejects(
     asUser(creatorThree, () =>
       database.query("select public.submit_creator_application()"),
     ),
-    /exactly the required number of valid story evidence/i,
+    /first required story evidence items must be provided and valid/i,
   );
   await database.query(
-    "update public.metric_evidence set views_reported = 1000 where creator_id = $1 and position = 5",
+    "update public.metric_evidence set views_reported = 1000 where creator_id = $1 and position = 2",
     [creatorThree],
   );
   await asUser(creatorThree, () =>

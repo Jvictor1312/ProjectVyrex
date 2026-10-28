@@ -33,8 +33,10 @@ export function EvidenceBoard({
   minimumViews,
   maxStoryAgeDays,
   canEdit,
+  requiredCount = 3,
 }: {
   slots: EvidenceSlot[];
+  requiredCount?: number;
   socialAccounts: { id: string; platform: string; handle: string }[];
   minimumViews: number;
   maxStoryAgeDays: number | null;
@@ -110,6 +112,11 @@ export function EvidenceBoard({
                 </span>
               )}
               <span className={styles.number}>{slot.position}</span>
+              {slot.position <= requiredCount && (
+                <span className={styles.required} title="Obrigatória">
+                  *<span className={styles.srOnly}> obrigatória</span>
+                </span>
+              )}
               <span
                 className={`${styles.status} ${
                   isDraft

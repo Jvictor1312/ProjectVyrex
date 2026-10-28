@@ -184,12 +184,14 @@ export function EligibilitySettingsForm({
           />
         </label>
         <label>
-          <span>Número de evidências (fixo nesta versão)</span>
+          <span>Evidências obrigatórias (de 1 a 5)</span>
           <input
             name="requiredEvidence"
             type="number"
-            readOnly
-            value={requiredEvidence}
+            min={1}
+            max={5}
+            required
+            defaultValue={requiredEvidence}
           />
         </label>
         <label>

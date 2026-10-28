@@ -241,7 +241,7 @@ export async function submitCreatorApplicationAction(
   return error
     ? {
         message:
-          "Confira o nome público, informe pelo menos uma rede social e envie os cinco Stories com 1.000 visualizações ou mais, em ordem cronológica e dentro do prazo configurado.",
+          "Confira o nome público, informe pelo menos uma rede social e envie as evidências obrigatórias com as visualizações mínimas, em ordem cronológica e dentro do prazo.",
         success: false,
       }
     : {

@@ -256,3 +256,22 @@ button.tile:disabled {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
+
+.required {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  color: #a64337;
+  font-size: 22px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
