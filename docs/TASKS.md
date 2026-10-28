@@ -65,7 +65,14 @@ Atualizado em: 2026-10-15 (sessão 4)
 - [x] Instaladas `design-taste-frontend`, `grilling`, `agent-browser`, `find-skills` (e `hyperframes`, removida em seguida por ser de vídeo). CLI `agent-browser` 0.40 instalado globalmente; testado em janela visível em localhost:3000.
 - [x] Inspetor da `design-taste-frontend` testado na home: roda e gera prints. Removidas `frontend-design`, `webapp-testing`, `using-git-worktrees`, `requesting-code-review`. Guia de uso em `CLAUDE.md` > "Skills do projeto".
 - [ ] Decidir com o usuário quais apontamentos do inspetor na home valem para a Vyrex: corpo de texto 14px (sugere 16px+), contraste 4,2:1 nos subtítulos do hero e no rodapé (mínimo 4,5:1), fontes "Avenir Next"/"Arial Black" declaradas mas não carregadas (o navegador usa substitutas), 11 tamanhos de fonte diferentes.
-- [ ] A pasta do projeto não tem `.git` nesta máquina: commit e push pendentes até reconectar ao repositório.
+- [x] Pasta reconectada ao GitHub (`origin/main`) e alterações enviadas.
+
+## Sessão 2026-10-28, menu e evidências do criador (Claude Code)
+
+- [x] Menu do criador (Visão geral, Meu cadastro, Mensagens, Configurações) foi para dentro da barra do topo, que fica fixa ao rolar. No celular, desce para uma segunda linha da barra.
+- [x] Evidências: dá para escolher vários prints de uma vez (preenchem os quadros vazios em ordem), preencher rede/data/visualizações de cada um numa lista e salvar tudo com um botão. Cada Story vai num envio próprio (limite de 10 MB por envio mantido); se algum falhar, os outros ficam salvos e o que falhou continua na tela.
+- [x] Verificado no navegador (preview, computador e celular), typecheck, lint e `npm test` (35/35). O lint passou a ignorar `.claude/` (scripts das skills).
+- [ ] Testar o salvamento real com login: a conta +user já enviou o cadastro (não editável). Testar quando houver uma conta em rascunho ou com correção pedida.
 
 ## Critério de status
 

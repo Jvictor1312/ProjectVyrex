@@ -13,5 +13,13 @@ export default defineConfig([
     },
   },
   ...tseslint.configs.recommended,
-  globalIgnores([".next/**", "out/**", "build/**", "next-env.d.ts"]),
+  // .claude/ guarda as skills (código de terceiros, não faz parte do site).
+  globalIgnores([
+    ".next/**",
+    "out/**",
+    "build/**",
+    "next-env.d.ts",
+    ".claude/**",
+    "graphify-out/**",
+  ]),
 ]);
