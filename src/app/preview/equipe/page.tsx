@@ -49,7 +49,6 @@ export default async function TeamDashboardPreview() {
           <div>
             <h1>Visão geral</h1>
           </div>
-          <span className="preview-notice">Demonstração com dados fictícios</span>
         </header>
         <div className={styles.summary}>
           {demoMetrics.map(([label, value]) => (

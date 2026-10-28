@@ -19,9 +19,6 @@ export default function CreatorDashboardPreview() {
         </Link>
       </header>
       <CreatorNav />
-      <p className="preview-notice" role="note">
-        Demonstração com dados fictícios
-      </p>
       <CreatorOverview
         name="Marina"
         status="changes_requested"

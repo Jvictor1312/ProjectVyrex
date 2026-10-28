@@ -58,14 +58,6 @@ export default function HomePage() {
         </nav>
       </header>
 
-      {process.env.NODE_ENV === "development" && (
-        <nav className="preview-strip" aria-label="Pré-visualizações locais">
-          <span>DEMONSTRAÇÕES LOCAIS</span>
-          <Link href="/preview/criador">Painel do criador</Link>
-          <Link href="/preview/equipe">Painel da equipe</Link>
-        </nav>
-      )}
-
       <section className={styles.hero} aria-labelledby="hero-title">
         <div className={styles.heroCopy}>
           <h1 id="hero-title" className={styles.heroTitle}>

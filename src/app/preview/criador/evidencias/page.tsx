@@ -11,9 +11,6 @@ export default function EvidencePreview() {
 
   return (
     <main className="dashboard-page">
-      <p className="preview-notice" role="note">
-        Demonstração com dados fictícios
-      </p>
       <section className="profile-content">
         <section className="profile-section">
           <div className="section-heading">
