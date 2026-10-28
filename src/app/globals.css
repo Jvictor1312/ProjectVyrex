@@ -22,7 +22,7 @@ body {
   margin: 0;
   background: var(--paper);
   color: var(--ink);
-  font-family: "Avenir Next", Avenir, "Segoe UI", sans-serif;
+  font-family: var(--font-sans), "Segoe UI", system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
 }
 a {
@@ -62,7 +62,7 @@ input {
   border-radius: 50%;
   color: var(--paper);
   background: var(--ink);
-  font-family: Georgia, serif;
+  font-family: Georgia, var(--font-serif), serif;
   font-size: 16px;
   font-weight: 500;
   letter-spacing: 0;
@@ -71,7 +71,7 @@ input {
 .signup-showcase-brand > span:not(.brand-mark),
 .brand-disc span,
 .signup-orb-word {
-  font-family: "Arial Black", Arial, sans-serif;
+  font-family: var(--font-sans), "Arial Black", Arial, sans-serif;
   font-weight: 900;
   letter-spacing: 0;
 }
@@ -181,7 +181,7 @@ button:focus-visible {
 h1 {
   max-width: 590px;
   margin: 0;
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: Georgia, var(--font-serif), "Times New Roman", serif;
   font-size: clamp(54px, 6vw, 82px);
   line-height: 0.99;
   font-weight: 400;
@@ -298,7 +298,7 @@ h1 em {
 .principles h2 {
   max-width: 240px;
   margin: 0;
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: Georgia, var(--font-serif), "Times New Roman", serif;
   font-size: 25px;
   line-height: 1.16;
   font-weight: 400;
@@ -332,7 +332,7 @@ h1 em {
 .public-info h2 {
   max-width: 330px;
   margin: 0;
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: Georgia, var(--font-serif), "Times New Roman", serif;
   font-size: 28px;
   font-weight: 400;
   line-height: 1.2;
@@ -823,7 +823,7 @@ button.signup-showcase-toggle:focus-visible {
 }
 .signup-video-dialog-header h2 {
   margin: 0;
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: Georgia, var(--font-serif), "Times New Roman", serif;
   font-size: 25px;
   font-weight: 400;
 }
@@ -846,7 +846,7 @@ button.signup-showcase-toggle:focus-visible {
   place-items: center;
   border: 1px solid #ffffff80;
   border-radius: 50%;
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: Georgia, var(--font-serif), "Times New Roman", serif;
   font-size: 24px;
 }
 .signup-video-placeholder p,
@@ -1132,7 +1132,7 @@ button.signup-showcase-toggle:focus-visible {
 }
 .dashboard-next h2 {
   margin: 12px 0;
-  font-family: Georgia, serif;
+  font-family: Georgia, var(--font-serif), serif;
   font-size: 30px;
   font-weight: 400;
 }
@@ -1330,7 +1330,7 @@ button.signup-showcase-toggle:focus-visible {
 }
 .section-heading h2 {
   margin: 0;
-  font-family: Georgia, serif;
+  font-family: Georgia, var(--font-serif), serif;
   font-size: 27px;
   font-weight: 400;
 }

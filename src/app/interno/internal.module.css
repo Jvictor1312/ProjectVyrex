@@ -30,7 +30,7 @@
     var(--bg) 232px
   );
   color: var(--text);
-  font-family: "Segoe UI", "Avenir Next", Avenir, system-ui, sans-serif;
+  font-family: var(--font-sans), "Segoe UI", system-ui, sans-serif;
   font-size: 14px;
 }
 
@@ -105,7 +105,7 @@
   border-radius: 50%;
   background: var(--text);
   color: var(--surface);
-  font-family: Georgia, serif;
+  font-family: Georgia, var(--font-serif), serif;
   font-size: 15px;
   font-weight: 400;
   letter-spacing: 0;
