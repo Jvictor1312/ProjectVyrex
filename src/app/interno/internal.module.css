@@ -1,9 +1,121 @@
+/* Tema da área da equipe. O claro é o padrão; o escuro só entra quando a
+   pessoa escolhe no botão do menu. As cores gerais do site (--ink, --paper…)
+   também são trocadas aqui para formulários e botões compartilhados. */
 .shell {
+  --bg: #f3f4f6;
+  --surface: #ffffff;
+  --text: #15181d;
+  --muted: #5f6672;
+  --line: #e2e5ea;
+  --hover: #eceef2;
+  --accent-hover: #2c313a;
+  --line-strong: #c4c9d1;
+  --text-muted: var(--muted);
+  --accent: var(--text);
+  --accent-text: var(--surface);
   min-height: 100svh;
   display: grid;
-  grid-template-columns: 230px minmax(0, 1fr);
-  background: #f5f6f3;
-  color: #151717;
+  grid-template-columns: 248px minmax(0, 1fr);
+  background: var(--bg);
+  color: var(--text);
+  font-family: "Segoe UI", "Avenir Next", Avenir, system-ui, sans-serif;
+}
+
+.shell[data-theme="dark"] {
+  --bg: #0e1013;
+  --surface: #171a1f;
+  --text: #e7e9ed;
+  --muted: #9aa2ae;
+  --line: #2a2f37;
+  --hover: #1f2329;
+  --accent-hover: #c9ced6;
+  --line-strong: #3a404a;
+  --ink: #e7e9ed;
+  --paper: #0e1013;
+  --white: #171a1f;
+  --green: #c9ced6;
+  color-scheme: dark;
+}
+
+.shell[data-theme="dark"] :global(.field) input,
+.shell[data-theme="dark"] :global(.field) select,
+.shell[data-theme="dark"] :global(.field) textarea,
+.shell[data-theme="dark"] input,
+.shell[data-theme="dark"] select,
+.shell[data-theme="dark"] textarea {
+  border-color: var(--line-strong);
+  background: var(--surface);
+  color: var(--text);
+}
+
+.shell[data-theme="dark"] :global(.button-dark) {
+  background: var(--text);
+  color: var(--bg);
+}
+
+.shell :global(.button) {
+  border-radius: 999px;
+}
+
+.brandTag {
+  margin-left: 2px;
+  padding: 2px 8px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0;
+}
+
+.sideFooter {
+  display: grid;
+  gap: 10px;
+  margin-top: auto;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+}
+
+.sideUser {
+  overflow: hidden;
+  padding: 0 4px;
+  color: var(--muted);
+  font-size: 13px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.themeToggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    background-color 140ms ease,
+    transform 100ms ease;
+}
+
+.themeToggle:hover {
+  background: var(--hover);
+}
+
+.themeToggle:active {
+  transform: scale(0.97);
+}
+
+.themeIcon {
+  width: 18px;
+  text-align: center;
 }
 
 .sidebar {
@@ -13,8 +125,8 @@
   display: flex;
   flex-direction: column;
   padding: 25px 18px;
-  border-right: 1px solid #d8dcd7;
-  background: #fff;
+  border-right: 1px solid var(--line);
+  background: var(--surface);
 }
 
 .brand {
@@ -32,8 +144,8 @@
   display: grid;
   place-items: center;
   border-radius: 50%;
-  background: #111;
-  color: #fff;
+  background: var(--text);
+  color: var(--surface);
   font-family: Georgia, serif;
   font-size: 15px;
   font-weight: 400;
@@ -47,7 +159,7 @@
 
 .sideLabel,
 .eyebrow {
-  color: #747b77;
+  color: var(--muted);
   font-size: 9px;
   font-weight: 800;
   letter-spacing: 1.3px;
@@ -59,14 +171,14 @@
 .sideLink,
 .sideLinkActive {
   padding: 10px 9px;
-  color: #626966;
+  color: var(--muted);
   font-size: 12px;
 }
 
 .sideLinkActive {
-  border-left: 2px solid #121414;
-  background: #f0f1ee;
-  color: #121414;
+  border-left: 2px solid var(--text);
+  background: var(--hover);
+  color: var(--text);
   font-weight: 700;
 }
 
@@ -79,20 +191,20 @@
 
 .sideRoles span {
   padding: 5px 7px;
-  border: 1px solid #e0e3df;
-  color: #5e6561;
+  border: 1px solid var(--line);
+  color: var(--muted);
   font-size: 9px;
 }
 
 .logoutForm {
-  margin-top: auto;
+  margin: 0;
 }
 .logoutForm button {
   width: 100%;
   padding: 10px;
-  border: 1px solid #d8dcd7;
-  background: #fff;
-  color: #333;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--text);
   text-align: left;
   font-size: 12px;
   cursor: pointer;
@@ -113,17 +225,20 @@
 }
 .pageHeader h1 {
   margin: 0;
-  font-family: Georgia, serif;
-  font-size: 38px;
-  font-weight: 400;
+  font-size: 28px;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+}
+.pageHeader .eyebrow {
+  display: none;
 }
 .pageHeader p:not(.eyebrow) {
   margin: 9px 0 0;
-  color: #707773;
+  color: var(--muted);
   font-size: 13px;
 }
 .userLabel {
-  color: #737a76;
+  color: var(--muted);
   font-size: 11px;
 }
 
@@ -132,8 +247,8 @@
   grid-template-columns: repeat(auto-fit, minmax(145px, 1fr));
   gap: 1px;
   margin: 30px 0 25px;
-  border: 1px solid #dce0db;
-  background: #dce0db;
+  border: 1px solid var(--line);
+  background: var(--line);
 }
 
 .metric {
@@ -142,10 +257,10 @@
   flex-direction: column;
   justify-content: space-between;
   padding: 13px 15px;
-  background: #fff;
+  background: var(--surface);
 }
 .metric span {
-  color: #717873;
+  color: var(--muted);
   font-size: 10px;
 }
 .metric strong {
@@ -161,15 +276,15 @@
 .report {
   min-width: 0;
   padding: 15px;
-  border: 1px solid #dce0db;
-  background: #fff;
+  border: 1px solid var(--line);
+  background: var(--surface);
 }
 .report h2 {
   margin: 0 0 10px;
   font-size: 11px;
 }
 .report > p {
-  color: #737a76;
+  color: var(--muted);
   font-size: 10px;
 }
 .reportRow {
@@ -177,12 +292,12 @@
   justify-content: space-between;
   gap: 12px;
   padding: 7px 0;
-  border-top: 1px solid #eceeeb;
-  color: #626966;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
   font-size: 10px;
 }
 .reportRow strong {
-  color: #151717;
+  color: var(--text);
   font-size: 10px;
 }
 
@@ -196,7 +311,7 @@
   display: grid;
   gap: 6px;
   min-width: 180px;
-  color: #555d58;
+  color: var(--muted);
   font-size: 10px;
   font-weight: 700;
 }
@@ -205,19 +320,19 @@
   height: 38px;
   min-width: 0;
   padding: 0 10px;
-  border: 1px solid #cdd2cd;
+  border: 1px solid var(--line);
   border-radius: 0;
-  background: #fff;
-  color: #151717;
+  background: var(--surface);
+  color: var(--text);
   font: inherit;
   font-size: 12px;
 }
 .filters button {
   height: 38px;
   padding: 0 14px;
-  border: 1px solid #111;
-  background: #111;
-  color: #fff;
+  border: 1px solid var(--text);
+  background: var(--text);
+  color: var(--surface);
   font-size: 11px;
   font-weight: 700;
   cursor: pointer;
@@ -243,8 +358,8 @@
 .tableWrap {
   width: 100%;
   overflow-x: auto;
-  border: 1px solid #dce0db;
-  background: #fff;
+  border: 1px solid var(--line);
+  background: var(--surface);
 }
 .table {
   width: 100%;
@@ -254,8 +369,8 @@
 }
 .table th {
   padding: 11px 14px;
-  border-bottom: 1px solid #dce0db;
-  color: #777e79;
+  border-bottom: 1px solid var(--line);
+  color: var(--muted);
   font-size: 9px;
   font-weight: 800;
   letter-spacing: 1px;
@@ -263,8 +378,8 @@
 }
 .table td {
   padding: 13px 14px;
-  border-bottom: 1px solid #eceeeb;
-  color: #535a56;
+  border-bottom: 1px solid var(--line);
+  color: var(--muted);
   font-size: 11px;
 }
 .table tbody tr:last-child td {
@@ -275,15 +390,15 @@
   gap: 4px;
 }
 .table td strong {
-  color: #181a19;
+  color: var(--text);
   font-size: 12px;
 }
 .table td small {
-  color: #929994;
+  color: var(--muted);
   font-size: 9px;
 }
 .table td a {
-  color: #171918;
+  color: var(--text);
   font-weight: 700;
   text-decoration: underline;
   text-underline-offset: 3px;
@@ -291,13 +406,13 @@
 .status {
   display: inline-block;
   padding: 5px 7px;
-  border: 1px solid #d8dcd7;
-  color: #414743;
+  border: 1px solid var(--line);
+  color: var(--text);
   white-space: nowrap;
 }
 .empty {
   height: 100px;
-  color: #777e79 !important;
+  color: var(--muted) !important;
   text-align: center;
 }
 
@@ -307,7 +422,7 @@
   align-items: center;
   gap: 15px;
   margin-top: 13px;
-  color: #747b77;
+  color: var(--muted);
   font-size: 10px;
 }
 .pagination > div {
@@ -316,12 +431,12 @@
   gap: 15px;
 }
 .pagination a {
-  color: #171918;
+  color: var(--text);
   text-decoration: underline;
   text-underline-offset: 3px;
 }
 .pagination a[aria-disabled="true"] {
-  color: #a6aca8;
+  color: var(--muted);
   pointer-events: none;
 }
 
@@ -339,12 +454,12 @@
     transform 100ms ease;
 }
 .sideLink:hover {
-  background: #f0f1ee;
-  color: #121414;
+  background: var(--hover);
+  color: var(--text);
 }
 .sideLinkActive {
-  background: #121414;
-  color: #fff;
+  background: var(--text);
+  color: var(--surface);
 }
 .sideLink:active,
 .sideLinkActive:active,
@@ -366,7 +481,7 @@
     transform 100ms ease;
 }
 .logoutForm button:hover {
-  background: #f0f1ee;
+  background: var(--hover);
 }
 .pageHeader p:not(.eyebrow) {
   font-size: 15px;
@@ -414,7 +529,7 @@
     transform 100ms ease;
 }
 .filters button:hover {
-  background: #2b2f2e;
+  background: var(--accent-hover);
 }
 .tableWrap {
   border-radius: 16px;
@@ -446,7 +561,7 @@
   position: relative;
 }
 .table tbody tr:hover td {
-  background: #f4f5f2;
+  background: var(--hover);
 }
 .table td a::after {
   position: absolute;
@@ -464,9 +579,9 @@
 .pagination a {
   display: inline-block;
   padding: 8px 14px;
-  border: 1px solid #d8dcd7;
+  border: 1px solid var(--line);
   border-radius: 999px;
-  background: #fff;
+  background: var(--surface);
   text-decoration: none;
   transition: transform 100ms ease;
 }
@@ -486,7 +601,7 @@
     gap: 10px;
     padding: 14px 18px;
     border-right: 0;
-    border-bottom: 1px solid #d8dcd7;
+    border-bottom: 1px solid var(--line);
   }
   .sideGroup {
     display: none;

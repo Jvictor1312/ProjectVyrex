@@ -1,12 +1,11 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { redirect } from "next/navigation";
-import { logoutAction } from "@/app/actions/auth";
 import {
   InviteInternalUserForm,
   UserActiveForm,
   UserRoleForm,
 } from "@/app/components/team-management";
+import { InternalShell } from "../internal-shell";
 import { requireUser } from "@/lib/auth";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import internalStyles from "../internal.module.css";
@@ -81,37 +80,7 @@ export default async function InternalTeamPage() {
   const inviteConfigured = Boolean(adminClient);
 
   return (
-    <main className={internalStyles.shell}>
-      <aside className={internalStyles.sidebar}>
-        <Link className={internalStyles.brand} href="/">
-          <span className={internalStyles.brandMark}>V</span>
-          <span>VYREX</span>
-        </Link>
-        <div className={internalStyles.sideGroup}>
-          <span className={internalStyles.sideLabel}>ESPAÇO INTERNO</span>
-          <Link className={internalStyles.sideLink} href="/interno">
-            Painel
-          </Link>
-          <Link
-            className={internalStyles.sideLinkActive}
-            href="/interno/equipe"
-          >
-            Equipe
-          </Link>
-          <Link
-            className={internalStyles.sideLink}
-            href="/interno/privacidade"
-          >
-            Privacidade
-          </Link>
-          <Link className={internalStyles.sideLink} href="/dashboard">
-            Área do criador
-          </Link>
-        </div>
-        <form action={logoutAction} className={internalStyles.logoutForm}>
-          <button type="submit">Sair</button>
-        </form>
-      </aside>
+    <InternalShell active="equipe" isAdmin={true} email={user.email}>
 
       <section className={internalStyles.main}>
         <header className={internalStyles.pageHeader}>
@@ -120,7 +89,6 @@ export default async function InternalTeamPage() {
             <h1>Equipe interna</h1>
             <p>Convites, funções e estado das contas colaboradoras.</p>
           </div>
-          <span className={internalStyles.userLabel}>{user.email}</span>
         </header>
 
         <div className={internalStyles.summary}>
@@ -226,6 +194,6 @@ export default async function InternalTeamPage() {
           )}
         </section>
       </section>
-    </main>
+    </InternalShell>
   );
 }

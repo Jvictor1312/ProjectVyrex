@@ -1,7 +1,7 @@
 .inviteForm {
   padding: 20px;
-  border: 1px solid #dce0db;
-  background: #fff;
+  border: 1px solid var(--line);
+  background: var(--surface);
 }
 .formFields {
   display: grid;
@@ -13,7 +13,7 @@
 .activeForm label {
   display: grid;
   gap: 6px;
-  color: #555d58;
+  color: var(--muted);
   font-size: 10px;
   font-weight: 700;
 }
@@ -24,10 +24,10 @@
   height: 38px;
   min-width: 0;
   padding: 0 9px;
-  border: 1px solid #cdd2cd;
+  border: 1px solid var(--line);
   border-radius: 0;
-  background: #fff;
-  color: #151717;
+  background: var(--surface);
+  color: var(--text);
   font: inherit;
   font-size: 11px;
 }
@@ -36,9 +36,9 @@
 .activeForm button {
   min-height: 36px;
   padding: 0 13px;
-  border: 1px solid #111;
-  background: #111;
-  color: #fff;
+  border: 1px solid var(--text);
+  background: var(--text);
+  color: var(--surface);
   font-size: 10px;
   font-weight: 700;
   cursor: pointer;
@@ -60,25 +60,25 @@
   line-height: 1.5;
 }
 .warning {
-  border-left: 3px solid #777;
-  background: #f0f1ef;
-  color: #424744;
+  border-left: 3px solid var(--muted);
+  background: var(--hover);
+  color: var(--text);
 }
 .error {
-  border-left: 3px solid #555;
-  background: #eeeeec;
-  color: #292d2b;
+  border-left: 3px solid var(--muted);
+  background: var(--hover);
+  color: var(--text);
 }
 .success {
-  border-left: 3px solid #111;
-  background: #f0f1ef;
-  color: #252927;
+  border-left: 3px solid var(--text);
+  background: var(--hover);
+  color: var(--text);
 }
 .userList {
   display: grid;
   gap: 1px;
-  border: 1px solid #dce0db;
-  background: #dce0db;
+  border: 1px solid var(--line);
+  background: var(--line);
 }
 .userRow {
   display: grid;
@@ -89,23 +89,23 @@
   align-items: center;
   gap: 17px;
   padding: 16px;
-  background: #fff;
+  background: var(--surface);
 }
 .userIdentity {
   display: grid;
   gap: 4px;
 }
 .userIdentity strong {
-  color: #181a19;
+  color: var(--text);
   font-size: 12px;
 }
 .userIdentity > span {
-  color: #5e6561;
+  color: var(--muted);
   font-size: 10px;
   overflow-wrap: anywhere;
 }
 .userIdentity small {
-  color: #929994;
+  color: var(--muted);
   font-size: 9px;
 }
 .roleList {
@@ -115,8 +115,8 @@
 }
 .roleList span {
   padding: 4px 6px;
-  border: 1px solid #dce0db;
-  color: #59605c;
+  border: 1px solid var(--line);
+  color: var(--muted);
   font-size: 9px;
 }
 .activeLabel,
@@ -125,10 +125,10 @@
   font-weight: 700;
 }
 .activeLabel {
-  color: #4b514d;
+  color: var(--text);
 }
 .inactiveLabel {
-  color: #555;
+  color: var(--muted);
 }
 .inlineForm {
   display: grid;
@@ -142,8 +142,8 @@
 }
 .auditList {
   display: grid;
-  border: 1px solid #dce0db;
-  background: #fff;
+  border: 1px solid var(--line);
+  background: var(--surface);
 }
 .auditRow {
   display: grid;
@@ -153,36 +153,36 @@
     ) minmax(150px, 1fr);
   gap: 12px;
   padding: 12px;
-  border-bottom: 1px solid #eceeeb;
+  border-bottom: 1px solid var(--line);
   align-items: start;
 }
 .auditRow:last-child {
   border-bottom: 0;
 }
 .auditRow strong {
-  color: #1c1f1d;
+  color: var(--text);
   font-size: 10px;
   overflow-wrap: anywhere;
 }
 .auditRow span,
 .auditRow small {
-  color: #666d69;
+  color: var(--muted);
   font-size: 9px;
   overflow-wrap: anywhere;
 }
 .auditRow code {
-  color: #505753;
+  color: var(--muted);
   font-size: 9px;
   overflow-wrap: anywhere;
   white-space: pre-wrap;
 }
 .dangerButton {
-  border-color: #555 !important;
-  background: #555 !important;
+  border-color: var(--muted) !important;
+  background: var(--muted) !important;
 }
 .secondaryButton {
-  background: #fff !important;
-  color: #171918 !important;
+  background: var(--surface) !important;
+  color: var(--text) !important;
 }
 @media (max-width: 900px) {
   .formFields {

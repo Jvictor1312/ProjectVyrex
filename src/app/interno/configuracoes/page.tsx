@@ -1,14 +1,15 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { redirect } from "next/navigation";
-import { logoutAction } from "@/app/actions/auth";
 import { InfoHelp } from "@/app/components/info-help";
+import { PresentationVideoForm } from "@/app/components/presentation-video-form";
 import { EligibilitySettingsForm } from "@/app/components/team-management";
+import { InternalShell } from "../internal-shell";
 import { requireUser } from "@/lib/auth";
+import { getPresentationVideoUrl } from "@/lib/site-media";
 import internalStyles from "../internal.module.css";
 import styles from "../team-management.module.css";
 
-export const metadata: Metadata = { title: "Critérios de elegibilidade" };
+export const metadata: Metadata = { title: "Configurações" };
 
 export default async function EligibilitySettingsPage() {
   const { supabase, user } = await requireUser();
@@ -18,7 +19,7 @@ export default async function EligibilitySettingsPage() {
   );
   if (permissionError || !allowed) redirect("/acesso-negado");
 
-  const [settingsResult, auditResult] = await Promise.all([
+  const [settingsResult, auditResult, videoUrl] = await Promise.all([
     supabase
       .from("eligibility_settings")
       .select(
@@ -32,51 +33,28 @@ export default async function EligibilitySettingsPage() {
       .eq("action", "eligibility.settings.changed")
       .order("created_at", { ascending: false })
       .limit(20),
+    getPresentationVideoUrl(),
   ]);
 
   const history = auditResult.data ?? [];
 
   return (
-    <main className={internalStyles.shell}>
-      <aside className={internalStyles.sidebar}>
-        <Link className={internalStyles.brand} href="/">
-          <span className={internalStyles.brandMark}>V</span>
-          <span>VYREX</span>
-        </Link>
-        <div className={internalStyles.sideGroup}>
-          <span className={internalStyles.sideLabel}>ESPAÇO INTERNO</span>
-          <Link className={internalStyles.sideLink} href="/interno">
-            Painel
-          </Link>
-          <Link className={internalStyles.sideLink} href="/interno/equipe">
-            Equipe
-          </Link>
-          <Link
-            className={internalStyles.sideLinkActive}
-            href="/interno/configuracoes"
-          >
-            Critérios
-          </Link>
-          <Link className={internalStyles.sideLink} href="/interno/privacidade">
-            Privacidade
-          </Link>
-        </div>
-        <form action={logoutAction} className={internalStyles.logoutForm}>
-          <button type="submit">Sair</button>
-        </form>
-      </aside>
-
+    <InternalShell active="criterios" isAdmin={true} email={user.email}>
       <section className={internalStyles.main}>
         <header className={internalStyles.pageHeader}>
           <div>
-            <p className={internalStyles.eyebrow}>ADMINISTRAÇÃO</p>
-            <h1>Critérios de elegibilidade</h1>
-            <p>
-              Alterações passam por validação server-side e geram auditoria.
-            </p>
+            <h1>Configurações</h1>
+            <p>Vídeo de apresentação e critérios de elegibilidade.</p>
           </div>
-          <span className={internalStyles.userLabel}>{user.email}</span>
         </header>
+
+        <section className={internalStyles.section}>
+          <h2>Vídeo de apresentação</h2>
+          <p className={internalStyles.empty}>
+            Aparece na tela de cadastro, ao clicar na esfera Vyrex.
+          </p>
+          <PresentationVideoForm currentUrl={videoUrl} />
+        </section>
 
         {settingsResult.error || !settingsResult.data ? (
           <p className={internalStyles.error} role="alert">
@@ -140,6 +118,6 @@ export default async function EligibilitySettingsPage() {
           )}
         </section>
       </section>
-    </main>
+    </InternalShell>
   );
 }

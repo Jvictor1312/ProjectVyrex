@@ -10,6 +10,7 @@ import {
   RelationshipControls,
   SocialAccountReviewForm,
 } from "@/app/components/internal-actions";
+import { InternalShell } from "../internal-shell";
 import { requireUserWithRoles } from "@/lib/auth";
 import styles from "../internal-detail.module.css";
 
@@ -220,22 +221,12 @@ export default async function CreatorInternalDetail({
   );
 
   return (
-    <main className="dashboard-page">
-      <header className="dashboard-header">
-        <Link className="brand" href="/interno">
-          <span className="brand-mark">V</span>
-          <span>VYREX</span>
-        </Link>
-        <Link className="quiet-button" href="/interno">
-          Voltar à fila
-        </Link>
-      </header>
-
+    <InternalShell active="painel" isAdmin={isAdmin}>
       <div className={styles.page}>
+        <Link className={styles.back} href="/interno">
+          ← Voltar à fila
+        </Link>
         <section className={styles.heading}>
-          <p className="eyebrow">
-            <span /> FICHA DO CRIADOR
-          </p>
           <h1>{creator.public_name || "Perfil sem nome público"}</h1>
           <p>
             {creator.city || "Cidade não informada"}
@@ -429,6 +420,6 @@ export default async function CreatorInternalDetail({
           )}
         </section>
       </div>
-    </main>
+    </InternalShell>
   );
 }

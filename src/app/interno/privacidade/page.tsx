@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { redirect } from "next/navigation";
-import { logoutAction } from "@/app/actions/auth";
 import { ResolveDataRequestForm } from "@/app/components/privacy-forms";
+import { InternalShell } from "../internal-shell";
 import { requireUser } from "@/lib/auth";
 import {
   dataRequestKindLabels,
@@ -49,37 +48,7 @@ export default async function PrivacyRequestsPage() {
   );
 
   return (
-    <main className={internalStyles.shell}>
-      <aside className={internalStyles.sidebar}>
-        <Link className={internalStyles.brand} href="/">
-          <span className={internalStyles.brandMark}>V</span>
-          <span>VYREX</span>
-        </Link>
-        <div className={internalStyles.sideGroup}>
-          <span className={internalStyles.sideLabel}>ESPAÇO INTERNO</span>
-          <Link className={internalStyles.sideLink} href="/interno">
-            Painel
-          </Link>
-          <Link className={internalStyles.sideLink} href="/interno/equipe">
-            Equipe
-          </Link>
-          <Link
-            className={internalStyles.sideLink}
-            href="/interno/configuracoes"
-          >
-            Critérios
-          </Link>
-          <Link
-            className={internalStyles.sideLinkActive}
-            href="/interno/privacidade"
-          >
-            Privacidade
-          </Link>
-        </div>
-        <form action={logoutAction} className={internalStyles.logoutForm}>
-          <button type="submit">Sair</button>
-        </form>
-      </aside>
+    <InternalShell active="privacidade" isAdmin={true} email={user.email}>
 
       <section className={internalStyles.main}>
         <header className={internalStyles.pageHeader}>
@@ -93,7 +62,6 @@ export default async function PrivacyRequestsPage() {
               atualização gera auditoria e notifica o titular.
             </p>
           </div>
-          <span className={internalStyles.userLabel}>{user.email}</span>
         </header>
 
         {requestsResult.error ? (
@@ -170,6 +138,6 @@ export default async function PrivacyRequestsPage() {
           </>
         )}
       </section>
-    </main>
+    </InternalShell>
   );
 }

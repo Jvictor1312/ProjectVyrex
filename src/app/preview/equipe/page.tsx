@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { InternalShell } from "../../interno/internal-shell";
 import styles from "../../interno/internal.module.css";
 
 const demoCreators = [
@@ -33,37 +34,16 @@ const demoMetrics = [
   ["Elegíveis", "54"],
 ];
 
-export default function TeamDashboardPreview() {
+export default async function TeamDashboardPreview() {
   if (process.env.NODE_ENV !== "development") notFound();
 
   return (
-    <main className={styles.shell}>
-      <aside className={styles.sidebar}>
-        <Link className={styles.brand} href="/">
-          <span className={styles.brandMark}>V</span>
-          <span>VYREX</span>
-        </Link>
-        <div className={styles.sideGroup}>
-          <span className={styles.sideLabel}>ESPAÇO INTERNO</span>
-          <Link className={styles.sideLinkActive} href="/preview/equipe">
-            Painel
-          </Link>
-          <Link className={styles.sideLink} href="/preview/equipe">
-            Equipe interna
-          </Link>
-          <Link className={styles.sideLink} href="/preview/equipe">
-            Critérios de elegibilidade
-          </Link>
-          <Link className={styles.sideLink} href="/preview/criador">
-            Área do criador
-          </Link>
-        </div>
-        <div className={styles.sideRoles}>
-          <span>Administrador</span>
-          <span>Recrutamento</span>
-          <span>Validação</span>
-        </div>
-      </aside>
+    <InternalShell
+      active="painel"
+      isAdmin
+      roles={["Administrador", "Recrutamento", "Validação"]}
+      email="equipe.demo@vyrex.local"
+    >
       <section className={styles.main}>
         <header className={styles.pageHeader}>
           <div>
@@ -127,6 +107,6 @@ export default function TeamDashboardPreview() {
           <Link href="/preview/criador">Ver painel do criador</Link>
         </footer>
       </section>
-    </main>
+    </InternalShell>
   );
 }

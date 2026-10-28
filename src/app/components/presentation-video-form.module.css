@@ -1,0 +1,78 @@
+.wrap {
+  display: grid;
+  gap: 14px;
+  max-width: 560px;
+}
+
+.preview {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: 14px;
+  background: #000;
+}
+
+.empty {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 16 / 9;
+  margin: 0;
+  border: 1.5px dashed var(--line-strong, #b9bcb9);
+  border-radius: 14px;
+  color: var(--text-muted, #737774);
+  font-size: 15px;
+}
+
+.fileInput {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.primary,
+.secondary {
+  min-height: 44px;
+  padding: 0 22px;
+  border-radius: 999px;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 100ms ease, opacity 140ms ease;
+}
+
+.primary {
+  border: 1px solid var(--accent, #101313);
+  background: var(--accent, #101313);
+  color: var(--accent-text, #fff);
+}
+
+.secondary {
+  border: 1px solid var(--line-strong, #b9bcb9);
+  background: transparent;
+  color: inherit;
+}
+
+.primary:active,
+.secondary:active {
+  transform: scale(0.97);
+}
+
+.primary:disabled,
+.secondary:disabled {
+  cursor: progress;
+  opacity: 0.6;
+}
+
+.hint {
+  margin: 0;
+  color: var(--text-muted, #737774);
+  font-size: 13px;
+}

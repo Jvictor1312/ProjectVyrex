@@ -4,7 +4,13 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import type { PointerEvent, ReactNode } from "react";
 
-export function SignupExperience({ children }: { children: ReactNode }) {
+export function SignupExperience({
+  children,
+  videoUrl,
+}: {
+  children: ReactNode;
+  videoUrl: string | null;
+}) {
   const [showcaseOpen, setShowcaseOpen] = useState(true);
 
   return (
@@ -14,6 +20,7 @@ export function SignupExperience({ children }: { children: ReactNode }) {
       <SignupShowcase
         open={showcaseOpen}
         onToggle={() => setShowcaseOpen((open) => !open)}
+        videoUrl={videoUrl}
       />
       <section className="signup-form-panel">
         <header className="signup-form-header">
@@ -32,9 +39,11 @@ export function SignupExperience({ children }: { children: ReactNode }) {
 function SignupShowcase({
   open,
   onToggle,
+  videoUrl,
 }: {
   open: boolean;
   onToggle: () => void;
+  videoUrl: string | null;
 }) {
   const [dialogOpen, setDialogOpen] = useState(false);
   const dialogRef = useRef<HTMLDialogElement>(null);
@@ -133,25 +142,33 @@ function SignupShowcase({
         onClose={() => setDialogOpen(false)}
       >
         <div className="signup-video-dialog-header">
-          <div>
-            <p className="eyebrow">VYREX / APRESENTAÇÃO</p>
-            <h2 id="signup-video-title">Conheça a Vyrex</h2>
-          </div>
+          <h2 id="signup-video-title">Conheça a Vyrex</h2>
           <button
-            className="quiet-button"
+            className="signup-video-close"
             type="button"
             onClick={() => dialogRef.current?.close()}
           >
             Fechar
           </button>
         </div>
-        <div className="signup-video-placeholder">
-          <span className="signup-video-mark" aria-hidden="true">
-            V
-          </span>
-          <p>Vídeo de apresentação em produção</p>
-          <span>O conteúdo será disponibilizado aqui.</span>
-        </div>
+        {videoUrl ? (
+          dialogOpen && (
+            <video
+              className="signup-video-player"
+              src={videoUrl}
+              controls
+              autoPlay
+              playsInline
+            />
+          )
+        ) : (
+          <div className="signup-video-placeholder">
+            <span className="signup-video-mark" aria-hidden="true">
+              V
+            </span>
+            <p>O vídeo de apresentação estará aqui em breve.</p>
+          </div>
+        )}
       </dialog>
     </>
   );

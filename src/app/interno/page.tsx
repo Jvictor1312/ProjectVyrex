@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { logoutAction } from "@/app/actions/auth";
+import { InternalShell } from "./internal-shell";
 import { requireUserWithRoles } from "@/lib/auth";
 import styles from "./internal.module.css";
 
@@ -295,45 +295,9 @@ export default async function InternalDashboard({
       ].some((result) => result.error));
 
   return (
-    <main className={styles.shell}>
-      <aside className={styles.sidebar}>
-        <Link className={styles.brand} href="/">
-          <span className={styles.brandMark}>V</span>
-          <span>VYREX</span>
-        </Link>
-        <div className={styles.sideGroup}>
-          <span className={styles.sideLabel}>ESPAÇO INTERNO</span>
-          <Link className={styles.sideLinkActive} href="/interno">
-            Painel
-          </Link>
-          {roles.includes("admin") && (
-            <Link className={styles.sideLink} href="/interno/equipe">
-              Equipe interna
-            </Link>
-          )}
-          {roles.includes("admin") && (
-            <Link className={styles.sideLink} href="/interno/configuracoes">
-              Critérios de elegibilidade
-            </Link>
-          )}
-          {roles.includes("admin") && (
-            <Link className={styles.sideLink} href="/interno/privacidade">
-              Privacidade
-            </Link>
-          )}
-          <Link className={styles.sideLink} href="/dashboard">
-            Área do criador
-          </Link>
-        </div>
-        <div className={styles.sideRoles}>
-          {roles.map((role) => (
-            <span key={role}>{roleLabels[role]}</span>
-          ))}
-        </div>
-        <form action={logoutAction} className={styles.logoutForm}>
-          <button type="submit">Sair</button>
-        </form>
-      </aside>
+    <InternalShell active="painel" isAdmin={roles.includes("admin")}
+      roles={roles.map((role) => roleLabels[role])}
+      email={user.email}>
 
       <section className={styles.main}>
         <header className={styles.pageHeader}>
@@ -344,7 +308,6 @@ export default async function InternalDashboard({
             <h1>{heading.title}</h1>
             <p>{heading.description}</p>
           </div>
-          <span className={styles.userLabel}>{user.email}</span>
         </header>
 
         <div className={styles.summary}>
@@ -499,6 +462,6 @@ export default async function InternalDashboard({
           </div>
         </footer>
       </section>
-    </main>
+    </InternalShell>
   );
 }

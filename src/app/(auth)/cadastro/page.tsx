@@ -1,12 +1,15 @@
 import type { Metadata } from "next";
 import { AuthForm } from "@/app/components/auth-form";
 import { SignupExperience } from "@/app/components/signup-showcase";
+import { getPresentationVideoUrl } from "@/lib/site-media";
 
 export const metadata: Metadata = { title: "Criar conta" };
 
-export default function SignupPage() {
+export default async function SignupPage() {
+  const videoUrl = await getPresentationVideoUrl();
+
   return (
-    <SignupExperience>
+    <SignupExperience videoUrl={videoUrl}>
       <AuthForm mode="signup" />
     </SignupExperience>
   );
