@@ -453,3 +453,9 @@
     transform: translate(-50%, -50%);
   }
 }
+
+.contact {
+  color: var(--muted);
+  font-size: 14px;
+  user-select: all;
+}

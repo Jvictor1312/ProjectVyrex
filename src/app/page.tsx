@@ -154,9 +154,13 @@ export default function HomePage() {
             Planejamos a campanha a partir do seu público e selecionamos
             criadores compatíveis, com entregas acompanhadas.
           </p>
-          <a className={styles.linkDark} href="#perguntas">
-            Ver dúvidas frequentes →
+          <a
+            className={styles.linkDark}
+            href="mailto:suportevyrex@gmail.com?subject=Vyrex%20para%20marcas"
+          >
+            Fale com a gente →
           </a>
+          <span className={styles.contact}>suportevyrex@gmail.com</span>
         </article>
       </section>
 
