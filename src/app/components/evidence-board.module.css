@@ -69,8 +69,8 @@ button.tile:disabled {
 /* A imagem fica borrada: mostra que há um arquivo sem expor o conteúdo. */
 .image {
   object-fit: cover;
-  filter: blur(9px) saturate(0.9);
-  transform: scale(1.15);
+  filter: blur(2.5px);
+  transform: scale(1.04);
 }
 
 .plus {

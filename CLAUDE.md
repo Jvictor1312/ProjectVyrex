@@ -16,6 +16,7 @@ As diretrizes não são uma ordem para recomeçar a auditoria a cada sessão. Tr
 
 - **Nunca apagar dados do Supabase.** O usuário decidiu manter todos os dados existentes, sem opção de apagar. Nada de `delete`, `truncate`, `drop` ou reset em dados reais.
 - **Git e GitHub:** o usuário autorizou commit e push para `origin main` (https://github.com/Jvictor1312/ProjectVyrex) ao concluir alterações. Use Conventional Commits em português (skill `git-commit`). Nunca commitar `.env*` (exceto `.env.example`). Não commitar `next-env.d.ts` quando a única mudança for o caminho `.next/dev/types` gerado pelo `next dev`.
+- **Subir tudo no GitHub, sem exceção:** faça commit e push ao fim de cada bloco de trabalho, não só no final da tarefa. Se o contexto ou os tokens estiverem acabando, pare, faça commit e push do que já foi feito e registre o que falta em `docs/TASKS.md`.
 - **Não publicar em produção** sem autorização explícita.
 - O usuário não programa com frequência: explique em português simples e sem jargão desnecessário.
 
