@@ -40,6 +40,7 @@ export default function EvidencePreview() {
             minimumViews={1000}
             maxStoryAgeDays={7}
             canEdit
+            canDelete
           />
         </section>
       </section>

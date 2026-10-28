@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { WithdrawApplicationButton } from "@/app/components/creator-forms";
 import {
   creatorStatusLabel,
   creatorStatusTone,
@@ -199,6 +200,8 @@ export function CreatorOverview({
         <Link className={styles.cta} href={nextStep.href}>
           {nextStep.cta}
         </Link>
+        {/* Só enquanto a equipe não começou a análise (o banco confere). */}
+        {status === "submitted" && <WithdrawApplicationButton dark />}
       </section>
 
       <div className={styles.feed}>

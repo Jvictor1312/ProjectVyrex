@@ -402,3 +402,56 @@ button.tile:disabled {
   outline: 2px solid var(--ink);
   outline-offset: 2px;
 }
+/* Apagar evidência salva (só no rascunho), com confirmação. */
+.deleteLink {
+  justify-self: start;
+  padding: 2px 0;
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  font-size: 13px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+.deleteLink:hover {
+  color: #a64337;
+}
+.deleteConfirm {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+}
+.deleteConfirm span {
+  flex-basis: 100%;
+  font-weight: 600;
+}
+.deleteYes,
+.deleteNo {
+  min-height: 30px;
+  padding: 0 10px;
+  border-radius: 8px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.deleteYes {
+  border: 1px solid #a64337;
+  background: #a64337;
+  color: #fff;
+}
+.deleteNo {
+  border: 1px solid var(--line);
+  background: #fff;
+  color: var(--ink);
+}
+.deleteLink:focus-visible,
+.deleteYes:focus-visible,
+.deleteNo:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}

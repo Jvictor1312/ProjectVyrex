@@ -241,6 +241,73 @@ export async function uploadStoryEvidenceAction(
   }
 }
 
+// Erro de função ausente: a migration 202610280005 ainda não foi aplicada.
+const featurePending = (code?: string, message?: string) =>
+  code === "PGRST202" || /could not find the function/i.test(message ?? "");
+const pendingMessage =
+  "Este recurso ainda não está disponível: falta aplicar uma atualização no banco de dados.";
+
+// Apaga uma evidência salva. O banco só permite no rascunho (antes do envio).
+export async function deleteDraftEvidenceAction(
+  _state: FormState,
+  formData: FormData,
+): Promise<FormState> {
+  const position = Number(formData.get("position"));
+  if (!Number.isInteger(position) || position < 1 || position > 5) {
+    return { message: "Quadro de evidência inválido.", success: false };
+  }
+
+  const { supabase } = await requireSession();
+  const { data, error } = await supabase.rpc("delete_own_draft_evidence", {
+    target_position: position,
+  });
+  if (error) {
+    if (featurePending(error.code, error.message))
+      return { message: pendingMessage, success: false };
+    return {
+      message: /before the application is sent/i.test(error.message)
+        ? "Depois do envio, as evidências não podem mais ser apagadas."
+        : "Não foi possível apagar a evidência. Tente de novo.",
+      success: false,
+    };
+  }
+
+  // O registro já saiu do banco; o arquivo é removido em seguida.
+  if (typeof data === "string" && data) {
+    await supabase.storage.from("story-evidence").remove([data]);
+  }
+  revalidatePath("/dashboard/perfil");
+  revalidatePath("/dashboard");
+  return { message: `Evidência ${position} apagada.`, success: true };
+}
+
+// Retira o cadastro enviado, só enquanto a equipe não começou a análise.
+export async function withdrawCreatorApplicationAction(
+  _state: FormState,
+  _formData: FormData,
+): Promise<FormState> {
+  void _state;
+  void _formData;
+  const { supabase } = await requireSession();
+  const { error } = await supabase.rpc("withdraw_creator_application");
+  if (error) {
+    if (featurePending(error.code, error.message))
+      return { message: pendingMessage, success: false };
+    return {
+      message: /already started|awaiting review/i.test(error.message)
+        ? "A equipe já começou a analisar seu cadastro; o envio não pode mais ser desfeito. Fale com a equipe pelas mensagens."
+        : "Não foi possível desfazer o envio. Tente de novo.",
+      success: false,
+    };
+  }
+
+  revalidatePath("/dashboard", "layout");
+  return {
+    message: "Envio desfeito. Seu cadastro voltou para rascunho e pode ser editado.",
+    success: true,
+  };
+}
+
 export async function submitCreatorApplicationAction(
   _state: FormState,
   _formData: FormData,

@@ -5,6 +5,7 @@ import {
   CreatorProfileForm,
   SocialAccountForm,
   SubmitApplicationButton,
+  WithdrawApplicationButton,
 } from "@/app/components/creator-forms";
 import { EvidenceBoard } from "@/app/components/evidence-board";
 import { requireUserFast } from "@/lib/auth";
@@ -303,6 +304,7 @@ export default async function CreatorProfilePage() {
               minimumViews={minimumViews}
               maxStoryAgeDays={maxStoryAgeDays}
               canEdit={canEdit}
+              canDelete={profile?.status === "incomplete"}
               requiredCount={requiredEvidence}
             />
           </section>
@@ -398,8 +400,11 @@ export default async function CreatorProfilePage() {
               <p className="field-hint">
                 Cadastro já enviado. Acompanhe pela{" "}
                 <Link href="/dashboard">visão geral</Link>.
+                {profile?.status === "submitted" &&
+                  " Enquanto a equipe não começar a análise, você ainda pode desfazer o envio."}
               </p>
             )}
+            {profile?.status === "submitted" && <WithdrawApplicationButton />}
           </section>
         </CreatorWizard>
       </section>

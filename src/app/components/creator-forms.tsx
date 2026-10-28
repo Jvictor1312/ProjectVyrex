@@ -6,6 +6,7 @@ import {
   saveCreatorProfileAction,
   saveSocialAccountAction,
   submitCreatorApplicationAction,
+  withdrawCreatorApplicationAction,
 } from "@/app/actions/creator";
 import { categoriesList, socialPlatforms } from "@/lib/validation/creator";
 import type { FormState } from "@/lib/validation/auth";
@@ -349,6 +350,62 @@ export function SubmitApplicationButton() {
       <button className="button button-dark" type="submit" disabled={pending}>
         {pending ? "Enviando…" : "Enviar para análise"}
       </button>
+    </form>
+  );
+}
+
+// Desfaz o envio enquanto a equipe não começou a análise. Pede confirmação;
+// o banco recusa se alguém da equipe já tiver agido sobre o cadastro.
+export function WithdrawApplicationButton({ dark = false }: { dark?: boolean }) {
+  const [state, action, pending] = useActionState(
+    withdrawCreatorApplicationAction,
+    initialState,
+  );
+  const [confirming, setConfirming] = useState(false);
+
+  return (
+    <form action={action} className={`withdraw-application${dark ? " on-dark" : ""}`}>
+      {confirming && !state.success && (
+        <p className="withdraw-confirm" role="alert">
+          Desfazer o envio? O cadastro volta para rascunho e sai da fila da
+          equipe até você enviar de novo.
+        </p>
+      )}
+      <ActionMessage state={state} />
+      {!state.success && (
+        <div className="withdraw-actions">
+          {confirming ? (
+            <>
+              <button
+                key="confirm"
+                className="button button-dark"
+                type="submit"
+                disabled={pending}
+              >
+                {pending ? "Desfazendo…" : "Confirmar e voltar ao rascunho"}
+              </button>
+              <button
+                key="back"
+                className="quiet-button"
+                type="button"
+                onClick={() => setConfirming(false)}
+                disabled={pending}
+              >
+                Manter enviado
+              </button>
+            </>
+          ) : (
+            <button
+              key="start"
+              className="quiet-button"
+              type="button"
+              onClick={() => setConfirming(true)}
+            >
+              Desfazer envio
+            </button>
+          )}
+        </div>
+      )}
     </form>
   );
 }

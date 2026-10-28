@@ -2133,3 +2133,35 @@ button.signup-showcase-toggle:focus-visible {
     margin-top: 24px;
   }
 }
+/* Desfazer envio do cadastro (área do criador). */
+.withdraw-application {
+  display: grid;
+  justify-items: start;
+  gap: 8px;
+  margin-top: 4px;
+}
+.withdraw-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+.withdraw-confirm {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.5;
+}
+.withdraw-application .quiet-button {
+  padding: 8px 0;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.withdraw-application.on-dark .withdraw-confirm,
+.withdraw-application.on-dark .quiet-button {
+  color: #e4e7e5;
+}
+.withdraw-application.on-dark .button-dark {
+  border-color: #f6f7f5;
+  background: #f6f7f5;
+  color: var(--ink);
+}

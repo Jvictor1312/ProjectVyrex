@@ -2,7 +2,10 @@
 
 import Image from "next/image";
 import { useEffect, useRef, useState, useTransition } from "react";
-import { uploadStoryEvidenceAction } from "@/app/actions/creator";
+import {
+  deleteDraftEvidenceAction,
+  uploadStoryEvidenceAction,
+} from "@/app/actions/creator";
 import { platformLabels } from "@/lib/labels";
 import type { FormState } from "@/lib/validation/auth";
 import styles from "./evidence-board.module.css";
@@ -36,9 +39,12 @@ export function EvidenceBoard({
   maxStoryAgeDays,
   canEdit,
   requiredCount = 3,
+  canDelete = false,
 }: {
   slots: EvidenceSlot[];
   requiredCount?: number;
+  // Apagar evidência salva: só no rascunho, antes do envio (o banco confere).
+  canDelete?: boolean;
   socialAccounts: { id: string; platform: string; handle: string }[];
   minimumViews: number;
   maxStoryAgeDays: number | null;
@@ -46,6 +52,20 @@ export function EvidenceBoard({
 }) {
   const fileInput = useRef<HTMLInputElement>(null);
   const pickingFor = useRef<number | null>(null);
+  const [confirmingDelete, setConfirmingDelete] = useState<number | null>(null);
+
+  function deleteSaved(position: number) {
+    startTransition(async () => {
+      const body = new FormData();
+      body.set("position", String(position));
+      try {
+        setResult(await deleteDraftEvidenceAction(initialState, body));
+      } catch {
+        setResult({ message: "Falha de conexão. Tente apagar de novo.", success: false });
+      }
+      setConfirmingDelete(null);
+    });
+  }
   const [drafts, setDrafts] = useState<Draft[]>([]);
   const [notice, setNotice] = useState("");
   const [result, setResult] = useState<FormState>(initialState);
@@ -311,6 +331,41 @@ export function EvidenceBoard({
               {slot.reason && !draft && (
                 <p className={styles.reason}>{slot.reason}</p>
               )}
+              {canDelete && slot.uploaded && !draft &&
+                (confirmingDelete === slot.position ? (
+                  <div className={styles.deleteConfirm} role="alert">
+                    <span>Apagar o Story {slot.position}?</span>
+                    <button
+                      key="confirm-delete"
+                      type="button"
+                      className={styles.deleteYes}
+                      onClick={() => deleteSaved(slot.position)}
+                      disabled={pending}
+                    >
+                      {pending ? "Apagando…" : "Apagar"}
+                    </button>
+                    <button
+                      key="cancel-delete"
+                      type="button"
+                      className={styles.deleteNo}
+                      onClick={() => setConfirmingDelete(null)}
+                      disabled={pending}
+                    >
+                      Manter
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    key="start-delete"
+                    type="button"
+                    className={styles.deleteLink}
+                    onClick={() => setConfirmingDelete(slot.position)}
+                    disabled={pending}
+                    aria-label={`Apagar a evidência do Story ${slot.position}`}
+                  >
+                    Apagar
+                  </button>
+                ))}
             </li>
           );
         })}

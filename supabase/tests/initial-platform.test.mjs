@@ -120,6 +120,15 @@ before(async () => {
       "utf8",
     ),
   );
+  await database.exec(
+    await readFile(
+      new URL(
+        "../migrations/202610280005_creator_withdraw_and_draft_evidence.sql",
+        import.meta.url,
+      ),
+      "utf8",
+    ),
+  );
   await database.query(
     "insert into auth.users (id, raw_user_meta_data) values ($1, '{}'::jsonb), ($2, '{}'::jsonb), ($3, '{}'::jsonb)",
     [creatorOne, creatorTwo, creatorThree],
@@ -824,4 +833,97 @@ test("eligibility changes require admin and record the resulting criteria", asyn
     entity_type: "eligibility_settings",
     entity_id: "singleton",
   });
+});
+
+// Evidência no rascunho e "desfazer envio" (202610280005).
+async function addEvidence(creatorId, handle, position) {
+  const account = await database.query(
+    `insert into public.social_accounts (creator_id, platform, handle, profile_url, followers_reported)
+     values ($1, 'instagram', $2, 'https://www.instagram.com/' || $2, 500)
+     returning id`,
+    [creatorId, handle],
+  );
+  const storagePath = `${creatorId}/draft-${position}.webp`;
+  await database.query(
+    `insert into public.metric_evidence (
+       creator_id, social_account_id, position, storage_path, content_type,
+       size_bytes, story_published_on, views_reported
+     ) values ($1, $2, $3, $4, 'image/webp', 100, current_date, 1500)`,
+    [creatorId, account.rows[0].id, position, storagePath],
+  );
+  return storagePath;
+}
+
+test("creator deletes own evidence while the application is a draft", async () => {
+  // Usuário novo: o cadastro nasce em rascunho pelo gatilho de cadastro.
+  const draftCreator = "10000000-0000-4000-8000-000000000004";
+  await database.query("insert into auth.users (id, raw_user_meta_data) values ($1, '{}'::jsonb)", [draftCreator]);
+  const storagePath = await addEvidence(draftCreator, "draft-four", 1);
+
+  const result = await asUser(draftCreator, () =>
+    database.query("select public.delete_own_draft_evidence(1::smallint) as path"),
+  );
+  assert.equal(result.rows[0].path, storagePath);
+
+  const remaining = await database.query(
+    "select count(*)::int as total from public.metric_evidence where creator_id = $1",
+    [draftCreator],
+  );
+  assert.equal(remaining.rows[0].total, 0);
+});
+
+test("creator cannot delete evidence after sending the application", async () => {
+  await addEvidence(creatorTwo, "sent-two", 5);
+  await assert.rejects(
+    asUser(creatorTwo, () =>
+      database.query("select public.delete_own_draft_evidence(5::smallint)"),
+    ),
+    /only be removed before the application is sent/i,
+  );
+});
+
+test("creator cannot withdraw once the team has started the review", async () => {
+  await database.query(
+    "update public.creator_profiles set public_name = 'Creator Two', status = 'submitted', submitted_at = now() - interval '1 hour' where user_id = $1",
+    [creatorTwo],
+  );
+  await database.query(
+    "insert into public.review_history (creator_id, actor_id, action) values ($1, $2, 'forwarded')",
+    [creatorTwo, assignedRecruiter],
+  );
+  await assert.rejects(
+    asUser(creatorTwo, () => database.query("select public.withdraw_creator_application()")),
+    /review has already started/i,
+  );
+  const profile = await database.query(
+    "select status from public.creator_profiles where user_id = $1",
+    [creatorTwo],
+  );
+  assert.equal(profile.rows[0].status, "submitted");
+});
+
+test("creator withdraws a sent application before any review and it returns to draft", async () => {
+  await database.query(
+    "update public.creator_profiles set public_name = 'Creator Three', status = 'submitted', submitted_at = now() where user_id = $1",
+    [creatorThree],
+  );
+  await asUser(creatorThree, () =>
+    database.query("select public.withdraw_creator_application()"),
+  );
+  const profile = await database.query(
+    "select status, submitted_at from public.creator_profiles where user_id = $1",
+    [creatorThree],
+  );
+  assert.deepEqual(profile.rows[0], { status: "incomplete", submitted_at: null });
+  const history = await database.query(
+    "select action from public.review_history where creator_id = $1 order by created_at desc limit 1",
+    [creatorThree],
+  );
+  assert.equal(history.rows[0].action, "withdrawn");
+
+  // Rascunho de novo: desfazer outra vez não é possível.
+  await assert.rejects(
+    asUser(creatorThree, () => database.query("select public.withdraw_creator_application()")),
+    /only be withdrawn while awaiting review/i,
+  );
 });
