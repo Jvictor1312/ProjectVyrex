@@ -1,54 +1,41 @@
 import Link from "next/link";
 import styles from "./home.module.css";
 
-const steps = [
-  {
-    title: "Você se cadastra",
-    text: "Perfil, redes sociais e prints dos seus Stories.",
-  },
-  {
-    title: "A equipe analisa",
-    text: "Cada perfil é conferido por uma pessoa, não por robô.",
-  },
-  {
-    title: "Conectamos às marcas",
-    text: "Perfis aprovados entram na base para campanhas compatíveis.",
-  },
+const facts = [
+  { title: "Cadastro gratuito", text: "Leva poucos minutos" },
+  { title: "Sem mínimo de seguidores", text: "Quem está começando entra" },
+  { title: "Análise humana", text: "Cada perfil é conferido" },
 ];
 
-const criteria = [
-  { title: "Sem mínimo de seguidores", text: "Quem está começando também entra." },
-  { title: "3 Stories obrigatórios", text: "Prints recentes, até 5 no total." },
-  { title: "1.000 visualizações", text: "Por Story enviado." },
-  { title: "Análise humana", text: "Números conferidos pela equipe." },
+const steps = [
+  { title: "Crie seu perfil", text: "Conte quem você é e informe suas redes." },
+  { title: "Envie 3 Stories", text: "Prints recentes com 1.000+ visualizações." },
+  { title: "Entre na rede", text: "Aprovado, seu perfil fica visível às marcas." },
 ];
 
 const faq = [
-  {
-    question: "Como funciona o cadastro?",
-    answer:
-      "Crie a conta, informe seu perfil e suas redes, envie os prints dos Stories e mande para análise.",
-  },
   {
     question: "Ser aprovado garante campanha ou pagamento?",
     answer:
       "Não. A aprovação coloca seu perfil na base de criadores elegíveis para futuras campanhas.",
   },
   {
-    question: "Quem vê as evidências que eu envio?",
+    question: "Quem vê os prints que eu envio?",
     answer:
       "Só você e a equipe autorizada. Os arquivos ficam em armazenamento privado.",
   },
   {
-    question: "E se houver uma pendência?",
+    question: "E se faltar alguma coisa no meu cadastro?",
     answer:
       "A equipe pede a correção e você acompanha tudo pelas mensagens da plataforma.",
   },
-  {
-    question: "O que a Vyrex faz por uma marca?",
-    answer:
-      "Planeja a campanha, seleciona criadores compatíveis, coordena as entregas e reúne os resultados.",
-  },
+];
+
+// Três órbitas inclinadas, cada uma com um elétron, como um átomo.
+const orbits = [
+  { tilt: 0, duration: 46, electron: 9 },
+  { tilt: 60, duration: 58, electron: 12 },
+  { tilt: 120, duration: 52, electron: 10.5 },
 ];
 
 export default function HomePage() {
@@ -62,11 +49,10 @@ export default function HomePage() {
         <nav className="topnav" aria-label="Navegação principal">
           <Link href="#como-funciona">Como funciona</Link>
           <Link href="#publicos">Para marcas</Link>
-          <Link href="#criterios">Critérios</Link>
           <Link href="#perguntas">Dúvidas</Link>
           <Link href="/login">Entrar</Link>
           <Link className="button button-dark button-small" href="/cadastro">
-            Quero me cadastrar <span aria-hidden="true">↗</span>
+            Quero me cadastrar
           </Link>
         </nav>
       </header>
@@ -79,86 +65,104 @@ export default function HomePage() {
         </nav>
       )}
 
-      <section className="hero" aria-labelledby="hero-title">
-        <div className="hero-copy">
-          <h1 id="hero-title">
-            Marketing de influência <em>com estratégia.</em>
+      <section className={styles.hero} aria-labelledby="hero-title">
+        <div className={styles.heroCopy}>
+          <h1 id="hero-title" className={styles.heroTitle}>
+            Criadores e marcas, na mesma órbita.
           </h1>
-          <p className="hero-description">
-            Conectamos marcas a criadores compatíveis, com análise humana do
-            cadastro à campanha.
+          <p className={styles.heroText}>
+            A Vyrex é uma agência de marketing de influência. Cadastre seu
+            perfil de criador, mostre seus resultados e entre na rede que as
+            marcas consultam para suas campanhas.
           </p>
-          <div className="hero-actions">
-            <Link className="button button-dark" href="/cadastro">
-              Fazer meu cadastro <span aria-hidden="true">↗</span>
+          <div className={styles.heroActions}>
+            <Link className={styles.primary} href="/cadastro">
+              Criar meu perfil grátis
             </Link>
-            <a className="text-link" href="#como-funciona">
-              Conheça a Vyrex <span aria-hidden="true">↓</span>
-            </a>
+            <Link className={styles.secondary} href="/login">
+              Já tenho conta
+            </Link>
           </div>
+          <ul className={styles.facts}>
+            {facts.map((fact) => (
+              <li key={fact.title}>
+                <span className={styles.check} aria-hidden="true">
+                  ✓
+                </span>
+                <span>
+                  <strong>{fact.title}</strong>
+                  {fact.text}
+                </span>
+              </li>
+            ))}
+          </ul>
         </div>
-        <div className="hero-art" aria-label="Identidade Vyrex">
-          <div className="orbit orbit-one" />
-          <div className="orbit orbit-two" />
-          <div className="brand-disc">
+
+        <div className={styles.atom} aria-hidden="true">
+          {orbits.map((orbit) => (
+            <div
+              key={orbit.tilt}
+              className={styles.orbitTilt}
+              style={{ transform: `rotate(${orbit.tilt}deg)` }}
+            >
+              <div
+                className={styles.orbit}
+                style={{ animationDuration: `${orbit.duration}s` }}
+              >
+                <span
+                  className={styles.electron}
+                  style={{ animationDuration: `${orbit.electron}s` }}
+                />
+              </div>
+            </div>
+          ))}
+          <div className={styles.nucleus}>
             <span>VYREX</span>
           </div>
         </div>
       </section>
 
-      <section className={styles.section} id="como-funciona">
-        <h2 className={styles.title}>Como funciona</h2>
-        <ol className={styles.steps}>
+      <section className={styles.steps} id="como-funciona" aria-label="Como funciona">
+        <h2>Como funciona</h2>
+        <ol>
           {steps.map((step, index) => (
-            <li className={styles.step} key={step.title}>
+            <li key={step.title}>
               <span className={styles.stepNumber}>{index + 1}</span>
-              <h3>{step.title}</h3>
-              <p>{step.text}</p>
+              <span>
+                <strong>{step.title}</strong>
+                {step.text}
+              </span>
             </li>
           ))}
         </ol>
       </section>
 
-      <section className={styles.section} id="publicos">
-        <div className={styles.audiences}>
-          <article className={`${styles.audience} ${styles.audienceDark}`}>
-            <h2>Para criadores</h2>
-            <p>
-              Monte seu perfil, envie seus Stories e acompanhe a análise da
-              equipe pela plataforma.
-            </p>
-            <Link className={styles.ctaLight} href="/cadastro">
-              Criar minha conta
-            </Link>
-          </article>
-          <article className={styles.audience}>
-            <h2>Para marcas</h2>
-            <p>
-              Planejamos a campanha a partir do seu público e objetivo, e
-              selecionamos criadores compatíveis.
-            </p>
-            <a className={styles.ctaDark} href="#perguntas">
-              Saiba como funciona
-            </a>
-          </article>
-        </div>
+      <section className={styles.audiences} id="publicos">
+        <article className={styles.audienceDark}>
+          <h2>Para criadores</h2>
+          <p>
+            Um perfil organizado, analisado por pessoas, pronto para ser
+            encontrado por marcas.
+          </p>
+          <Link className={styles.linkLight} href="/cadastro">
+            Começar agora →
+          </Link>
+        </article>
+        <article className={styles.audienceLight}>
+          <h2>Para marcas</h2>
+          <p>
+            Planejamos a campanha a partir do seu público e selecionamos
+            criadores compatíveis, com entregas acompanhadas.
+          </p>
+          <a className={styles.linkDark} href="#perguntas">
+            Ver dúvidas frequentes →
+          </a>
+        </article>
       </section>
 
-      <section className={styles.section} id="criterios">
-        <h2 className={styles.title}>Critérios para criadores</h2>
-        <ul className={styles.criteria}>
-          {criteria.map((item) => (
-            <li key={item.title}>
-              <strong>{item.title}</strong>
-              <span>{item.text}</span>
-            </li>
-          ))}
-        </ul>
-      </section>
-
-      <section className={styles.section} id="perguntas">
-        <h2 className={styles.title}>Dúvidas</h2>
+      <section className={styles.closing} id="perguntas">
         <div className={styles.faq}>
+          <h2>Dúvidas</h2>
           {faq.map((item) => (
             <details key={item.question}>
               <summary>{item.question}</summary>
@@ -166,13 +170,12 @@ export default function HomePage() {
             </details>
           ))}
         </div>
-      </section>
-
-      <section className={styles.finalCta}>
-        <h2>Pronto para começar?</h2>
-        <Link className={styles.ctaLight} href="/cadastro">
-          Criar minha conta
-        </Link>
+        <div className={styles.finalCta}>
+          <h2>Seu perfil pode ser o próximo.</h2>
+          <Link className={styles.primaryLight} href="/cadastro">
+            Criar meu perfil grátis
+          </Link>
+        </div>
       </section>
 
       <footer className="site-footer">
