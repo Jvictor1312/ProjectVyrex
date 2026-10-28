@@ -36,6 +36,10 @@ Atualizado em: 2026-10-15 (sessão 4)
 - [ ] SMS de recuperação e verificação de posse do celular: exige um provedor de SMS (Twilio, MessageBird ou Vonage) configurado no Supabase.
 - [ ] Testar as telas logadas com dados reais: o usuário precisa entrar no Chrome.
 
+## Próxima sessão
+
+- [ ] Revisar as skills de `.claude/skills/`: quais foram usadas e quais estão paradas, para remover as que só ocupam espaço (pedido do usuário em 2026-10-28).
+
 ## Sessão 2026-10-28, fluxo do administrador (Claude Code)
 
 - [x] Fluxo completo testado com a conta +adm: rede verificada, 3 evidências aprovadas, mensagem enviada, cadastro de teste APROVADO, contato registrado, vídeo de apresentação enviado e exibido no cadastro.
