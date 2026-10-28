@@ -5,6 +5,7 @@ import { fetchActiveRoleKeys } from "@/lib/auth";
 import { rateLimit, tooManyAttempts } from "@/lib/rate-limit";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { invalidPhoneMessage, normalizePhone } from "@/lib/validation/phone";
+import { isValidCpf, looksLikeEmail, normalizeCpf } from "@/lib/validation/cpf";
 import { dashboardPathForRoles } from "@/lib/auth-routing";
 import {
   createSupabaseServerClient,
@@ -136,13 +137,25 @@ export async function signupAction(
 
 export type RecoveryOptions =
   | { status: "idle" }
-  | { status: "error"; message: string }
+  | { status: "error"; message: string; identifier?: string }
   | {
       status: "options";
-      email: string;
+      // E-mail ou CPF (só dígitos), como a pessoa informou. No caminho do CPF
+      // o e-mail completo nunca vai para o navegador, só a versão mascarada.
+      identifier: string;
+      kind: "email" | "cpf";
       maskedEmail: string;
       phoneHint: string | null;
     };
+
+// CPF -> e-mail da conta ativa. Só o servidor consegue (chave de serviço).
+async function emailForCpf(cpf: string): Promise<string | null | "unavailable"> {
+  const admin = createSupabaseAdminClient();
+  if (!admin) return "unavailable";
+  const { data, error } = await admin.rpc("recovery_email_for_cpf", { lookup_cpf: cpf });
+  if (error) return "unavailable";
+  return typeof data === "string" && data ? data : null;
+}
 
 function maskEmail(email: string) {
   const [name, domain] = email.split("@");
@@ -155,29 +168,65 @@ export async function recoveryOptionsAction(
   _previousState: RecoveryOptions,
   formData: FormData,
 ): Promise<RecoveryOptions> {
-  const parsed = recoverySchema.safeParse({ email: formData.get("email") });
-  if (!parsed.success) {
-    return { status: "error", message: "Informe um e-mail válido." };
-  }
+  const raw = String(formData.get("identifier") ?? "").trim().slice(0, 254);
   if (!isSupabaseConfigured()) {
-    return { status: "error", message: setupMessage.message };
+    return { status: "error", message: setupMessage.message, identifier: raw };
+  }
+  if (!(await rateLimit("recovery-lookup", 10, 900)).allowed) {
+    return { status: "error", message: tooManyAttempts.message, identifier: raw };
   }
 
-  if (!(await rateLimit("recovery-lookup", 10, 900)).allowed) {
-    return { status: "error", message: tooManyAttempts.message };
+  let email: string;
+  let kind: "email" | "cpf";
+  let identifier: string;
+  if (looksLikeEmail(raw)) {
+    const parsed = recoverySchema.safeParse({ email: raw });
+    if (!parsed.success) {
+      return { status: "error", message: "Informe um e-mail válido.", identifier: raw };
+    }
+    email = parsed.data.email;
+    kind = "email";
+    identifier = email;
+  } else {
+    const cpf = normalizeCpf(raw);
+    if (!isValidCpf(cpf)) {
+      return {
+        status: "error",
+        message: "Informe um e-mail ou um CPF válido (11 números).",
+        identifier: raw,
+      };
+    }
+    const found = await emailForCpf(cpf);
+    if (found === "unavailable") {
+      return {
+        status: "error",
+        message: "A recuperação por CPF está indisponível no momento. Use o e-mail da conta.",
+        identifier: raw,
+      };
+    }
+    if (!found) {
+      return {
+        status: "error",
+        message:
+          "Não encontramos uma conta ativa com esse CPF. Tente com o e-mail da conta; o CPF só funciona se tiver sido salvo em Configurações.",
+        identifier: raw,
+      };
+    }
+    email = found;
+    kind = "cpf";
+    identifier = cpf;
   }
 
   // A dica do celular só pode ser lida pelo servidor (chave de serviço).
   const admin = createSupabaseAdminClient();
   const { data } = admin
-    ? await admin.rpc("recovery_phone_hint", {
-        lookup_email: parsed.data.email,
-      })
+    ? await admin.rpc("recovery_phone_hint", { lookup_email: email })
     : { data: null };
   return {
     status: "options",
-    email: parsed.data.email,
-    maskedEmail: maskEmail(parsed.data.email),
+    identifier,
+    kind,
+    maskedEmail: maskEmail(email),
     phoneHint: typeof data === "string" && data ? data : null,
   };
 }
@@ -188,9 +237,21 @@ export async function recoveryAction(
   _previousState: FormState,
   formData: FormData,
 ): Promise<FormState> {
-  const parsed = recoverySchema.safeParse({ email: formData.get("email") });
-  if (!parsed.success) return invalidForm;
   if (!isSupabaseConfigured()) return setupMessage;
+  // O e-mail é sempre resolvido aqui no servidor: pelo próprio e-mail ou
+  // buscando de novo pelo CPF (o navegador nunca recebe o e-mail completo).
+  const identifier = String(formData.get("identifier") ?? "").trim();
+  let email: string | null = null;
+  if (formData.get("kind") === "cpf") {
+    const cpf = normalizeCpf(identifier);
+    const found = isValidCpf(cpf) ? await emailForCpf(cpf) : null;
+    email = found && found !== "unavailable" ? found : null;
+  } else {
+    const parsed = recoverySchema.safeParse({ email: identifier });
+    email = parsed.success ? parsed.data.email : null;
+  }
+  if (!email) return invalidForm;
+  const parsed = { data: { email } };
 
   if (!(await rateLimit("recovery-send", 3, 3600, parsed.data.email)).allowed) {
     return tooManyAttempts;
@@ -209,7 +270,9 @@ export async function recoveryAction(
 
   return {
     message:
-      "Se houver uma conta com esse e-mail, enviamos as instruções de recuperação.",
+      formData.get("kind") === "cpf"
+        ? `Enviamos as instruções para ${maskEmail(email)}. Confira a caixa de entrada e o spam.`
+        : "Se houver uma conta com esse e-mail, enviamos as instruções de recuperação. Confira também o spam.",
     success: true,
   };
 }

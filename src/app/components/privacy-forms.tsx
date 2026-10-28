@@ -89,7 +89,7 @@ export function ResolveDataRequestForm({ requestId }: { requestId: string }) {
 export function AccountSettingsForm({
   initial,
 }: {
-  initial: { fullName: string; phone: string };
+  initial: { fullName: string; phone: string; cpf: string };
 }) {
   const [state, action, pending] = useActionState(
     updateAccountSettingsAction,
@@ -118,9 +118,24 @@ export function AccountSettingsForm({
           autoComplete="tel"
         />
       </label>
+      <label className="field">
+        <span>CPF (opcional)</span>
+        <input
+          name="cpf"
+          inputMode="numeric"
+          maxLength={14}
+          placeholder="000.000.000-00"
+          defaultValue={initial.cpf}
+          autoComplete="off"
+        />
+        <small className="field-hint">
+          Com o CPF salvo, você também pode recuperar a senha informando o CPF.
+          Só você vê este dado. Deixe vazio para removê-lo.
+        </small>
+      </label>
       <ActionMessage state={state} />
       <button className="button button-dark" type="submit" disabled={pending}>
-        {pending ? "Salvando..." : "Salvar dados"}
+        {pending ? "Salvando…" : "Salvar dados"}
       </button>
     </form>
   );

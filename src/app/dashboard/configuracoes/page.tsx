@@ -12,13 +12,14 @@ import {
 } from "@/lib/validation/privacy";
 import { CreatorShell } from "../creator-shell";
 import styles from "../dashboard.module.css";
+import { formatCpf } from "@/lib/validation/cpf";
 
 export const metadata: Metadata = { title: "Configurações" };
 
 // Conta, senha e privacidade numa só tela; a privacidade fica recolhida.
 export default async function CreatorSettingsPage() {
   const { supabase, user, activeCheck, ensureActive } = await requireUserFast();
-  const [profileResult, requestsResult, activeResult] = await Promise.all([
+  const [profileResult, requestsResult, activeResult, documentResult] = await Promise.all([
     supabase
       .from("profiles")
       .select("full_name, phone")
@@ -31,6 +32,8 @@ export default async function CreatorSettingsPage() {
       .order("created_at", { ascending: false })
       .limit(20),
     activeCheck,
+    // CPF opcional: só o próprio usuário consegue ler (regra do banco).
+    supabase.from("user_documents").select("cpf").eq("user_id", user.id).maybeSingle(),
   ]);
   await ensureActive(activeResult);
   const profile = profileResult.data;
@@ -54,6 +57,7 @@ export default async function CreatorSettingsPage() {
               initial={{
                 fullName: profile.full_name ?? "",
                 phone: profile.phone ?? "",
+                cpf: documentResult.data?.cpf ? formatCpf(documentResult.data.cpf) : "",
               }}
             />
           </section>

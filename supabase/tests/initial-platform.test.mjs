@@ -135,6 +135,12 @@ before(async () => {
       "utf8",
     ),
   );
+  await database.exec(
+    await readFile(
+      new URL("../migrations/202610280007_user_cpf.sql", import.meta.url),
+      "utf8",
+    ),
+  );
   await database.query(
     "insert into auth.users (id, raw_user_meta_data) values ($1, '{}'::jsonb), ($2, '{}'::jsonb), ($3, '{}'::jsonb)",
     [creatorOne, creatorTwo, creatorThree],
@@ -940,4 +946,51 @@ test("decision notifications carry a title that says what was decided", async ()
   const all = titles.rows.map((row) => row.title);
   assert.ok(all.includes("Cadastro não aprovado"), `títulos: ${all.join(", ")}`);
   assert.ok(!all.includes("Atualização do cadastro"));
+});
+// CPF opcional da conta (202610280007).
+test("database validates CPF check digits", async () => {
+  const result = await database.query(
+    "select public.is_valid_cpf('529.982.247-25') as valid, public.is_valid_cpf('52998224726') as wrong, public.is_valid_cpf('11111111111') as repeated",
+  );
+  assert.deepEqual(result.rows[0], { valid: true, wrong: false, repeated: false });
+});
+
+test("creator stores own CPF, only they can read it, and duplicates are refused", async () => {
+  await asUser(creatorOne, () => database.query("select public.set_own_cpf('529.982.247-25')"));
+
+  const own = await asUser(creatorOne, () => database.query("select cpf from public.user_documents"));
+  assert.deepEqual(own.rows, [{ cpf: "52998224725" }]);
+
+  const other = await asUser(creatorTwo, () => database.query("select cpf from public.user_documents"));
+  assert.equal(other.rows.length, 0);
+  const staff = await asUser(administrator, () => database.query("select cpf from public.user_documents"));
+  assert.equal(staff.rows.length, 0);
+
+  await assert.rejects(
+    asUser(creatorTwo, () => database.query("select public.set_own_cpf('52998224725')")),
+    /cpf already registered/i,
+  );
+  await assert.rejects(
+    asUser(creatorTwo, () => database.query("select public.set_own_cpf('529.982.247-26')")),
+    /invalid cpf/i,
+  );
+  await assert.rejects(
+    asUser(creatorTwo, () =>
+      database.query("insert into public.user_documents (user_id, cpf) values ($1, '11144477735')", [creatorTwo]),
+    ),
+    /permission denied/i,
+  );
+});
+
+test("creator can remove own CPF by saving an empty value", async () => {
+  await asUser(creatorOne, () => database.query("select public.set_own_cpf('')"));
+  const own = await asUser(creatorOne, () => database.query("select cpf from public.user_documents"));
+  assert.equal(own.rows.length, 0);
+});
+
+test("signed-in users cannot look up an e-mail by CPF", async () => {
+  await assert.rejects(
+    asUser(creatorTwo, () => database.query("select public.recovery_email_for_cpf('52998224725')")),
+    /permission denied/i,
+  );
 });

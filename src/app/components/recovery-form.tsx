@@ -23,17 +23,25 @@ export function RecoveryForm() {
       <form action={(data) => { setRestart(0); lookup(data); }} className="auth-form">
         <div className="auth-heading">
           <h1>Recupere seu acesso.</h1>
-          <p>Informe o e-mail da sua conta.</p>
+          <p>Informe o e-mail da sua conta ou o CPF salvo em Configurações.</p>
         </div>
         <label className="field">
-          <span>E-mail</span>
+          <span>CPF ou e-mail</span>
           <input
-            autoComplete="email"
-            name="email"
-            type="email"
+            autoComplete="username"
+            name="identifier"
+            type="text"
+            inputMode="email"
             required
             maxLength={254}
-            defaultValue={options.status === "options" ? options.email : ""}
+            placeholder="000.000.000-00 ou nome@email.com"
+            defaultValue={
+              options.status === "options" && options.kind === "email"
+                ? options.identifier
+                : options.status === "error"
+                  ? (options.identifier ?? "")
+                  : ""
+            }
           />
         </label>
         {options.status === "error" && (
@@ -46,7 +54,7 @@ export function RecoveryForm() {
           type="submit"
           disabled={looking}
         >
-          {looking ? "Aguarde..." : "Continuar"}
+          {looking ? "Aguarde…" : "Continuar"}
           <span aria-hidden="true">↗</span>
         </button>
         <div className="auth-links">
@@ -60,9 +68,14 @@ export function RecoveryForm() {
     <form action={send} className="auth-form">
       <div className="auth-heading">
         <h1>Para onde enviamos?</h1>
-        <p>Escolha como quer recuperar sua senha.</p>
+        <p>
+          {options.kind === "cpf"
+            ? "Encontramos a conta ligada a esse CPF. As instruções vão para o e-mail abaixo."
+            : "Escolha como quer recuperar sua senha."}
+        </p>
       </div>
-      <input type="hidden" name="email" value={options.email} />
+      <input type="hidden" name="identifier" value={options.identifier} />
+      <input type="hidden" name="kind" value={options.kind} />
       <fieldset className="recovery-options">
         <legend className="sr-only">Canal de recuperação</legend>
         <label className="recovery-option">
@@ -96,12 +109,12 @@ export function RecoveryForm() {
         type="submit"
         disabled={sending || state.success}
       >
-        {sending ? "Enviando..." : state.success ? "Enviado" : "Enviar"}
+        {sending ? "Enviando…" : state.success ? "Enviado" : "Enviar para o e-mail"}
         <span aria-hidden="true">↗</span>
       </button>
       <div className="auth-links">
         <button className="link-button" type="button" onClick={() => setRestart(1)}>
-          Usar outro e-mail
+          Usar outro CPF ou e-mail
         </button>
       </div>
     </form>

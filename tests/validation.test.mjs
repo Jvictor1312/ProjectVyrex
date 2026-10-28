@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import sharp from "sharp";
+import { formatCpf, isValidCpf, looksLikeEmail, normalizeCpf } from "../src/lib/validation/cpf.ts";
 import {
   passwordUpdateSchema,
   signupSchema,
@@ -250,4 +251,16 @@ test("callback redirect accepts only a normalized local destination", () => {
   ]) {
     assert.equal(safeLocalRedirectPath(destination), "/dashboard");
   }
+});
+
+test("CPF validation matches the database rule", () => {
+  assert.equal(isValidCpf("529.982.247-25"), true);
+  assert.equal(isValidCpf("11144477735"), true);
+  assert.equal(isValidCpf("529.982.247-26"), false);
+  assert.equal(isValidCpf("111.111.111-11"), false);
+  assert.equal(isValidCpf("123"), false);
+  assert.equal(normalizeCpf("529.982.247-25"), "52998224725");
+  assert.equal(formatCpf("52998224725"), "529.982.247-25");
+  assert.equal(looksLikeEmail("pessoa@vyrex.com"), true);
+  assert.equal(looksLikeEmail("529.982.247-25"), false);
 });

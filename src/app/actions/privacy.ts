@@ -2,6 +2,7 @@
 
 import { rateLimit, tooManyAttempts } from "@/lib/rate-limit";
 import { invalidPhoneMessage, normalizePhone } from "@/lib/validation/phone";
+import { isValidCpf, normalizeCpf } from "@/lib/validation/cpf";
 import { revalidatePath } from "next/cache";
 import { requireSession } from "@/lib/auth";
 import {
@@ -105,6 +106,14 @@ export async function updateAccountSettingsAction(
   if (parsed.data.phone && !phone) {
     return { message: invalidPhoneMessage, success: false };
   }
+  // CPF é opcional; vazio remove o CPF salvo.
+  const cpf = normalizeCpf(String(formData.get("cpf") ?? ""));
+  if (cpf && !isValidCpf(cpf)) {
+    return {
+      message: "CPF inválido. Confira os 11 números ou deixe o campo vazio.",
+      success: false,
+    };
+  }
 
   const { supabase, user } = await requireSession();
   const { data, error } = await supabase
@@ -120,6 +129,20 @@ export async function updateAccountSettingsAction(
   if (error || !data) {
     return {
       message: "Não foi possível salvar seus dados. Tente novamente.",
+      success: false,
+    };
+  }
+
+  // O banco confere os dígitos e impede o mesmo CPF em duas contas.
+  const { error: cpfError } = await supabase.rpc("set_own_cpf", { new_cpf: cpf });
+  if (cpfError) {
+    revalidatePath("/dashboard/configuracoes");
+    return {
+      message: /already registered/i.test(cpfError.message)
+        ? "Nome e telefone salvos, mas este CPF já está ligado a outra conta. Se for seu, fale com a equipe."
+        : /invalid cpf/i.test(cpfError.message)
+          ? "Nome e telefone salvos, mas o CPF é inválido."
+          : "Nome e telefone salvos, mas não foi possível salvar o CPF. Tente de novo.",
       success: false,
     };
   }
