@@ -49,7 +49,8 @@ Atualizado em: 2026-10-28. Reescrito para mostrar só o estado atual e as pendê
 - [ ] **Segurança das chaves (fim do projeto, decisão do usuário):** a chave secreta e a `service_role` antiga foram coladas na conversa em 2026-10-28. Trocar a secreta; migrar a chave pública para `sb_publishable_` e então desativar as chaves antigas (JWT). O token de acesso (`sbp_`) também foi colado na conversa: apagar e gerar outro em supabase.com/dashboard/account/tokens.
 
 ### Técnicas (podem ser feitas sem o usuário)
-- [ ] **Testes automáticos de navegador** (cadastro, envio, análise, correção). Fora do escopo por decisão do usuário em 2026-10-28.
+- [x] **Testes automáticos de navegador** (Playwright, `npm run test:e2e`): públicas, proteção de rotas, recuperação neutra, área do criador e da equipe só leitura, em computador e celular. Liberado pelo usuário em 2026-10-28.
+- [ ] Usuário: guardar as senhas das contas de teste com `scripts/set-test-credentials.ps1` para liberar os testes com login.
 - [ ] **Busca sem acento:** "joao" não encontra "João". Exige a extensão `unaccent` (migration aditiva) ou uma coluna normalizada.
 - [ ] **Barra de progresso por arquivo** no envio de evidências: as Server Actions não informam o progresso do upload; exigiria enviar direto ao Storage pelo navegador.
 - [ ] **Painéis separados por função:** hoje `/interno` é um painel único que se adapta à função; avaliar se a operação precisa de telas próprias.

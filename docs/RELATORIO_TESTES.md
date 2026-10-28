@@ -39,7 +39,7 @@
 | Gravidade | Teste | Problema | Situação |
 |---|---|---|---|
 | Média | SEC-14 | O limite "8 tentativas por e-mail" também usava o endereço de rede lido do cabeçalho `x-forwarded-for`, que o visitante consegue forjar. Trocando o cabeçalho a cada tentativa, o contador zerava, tanto o limite por e-mail quanto o limite por rede. | **Corrigido.** O limite por e-mail ou conta agora vale em qualquer endereço de rede, e o endereço vem primeiro do `x-real-ip`, preenchido pela hospedagem (`src/lib/rate-limit.ts`). |
-| Média | SEC-13 | O cadastro responde "Este e-mail já está cadastrado", e a recuperação por CPF responde "Não encontramos uma conta ativa com esse CPF". As duas respostas permitem descobrir se um e-mail ou CPF tem conta. | **Aberto. Precisa de decisão do usuário** (ver propostas abaixo). |
+| Média | SEC-13 | O cadastro responde "Este e-mail já está cadastrado", e a recuperação por CPF responde "Não encontramos uma conta ativa com esse CPF". As duas respostas permitem descobrir se um e-mail ou CPF tem conta. | **Corrigido** (commit `6ccf6f1`, decisão do usuário: mensagens neutras). O cadastro com e-mail existente vai para a mesma tela de confirmação. A recuperação responde igual exista ou não a conta, leva pelo menos 1,2 s e não mostra mais o e-mail mascarado nem a dica do celular. Teste automático em `tests/e2e/public.spec.ts`. |
 | Baixa | SEC-02 | Sem login, `/dashboard` e `/interno` respondiam 200 com a tela de carregamento e só depois redirecionavam. Não havia vazamento: só o título da página aparecia. | **Corrigido.** O filtro de entrada (`proxy`) redireciona direto para `/login` (307). |
 
 ### Propostas para o SEC-13 (enumeração de contas)

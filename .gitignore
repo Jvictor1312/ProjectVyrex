@@ -162,3 +162,8 @@ vite.config.ts.timestamp-*
 
 # Turbo Repo
 .turbo
+
+# Playwright (sessões das contas de teste e relatórios)
+/playwright/.auth/
+/playwright-report/
+/test-results/

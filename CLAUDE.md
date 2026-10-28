@@ -36,7 +36,7 @@ O usuário acompanha tudo pelo VS Code, com o site aberto. **Dê mais empenho a 
 - `agent-browser` 0.40 instalado globalmente (`npm i -g agent-browser`, em `%APPDATA%\npm`). Chrome em `C:\Program Files\Google\Chrome\Application\chrome.exe`.
 - Claude in Chrome está conectado: prefira-o para mostrar as telas ao usuário no Chrome dele.
 - Servidor de desenvolvimento: `npm run dev` → http://localhost:3000 (hot reload).
-- Verificações: `npm run typecheck`, `npm run lint`, `npm test` (PGlite + validação), `npm run build`.
+- Verificações: `npm run typecheck`, `npm run lint`, `npm test` (PGlite + validação), `npm run build` e `npm run test:e2e` (Playwright no Chrome instalado, projetos "computador" e "celular"; testes em `tests/e2e/`).
 - Next.js desta versão tem mudanças em relação ao que você conhece: consulte `node_modules/next/dist/docs/` antes de escrever código Next (ver `AGENTS.md`).
 
 ## Skills do projeto (`.claude/skills/`)
@@ -66,7 +66,7 @@ Removidas por não servirem a este projeto: `hyperframes` (vídeo), `frontend-de
 - Todas as migrations de `supabase/migrations/` (até `202610280008_user_id_for_email.sql`) estão aplicadas no banco (pelo SQL Editor ou pela Management API; não existe a tabela `supabase_migrations.schema_migrations`). Novas migrations devem ser aditivas e não destrutivas; aplique-as pela Management API (`POST /v1/projects/{ref}/database/query`) e inclua-as nos testes PGlite.
 - Critérios atuais no banco: 0 seguidores mínimos, 1.000 visualizações por evidência e **3 evidências obrigatórias** (posições 1 a 3; a 4ª e a 5ª são opcionais). As diretrizes citam 3.000/2.000 e 5 evidências: estão desatualizadas.
 - E-mails do Supabase: no plano gratuito sem SMTP próprio os textos não podem ser alterados. Os modelos em português estão em `supabase/templates/`; aplique-os quando o usuário configurar o SMTP.
-- Contas de teste: `jvictorbviana+user@gmail.com` (criador) e `jvictorbviana+adm@gmail.com` (admin). O usuário entra no Chrome; o Claude não digita as senhas.
+- Contas de teste: `jvictorbviana+user@gmail.com` (criador) e `jvictorbviana+adm@gmail.com` (admin). O Claude pode entrar nelas (veja "Testar telas com login").
 - O access token do Supabase (`sbp_...`) está salvo, a pedido do usuário, na variável de ambiente do usuário do Windows `SUPABASE_ACCESS_TOKEN`. Use-a para a Management API e o Supabase CLI. Nunca escreva o valor em arquivos do projeto, logs ou mensagens.
 
 ## Documentação
@@ -77,7 +77,13 @@ Removidas por não servirem a este projeto: `hyperframes` (vídeo), `frontend-de
 
 ## Testar telas com login
 
-- O Supabase é o banco real na nuvem: o Claude não cria contas nem digita senhas nele. O usuário cria as contas de teste e entra no Chrome; o Claude pode dar a função de equipe a uma conta via SQL quando o usuário pedir.
+- **Contas de teste (autorizado pelo usuário em 2026-10-28):** o Claude pode entrar sempre que precisar nas contas de teste `+adm` (administrador) e `+user` (criador). São descartáveis e serão excluídas quando o site for finalizado. O e-mail e a senha ficam em variáveis de ambiente do usuário do Windows (`VYREX_TEST_ADMIN_EMAIL`, `VYREX_TEST_ADMIN_PASSWORD`, `VYREX_TEST_USER_EMAIL`, `VYREX_TEST_USER_PASSWORD`), gravadas pelo próprio usuário com `scripts/set-test-credentials.ps1`.
+  - **Nunca** imprima, registre ou escreva esses valores em arquivos, commits, logs ou mensagens. Leia-os do registro na hora: `[Environment]::GetEnvironmentVariable('VYREX_TEST_ADMIN_PASSWORD','User')`.
+  - **Testes automáticos:** `npm run test:e2e` (ou `scripts/e2e.ps1 [args do Playwright]`). O setup entra nas duas contas e guarda as sessões em `playwright/.auth/` (fora do git), reaproveitadas por 30 min.
+  - **Para mostrar telas** com agent-browser: abra `/login`, preencha `input[name=email]` e `input[name=password]` passando o valor da variável dentro do próprio comando (sem ecoar) e clique em "Entrar".
+  - Se as variáveis não existirem, peça ao usuário para rodar `powershell -ExecutionPolicy Bypass -File scripts\set-test-credentials.ps1` no terminal do VS Code. Não peça a senha na conversa.
+  - Com essas contas, só navegue e leia. Salvar, enviar cadastro, apagar evidência, convidar, mudar funções, desativar, decidir cadastros ou mudar critérios só com pedido explícito do usuário, porque o banco é o real. O limite de login é 8 tentativas por e-mail a cada 15 min.
+- O Claude não cria outras contas no Supabase real. Pode dar a função de equipe a uma conta via SQL quando o usuário pedir.
 - Sem login, use as previews (só em desenvolvimento): `/preview/criador`, `/preview/criador/cadastro`, `/preview/criador/evidencias`, `/preview/equipe`, `/preview/equipe/colaboradores`.
 - **Celular primeiro** (decisão do usuário: a maioria dos usuários vem do celular; o computador já está aprovado). Ajustes de celular ficam em `@media (max-width: 760px)` sem alterar o computador: campos com 16px (sem zoom no iPhone), alvos de toque de 44px ou mais, texto de 12px no mínimo, menu do criador fixo embaixo. Confira em 390 e 360px. Elas usam os mesmos componentes das telas reais; mantenha assim ao criar novas telas.
 
