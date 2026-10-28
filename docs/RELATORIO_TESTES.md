@@ -166,3 +166,23 @@ Testes depois das correções: verificação de código OK, padrão de escrita O
 4. **Decisão sobre o Playwright** (testes automáticos de navegador), que o usuário tinha deixado fora do escopo.
 5. **Decisão sobre o SEC-13** (mensagens neutras no cadastro e na recuperação por CPF).
 6. **Teste em celulares reais** (iPhone com Safari e Android com Chrome).
+
+## Rodada 2: testes de navegador com login (Playwright)
+
+**Data:** 28/10/2026. Contas de teste `+adm` (administrador) e `+user` (criador), com as senhas guardadas pelo usuário no Windows (`scripts/set-test-credentials.ps1`).
+**Comando:** `npm run test:e2e`, no Chrome, em **computador** (1366 px) e **celular** (Pixel 7).
+**Resultado:** **55 aprovados, 0 falhas e 3 pulados de propósito** (o teste da barra de baixo só roda no celular e os de recuperação só no computador). Os testes **só navegam e leem**; nada foi salvo, enviado ou apagado.
+
+| Teste do plano | Resultado agora | O que o teste automático comprova |
+|---|---|---|
+| SEC-02 | APROVADO (com e sem login) | Sem login, as 6 rotas privadas vão para `/login`. Logado como criador, `/interno`, `/interno/equipe` e `/interno/configuracoes` não abrem. |
+| SEC-10 | APROVADO | `/auth/callback?next=//externo` termina em `localhost:3000/login`. |
+| SEC-13 | APROVADO (corrigido) | CPF fictício novo a cada execução recebe a resposta neutra; CPF inválido é recusado. |
+| CRI-04 | APROVADO | O administrador entra em `/interno` e o criador em `/dashboard`. Já logado, `/login` e `/cadastro` levam ao painel. |
+| EQP-04 | APROVADO em parte (só leitura) | O administrador navega pela visão geral, colaboradores, configurações e privacidade; o filtro de situação funciona; critérios e vídeo aparecem. |
+| EQP-10 | APROVADO | O histórico administrativo começa recolhido e abre com um clique (dados reais). |
+| MOB-01 / MOB-04 | APROVADO (simulação) | No celular, a barra do criador fica fixa embaixo, sem rolagem lateral. As 6 páginas públicas não rolam de lado nos dois tamanhos. Os campos do login têm 16 px no celular. |
+| PERF-01 / PERF-02 | APROVADO em parte | O menu do criador troca de página e marca a atual; voltar e avançar funcionam; a sessão continua depois de recarregar. |
+| UX-03 | APROVADO em parte | Uma ficha de cadastro inexistente não derruba a página (resposta abaixo de 500). |
+
+Ainda dependem de um banco separado ou de pedido explícito, porque alteram dados reais: o fluxo completo de envio e análise, convites, mudança de funções, desativação, uploads e limites de tentativas.

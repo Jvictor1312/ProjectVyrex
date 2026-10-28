@@ -9,7 +9,7 @@ test.use({ storageState: storageFile("admin") });
 test("visão geral lista cadastros e aceita filtros", async ({ page }) => {
   await page.goto("/interno");
   await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
-  await expect(page.getByText("Cadastros de criadores")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Cadastros de criadores" })).toBeVisible();
   await page.getByLabel("Situação").selectOption({ index: 1 });
   await page.getByRole("button", { name: "Filtrar" }).click();
   await expect(page).toHaveURL(/status=/);
