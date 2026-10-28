@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import {
   CreatorWizard,
   CreatorProfileForm,
@@ -364,10 +365,7 @@ export default async function CreatorProfilePage() {
                 </ul>
               </div>
             ) : (
-              <p className="field-hint">
-                Os requisitos informados parecem completos. O servidor fará a
-                validação final antes de encaminhar.
-              </p>
+              <p className="field-hint">Tudo pronto para enviar.</p>
             )}
           </section>
 
@@ -380,26 +378,18 @@ export default async function CreatorProfilePage() {
               <span className="principle-number">05</span>
               <div>
                 <h2>Enviar para análise</h2>
-                <p>
-                  O sistema confere os requisitos mínimos; a equipe decide
-                  manualmente.
-                </p>
+                <p>A equipe confere tudo e responde por aqui.</p>
               </div>
             </div>
             {profile?.decision_reason && (
               <p className="decision-reason">{profile.decision_reason}</p>
             )}
-            <p className="field-hint">
-              O envio não confirma a autenticidade das imagens nem garante
-              aprovação. Um cadastro aprovado integra a base de elegíveis e não
-              representa contratação, campanha ou pagamento.
-            </p>
             {canEdit ? (
               <SubmitApplicationButton />
             ) : (
               <p className="field-hint">
-                Este cadastro já foi encaminhado ou teve uma decisão. Para
-                acompanhar, consulte o painel e as mensagens da equipe.
+                Cadastro já enviado. Acompanhe pela{" "}
+                <Link href="/dashboard">visão geral</Link>.
               </p>
             )}
           </section>

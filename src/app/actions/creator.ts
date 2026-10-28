@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { randomUUID } from "node:crypto";
 import { z } from "zod";
 import { requireUser } from "@/lib/auth";
@@ -238,16 +239,17 @@ export async function submitCreatorApplicationAction(
   const { supabase } = await requireUser();
   const { error } = await supabase.rpc("submit_creator_application");
 
-  return error
-    ? {
-        message:
-          "Confira o nome público, informe pelo menos uma rede social e envie as evidências obrigatórias com as visualizações mínimas, em ordem cronológica e dentro do prazo.",
-        success: false,
-      }
-    : {
-        message: "Cadastro encaminhado. A equipe fará a validação manual.",
-        success: true,
-      };
+  if (error) {
+    return {
+      message:
+        "Confira o nome público, a rede social e as evidências obrigatórias (visualizações mínimas, ordem e prazo).",
+      success: false,
+    };
+  }
+
+  // Depois de enviar, a pessoa vai para a visão geral, que mostra a análise.
+  revalidatePath("/dashboard", "layout");
+  redirect("/dashboard");
 }
 
 export async function markNotificationReadAction(

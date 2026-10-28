@@ -133,14 +133,17 @@ export function CreatorWizard({
         <span aria-live="polite">
           Etapa {activeStep + 1} de {steps.length}
         </span>
-        <button
-          className="button button-dark"
-          type="button"
-          disabled={activeStep >= steps.length - 1}
-          onClick={() => goTo(activeStep + 1)}
-        >
-          Continuar
-        </button>
+{activeStep < steps.length - 1 ? (
+          <button
+            className="button button-dark"
+            type="button"
+            onClick={() => goTo(activeStep + 1)}
+          >
+            Continuar
+          </button>
+        ) : (
+          <span />
+        )}
       </nav>
     </div>
   );
