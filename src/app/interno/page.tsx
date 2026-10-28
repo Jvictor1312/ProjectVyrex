@@ -27,6 +27,20 @@ const statusLabels: Record<(typeof statusOptions)[number], string> = {
   suspended: "Suspenso",
 };
 
+const platformLabels: Record<string, string> = {
+  instagram: "Instagram",
+  tiktok: "TikTok",
+  youtube: "YouTube",
+  other: "Outra rede",
+};
+
+function accountName(
+  person: { full_name: string | null } | { full_name: string | null }[] | null,
+) {
+  const value = Array.isArray(person) ? person[0] : person;
+  return value?.full_name ?? null;
+}
+
 const roleLabels: Record<string, string> = {
   admin: "Administrador",
   recruiter: "Recrutador",
@@ -49,8 +63,7 @@ export default async function InternalDashboard({
 }: {
   searchParams: SearchParams;
 }) {
-  const { supabase, user, roleKeys, rolesError } =
-    await requireUserWithRoles();
+  const { supabase, user, roleKeys, rolesError } = await requireUserWithRoles();
   const params = await searchParams;
   const search = stringParam(params.q)?.trim().slice(0, 80) ?? "";
   const rawStatus = stringParam(params.status) ?? "all";
@@ -80,9 +93,12 @@ export default async function InternalDashboard({
     selectedStatus === "all" ? [...statusOptions] : [selectedStatus];
   let creatorsQuery = supabase
     .from("creator_profiles")
-    .select("user_id, public_name, status, submitted_at, updated_at", {
-      count: "exact",
-    })
+    .select(
+      "user_id, public_name, status, submitted_at, updated_at, account:profiles!creator_profiles_user_id_fkey(full_name)",
+      {
+        count: "exact",
+      },
+    )
     .in("status", statuses)
     .ilike("public_name", search ? `%${search}%` : "%")
     .order("updated_at", { ascending: false })
@@ -98,9 +114,12 @@ export default async function InternalDashboard({
           : [];
     creatorsQuery = supabase
       .from("creator_profiles")
-      .select("user_id, public_name, status, submitted_at, updated_at", {
-        count: "exact",
-      })
+      .select(
+        "user_id, public_name, status, submitted_at, updated_at, account:profiles!creator_profiles_user_id_fkey(full_name)",
+        {
+          count: "exact",
+        },
+      )
       .in("status", allowedStates)
       .ilike("public_name", search ? `%${search}%` : "%")
       .order("submitted_at", { ascending: true })
@@ -151,11 +170,15 @@ export default async function InternalDashboard({
       : Promise.resolve({ count: null, error: null }),
     supabase
       .from("recruiter_assignments")
-      .select("creator_id, recruiter_id")
+      .select(
+        "creator_id, recruiter_id, person:profiles!recruiter_assignments_recruiter_id_fkey(full_name)",
+      )
       .is("ended_at", null),
     supabase
       .from("relationship_assignments")
-      .select("creator_id, manager_id")
+      .select(
+        "creator_id, manager_id, person:profiles!relationship_assignments_manager_id_fkey(full_name)",
+      )
       .is("ended_at", null),
     supabase.from("social_accounts").select("platform"),
     primaryRole === "admin"
@@ -199,29 +222,27 @@ export default async function InternalDashboard({
   const averageAnalysisLabel =
     averageAnalysisDays.length >= 5
       ? `${(averageAnalysisDays.reduce((total, days) => total + days, 0) / averageAnalysisDays.length).toFixed(1)} dias`
-      : "Dados insuficientes";
-  const assignedStaffIds =
-    primaryRole === "admin"
-      ? [...new Set([...recruiterCounts.keys(), ...managerCounts.keys()])]
-      : [];
-  const staffProfileResult = assignedStaffIds.length
-    ? await supabase
-        .from("profiles")
-        .select("id, full_name")
-        .in("id", assignedStaffIds)
-    : { data: [], error: null };
-  const staffNames = new Map(
-    (staffProfileResult.data ?? []).map((profile) => [
-      profile.id,
-      profile.full_name,
-    ]),
-  );
+      : "—";
+  const staffNames = new Map<string, string>();
+  for (const row of [
+    ...(recruiterAssignmentsResult.data ?? []).map((item) => ({
+      id: item.recruiter_id,
+      person: item.person,
+    })),
+    ...(managerAssignmentsResult.data ?? []).map((item) => ({
+      id: item.manager_id,
+      person: item.person,
+    })),
+  ]) {
+    const name = accountName(row.person);
+    if (name) staffNames.set(row.id, name);
+  }
   const recruiterReport = [...recruiterCounts].map(([staffId, count]) => ({
-    name: staffNames.get(staffId) ?? staffId.slice(0, 8),
+    name: staffNames.get(staffId) ?? "Sem nome",
     count,
   }));
   const managerReport = [...managerCounts].map(([staffId, count]) => ({
-    name: staffNames.get(staffId) ?? staffId.slice(0, 8),
+    name: staffNames.get(staffId) ?? "Sem nome",
     count,
   }));
 
@@ -295,10 +316,12 @@ export default async function InternalDashboard({
       ].some((result) => result.error));
 
   return (
-    <InternalShell active="painel" isAdmin={roles.includes("admin")}
+    <InternalShell
+      active="painel"
+      isAdmin={roles.includes("admin")}
       roles={roles.map((role) => roleLabels[role])}
-      email={user.email}>
-
+      email={user.email}
+    >
       <section className={styles.main}>
         <header className={styles.pageHeader}>
           <div>
@@ -354,7 +377,7 @@ export default async function InternalDashboard({
               ) : (
                 [...socialCounts].map(([platform, count]) => (
                   <div className={styles.reportRow} key={platform}>
-                    <span>{platform}</span>
+                    <span>{platformLabels[platform] ?? platform}</span>
                     <strong>{count}</strong>
                   </div>
                 ))
@@ -409,9 +432,10 @@ export default async function InternalDashboard({
                 <tr key={creator.user_id}>
                   <td>
                     <strong>
-                      {creator.public_name || "Perfil sem nome público"}
+                      {creator.public_name ||
+                        accountName(creator.account) ||
+                        "Sem nome"}
                     </strong>
-                    <small>{creator.user_id.slice(0, 8)}…</small>
                   </td>
                   <td>
                     <span className={styles.status}>
@@ -443,23 +467,25 @@ export default async function InternalDashboard({
 
         <footer className={styles.pagination}>
           <span>{formatCount(creatorResult.count)} cadastro(s)</span>
-          <div>
-            <Link
-              aria-disabled={page <= 1}
-              href={pageLink(Math.max(1, page - 1))}
-            >
-              Anterior
-            </Link>
-            <span>
-              Página {page} de {totalPages}
-            </span>
-            <Link
-              aria-disabled={page >= totalPages}
-              href={pageLink(Math.min(totalPages, page + 1))}
-            >
-              Próxima
-            </Link>
-          </div>
+          {totalPages > 1 && (
+            <div>
+              <Link
+                aria-disabled={page <= 1}
+                href={pageLink(Math.max(1, page - 1))}
+              >
+                Anterior
+              </Link>
+              <span>
+                Página {page} de {totalPages}
+              </span>
+              <Link
+                aria-disabled={page >= totalPages}
+                href={pageLink(Math.min(totalPages, page + 1))}
+              >
+                Próxima
+              </Link>
+            </div>
+          )}
         </footer>
       </section>
     </InternalShell>

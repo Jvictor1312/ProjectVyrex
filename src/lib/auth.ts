@@ -109,3 +109,18 @@ export async function requireUserWithRoles() {
   const { supabase, user, roles } = await authenticate(true);
   return { supabase, user, roleKeys: roles.keys, rolesError: roles.error };
 }
+
+// Para ações (botões de salvar): só confere o login, localmente. As funções e
+// regras do banco já exigem conta ativa (has_permission e RLS verificam
+// profiles.is_active), então a consulta extra ao perfil não é necessária.
+export async function requireSession() {
+  if (!isSupabaseConfigured()) {
+    await cookies();
+    redirect("/login?configuracao=supabase");
+  }
+  const supabase = await createSupabaseServerClient();
+  const { data, error } = await supabase.auth.getClaims();
+  const claims = data?.claims;
+  if (error || !claims?.sub) redirect("/login");
+  return { supabase, user: { id: claims.sub, email: claims.email ?? null } };
+}

@@ -2,7 +2,7 @@
 
 import { invalidPhoneMessage, normalizePhone } from "@/lib/validation/phone";
 import { revalidatePath } from "next/cache";
-import { requireUser } from "@/lib/auth";
+import { requireSession } from "@/lib/auth";
 import {
   accountSettingsSchema,
   dataRequestSchema,
@@ -25,7 +25,7 @@ export async function createDataRequestAction(
     };
   }
 
-  const { supabase } = await requireUser();
+  const { supabase } = await requireSession();
   const { error } = await supabase.rpc("create_data_request", {
     request_kind: parsed.data.kind,
     request_details: parsed.data.details ?? null,
@@ -62,7 +62,7 @@ export async function resolveDataRequestAction(
     return { message: "Confira os campos informados.", success: false };
   }
 
-  const { supabase } = await requireUser();
+  const { supabase } = await requireSession();
   const { error } = await supabase.rpc("resolve_data_request", {
     request_id: parsed.data.requestId,
     new_status: parsed.data.status,
@@ -105,7 +105,7 @@ export async function updateAccountSettingsAction(
     return { message: invalidPhoneMessage, success: false };
   }
 
-  const { supabase, user } = await requireUser();
+  const { supabase, user } = await requireSession();
   const { data, error } = await supabase
     .from("profiles")
     .update({
@@ -144,7 +144,7 @@ export async function changePasswordAction(
     };
   }
 
-  const { supabase } = await requireUser();
+  const { supabase } = await requireSession();
   const { error } = await supabase.auth.updateUser({
     password: parsed.data.password,
   });

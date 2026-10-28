@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { randomUUID } from "node:crypto";
 import { z } from "zod";
-import { requireUser } from "@/lib/auth";
+import { requireSession } from "@/lib/auth";
 import {
   maximumEvidenceBytes,
   normalizeEvidenceImage,
@@ -37,7 +37,7 @@ export async function saveCreatorProfileAction(
       success: false,
     };
 
-  const { supabase, user } = await requireUser();
+  const { supabase, user } = await requireSession();
   const { data, error } = await supabase
     .from("creator_profiles")
     .update({
@@ -82,7 +82,7 @@ export async function saveSocialAccountAction(
       success: false,
     };
 
-  const { supabase, user } = await requireUser();
+  const { supabase, user } = await requireSession();
   const account = {
     platform: parsed.data.platform,
     handle: parsed.data.handle,
@@ -146,7 +146,7 @@ export async function uploadStoryEvidenceAction(
     };
   }
 
-  const { supabase, user } = await requireUser();
+  const { supabase, user } = await requireSession();
   const existing = await supabase
     .from("metric_evidence")
     .select("id, storage_path")
@@ -236,7 +236,7 @@ export async function submitCreatorApplicationAction(
 ): Promise<FormState> {
   void _state;
   void _formData;
-  const { supabase } = await requireUser();
+  const { supabase } = await requireSession();
   const { error } = await supabase.rpc("submit_creator_application");
 
   if (error) {
@@ -263,7 +263,7 @@ export async function markNotificationReadAction(
     return { message: "Notificação inválida.", success: false };
   }
 
-  const { supabase, user } = await requireUser();
+  const { supabase, user } = await requireSession();
   const { data, error } = await supabase
     .from("notifications")
     .update({ read_at: new Date().toISOString() })

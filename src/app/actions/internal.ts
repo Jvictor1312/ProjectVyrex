@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
-import { requireUser } from "@/lib/auth";
+import { requireSession } from "@/lib/auth";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import type { FormState } from "@/lib/validation/auth";
 
@@ -44,7 +44,7 @@ export async function forwardCreatorAction(
   });
   if (!parsed.success) return invalid();
 
-  const { supabase } = await requireUser();
+  const { supabase } = await requireSession();
   const { error } = await supabase.rpc("forward_creator_to_validation", {
     target_creator: parsed.data.targetCreator,
   });
@@ -72,7 +72,7 @@ export async function recordContactEventAction(
     });
   if (!parsed.success) return invalid(parsed.error.issues[0]?.message);
 
-  const { supabase } = await requireUser();
+  const { supabase } = await requireSession();
   const { error } = await supabase.rpc("record_contact_event", {
     target_creator: parsed.data.targetCreator,
     contact_channel: parsed.data.channel,
@@ -99,7 +99,7 @@ export async function sendCreatorMessageAction(
     });
   if (!parsed.success) return invalid(parsed.error.issues[0]?.message);
 
-  const { supabase } = await requireUser();
+  const { supabase } = await requireSession();
   const { error } = await supabase.rpc("write_staff_message", {
     target_creator: parsed.data.targetCreator,
     message_body: parsed.data.body,
@@ -124,7 +124,7 @@ export async function requestCorrectionsAction(
     });
   if (!parsed.success) return invalid(parsed.error.issues[0]?.message);
 
-  const { supabase } = await requireUser();
+  const { supabase } = await requireSession();
   const { error } = await supabase.rpc("request_creator_corrections", {
     target_creator: parsed.data.targetCreator,
     correction_reason: parsed.data.reason,
@@ -154,7 +154,7 @@ export async function reviewStoryEvidenceAction(
     return invalid("Informe o motivo para rejeitar ou solicitar correção.");
   }
 
-  const { supabase } = await requireUser();
+  const { supabase } = await requireSession();
   const { data: evidence, error: evidenceError } = await supabase
     .from("metric_evidence")
     .select("creator_id")
@@ -192,7 +192,7 @@ export async function reviewSocialAccountAction(
     return invalid("Informe o motivo para rejeitar a rede social.");
   }
 
-  const { supabase } = await requireUser();
+  const { supabase } = await requireSession();
   const { data: account, error: accountError } = await supabase
     .from("social_accounts")
     .select("creator_id")
@@ -227,7 +227,7 @@ export async function recordFinalDecisionAction(
     });
   if (!parsed.success) return invalid(parsed.error.issues[0]?.message);
 
-  const { supabase } = await requireUser();
+  const { supabase } = await requireSession();
   const { error } = await supabase.rpc("record_review_decision", {
     target_creator: parsed.data.targetCreator,
     decision: parsed.data.decision,
@@ -258,7 +258,7 @@ export async function assignCreatorResponsiblesAction(
     });
   if (!parsed.success) return invalid(parsed.error.issues[0]?.message);
 
-  const { supabase } = await requireUser();
+  const { supabase } = await requireSession();
   const { error } = await supabase.rpc("assign_creator_responsibles", {
     target_creator: parsed.data.targetCreator,
     new_recruiter: parsed.data.recruiterId,
@@ -286,7 +286,7 @@ export async function inviteInternalUserAction(
     });
   if (!parsed.success) return invalid(parsed.error.issues[0]?.message);
 
-  const { supabase } = await requireUser();
+  const { supabase } = await requireSession();
   const { data: allowed, error: permissionError } = await supabase.rpc(
     "has_permission",
     { permission_name: "creators.manage_roles" },
@@ -351,7 +351,7 @@ export async function manageInternalRoleAction(
     });
   if (!parsed.success) return invalid(parsed.error.issues[0]?.message);
 
-  const { supabase } = await requireUser();
+  const { supabase } = await requireSession();
   const { error } = await supabase.rpc("set_user_role", {
     target_user: parsed.data.targetUser,
     role_key: parsed.data.role,
@@ -386,7 +386,7 @@ export async function setInternalUserActiveAction(
     return invalid("Informe o motivo para desativar a conta.");
   }
 
-  const { supabase } = await requireUser();
+  const { supabase } = await requireSession();
   const { error } = await supabase.rpc("set_user_active", {
     target_user: parsed.data.targetUser,
     enabled: parsed.data.enabled,
@@ -421,7 +421,7 @@ export async function updateEligibilitySettingsAction(
     });
   if (!parsed.success) return invalid(parsed.error.issues[0]?.message);
 
-  const { supabase } = await requireUser();
+  const { supabase } = await requireSession();
   const { error } = await supabase.rpc("update_eligibility_settings", {
     new_minimum_followers: parsed.data.minimumFollowers,
     new_required_evidence: parsed.data.requiredEvidence,

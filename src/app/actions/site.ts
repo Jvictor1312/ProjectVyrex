@@ -1,14 +1,14 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { requireUser } from "@/lib/auth";
+import { requireSession } from "@/lib/auth";
 import { siteMediaBucket } from "@/lib/site-media";
 import type { FormState } from "@/lib/validation/auth";
 
 const videoPathPattern = /^presentation\/[0-9a-f-]{36}\.(mp4|webm)$/;
 
 async function currentVideoPath() {
-  const { supabase, user } = await requireUser();
+  const { supabase, user } = await requireSession();
   const { data: allowed } = await supabase.rpc("has_permission", {
     permission_name: "creators.configure_eligibility",
   });
