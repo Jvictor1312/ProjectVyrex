@@ -50,8 +50,13 @@ O usuário acompanha tudo pelo VS Code, com o site aberto. **Dê mais empenho a 
 - `docs/ARCHITECTURE.md`, `docs/DECISIONS.md`, `docs/SECURITY.md`, `docs/TESTING.md`.
 - `README.md`: instalação e configuração.
 
+## Testar telas com login
+
+- O Supabase é o banco real na nuvem: o Claude não cria contas nem digita senhas nele. O usuário cria as contas de teste e entra no Chrome; o Claude pode dar a função de equipe a uma conta via SQL quando o usuário pedir.
+- Sem login, use as previews (só em desenvolvimento): `/preview/criador`, `/preview/criador/evidencias`, `/preview/equipe`. Elas usam os mesmos componentes das telas reais; mantenha assim ao criar novas telas.
+
 ## Problemas conhecidos
 
-- O teste `assigned relationship manager can request corrections with an audit trail` (`supabase/tests/initial-platform.test.mjs:436`) falha: o teste não preenche o nome público antes da submissão, exigido pela migration `202610150003`. O teste está desatualizado; a regra está correta.
+- `Public/image.png` e `Public/image2.png` estão corrompidos e não são usados. A pasta `Public` com P maiúsculo funciona no Windows, mas quebra em Linux (deploy).
 
 @docs/DIRETRIZES.md

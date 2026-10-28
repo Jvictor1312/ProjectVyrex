@@ -9,9 +9,17 @@ Atualizado em: 2026-10-15 (sessão 4)
 - [x] Apresentação do cadastro: um único puxador na própria barra preta recolhe e abre; recolhida, a barra vira uma faixa clicável. Verificado em navegador (computador e celular), com prints.
 - [x] `loading.tsx` em `/dashboard`, `/interno` e `/interno/[creatorId]`: a troca de tela agora é imediata, com tela de carregamento enquanto o Supabase responde.
 - [x] Esfera do cadastro move sem re-renderizar o componente a cada movimento do mouse.
-- [ ] Telas com login ainda não medidas nem verificadas no navegador (falta uma conta de teste).
-- [ ] Site sem favicon (404 no console). Pasta `Public` com P maiúsculo: funciona no Windows, quebra em Linux (deploy).
-- [ ] Teste `assigned relationship manager can request corrections` desatualizado (falta nome público antes da submissão).
+- [x] Cadastro: botão "Recolher" pequeno, na base da barra e à direita; logo duplicado e textos pequenos removidos.
+- [x] Visão geral do criador redesenhada (`dashboard/creator-overview.tsx`): cartão preto com o próximo passo, trilha de etapas e botão; mensagens, notificações e histórico em cartões. A preview `/preview/criador` usa o mesmo componente.
+- [x] Envio de evidências refeito (`components/evidence-board.tsx`): cada quadro é clicável, a imagem aparece borrada no quadro e um formulário curto pede rede, data e visualizações. Preview em `/preview/criador/evidencias`. Verificado no navegador com Playwright.
+- [x] Causa do "envio que não funciona": salvar rede social e evidência não atualizava a página (faltava `revalidatePath`), então a seção de evidências continuava sem rede e o envio ficava travado.
+- [x] Painel da equipe: menu lateral, filtros, tabela e paginação com fontes legíveis e retorno ao clique; a linha inteira da tabela abre o cadastro.
+- [x] Funções do usuário buscadas em uma consulta e junto com o perfil (`requireUserWithRoles`), cortando 2 idas ao banco em `/interno`, `/interno/[creatorId]` e no login.
+- [x] Fontes de 9–12 px aumentadas nas áreas de formulário e painel; textos longos encurtados nas abas do criador.
+- [x] Favicon (`src/app/icon.svg`).
+- [x] Teste `assigned relationship manager can request corrections` corrigido (preenche o nome público). 35/35 testes passam.
+- [ ] Telas com login não verificadas no navegador: não há conta de teste (o usuário precisa criá-las; ver CLAUDE.md).
+- [ ] `Public/image.png` e `Public/image2.png` estão corrompidos (não são imagens válidas). Não são usados no código. Pasta `Public` com P maiúsculo quebra em Linux (deploy).
 
 ## Critério de status
 
