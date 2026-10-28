@@ -45,10 +45,18 @@ export default function TeamDashboardPreview() {
         </Link>
         <div className={styles.sideGroup}>
           <span className={styles.sideLabel}>ESPAÇO INTERNO</span>
-          <span className={styles.sideLinkActive}>Visão geral</span>
-          <span className={styles.sideLink}>Triagem e validação</span>
-          <span className={styles.sideLink}>Responsáveis</span>
-          <span className={styles.sideLink}>Configurações</span>
+          <Link className={styles.sideLinkActive} href="/preview/equipe">
+            Painel
+          </Link>
+          <Link className={styles.sideLink} href="/preview/equipe">
+            Equipe interna
+          </Link>
+          <Link className={styles.sideLink} href="/preview/equipe">
+            Critérios de elegibilidade
+          </Link>
+          <Link className={styles.sideLink} href="/preview/criador">
+            Área do criador
+          </Link>
         </div>
         <div className={styles.sideRoles}>
           <span>Administrador</span>
@@ -59,18 +67,10 @@ export default function TeamDashboardPreview() {
       <section className={styles.main}>
         <header className={styles.pageHeader}>
           <div>
-            <p className={styles.eyebrow}>VISÃO DA EQUIPE · DEMONSTRAÇÃO</p>
             <h1>Visão geral</h1>
-            <p>Fila de cadastros e indicadores operacionais.</p>
           </div>
-          <Link className={styles.userLabel} href="/login">
-            Entrar na conta
-          </Link>
+          <span className="preview-notice">Demonstração com dados fictícios</span>
         </header>
-        <p className={styles.demoNotice} role="note">
-          DEMONSTRAÇÃO LOCAL. Nomes, métricas e estados são fictícios; nenhuma
-          ação ou dado é persistido.
-        </p>
         <div className={styles.summary}>
           {demoMetrics.map(([label, value]) => (
             <article className={styles.metric} key={label}>
@@ -101,6 +101,7 @@ export default function TeamDashboardPreview() {
                 <th>Criador</th>
                 <th>Rede declarada</th>
                 <th>Status</th>
+                <th />
               </tr>
             </thead>
             <tbody>
@@ -108,11 +109,13 @@ export default function TeamDashboardPreview() {
                 <tr key={creator.name}>
                   <td>
                     <strong>{creator.name}</strong>
-                    <small>Exemplo demonstrativo</small>
                   </td>
                   <td>{creator.network}</td>
                   <td>
                     <span className={styles.status}>{creator.status}</span>
+                  </td>
+                  <td>
+                    <Link href="/preview/criador">Abrir cadastro</Link>
                   </td>
                 </tr>
               ))}

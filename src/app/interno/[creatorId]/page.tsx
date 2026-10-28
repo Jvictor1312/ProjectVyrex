@@ -10,7 +10,7 @@ import {
   RelationshipControls,
   SocialAccountReviewForm,
 } from "@/app/components/internal-actions";
-import { requireUser } from "@/lib/auth";
+import { requireUserWithRoles } from "@/lib/auth";
 import styles from "../internal-detail.module.css";
 
 export const metadata: Metadata = { title: "Ficha do criador" };
@@ -46,21 +46,11 @@ export default async function CreatorInternalDetail({
   params: Promise<{ creatorId: string }>;
 }) {
   const { creatorId } = await params;
-  const { supabase, user } = await requireUser();
-  const roleLinks = await supabase
-    .from("user_roles")
-    .select("role_id")
-    .eq("user_id", user.id)
-    .is("revoked_at", null);
-  if (roleLinks.error) notFound();
+  const { supabase, roleKeys, rolesError } =
+    await requireUserWithRoles();
+  if (rolesError) notFound();
 
-  const roleIds = (roleLinks.data ?? []).map((item) => item.role_id);
-  const roleResult = roleIds.length
-    ? await supabase.from("roles").select("key").in("id", roleIds)
-    : { data: [], error: null };
-  if (roleResult.error) notFound();
-
-  const roles = new Set((roleResult.data ?? []).map((role) => role.key));
+  const roles = new Set(roleKeys);
   const isAdmin = roles.has("admin");
   const canRecruit = isAdmin || roles.has("recruiter");
   const canRelate = isAdmin || roles.has("relationship_manager");

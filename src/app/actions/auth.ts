@@ -1,6 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { fetchActiveRoleKeys } from "@/lib/auth";
 import { dashboardPathForRoles } from "@/lib/auth-routing";
 import {
   createSupabaseServerClient,
@@ -48,12 +49,8 @@ export async function loginAction(
     };
   }
 
-  const { data: roleLinks, error: roleLinksError } = await supabase
-    .from("user_roles")
-    .select("role_id")
-    .eq("user_id", signIn.user.id)
-    .is("revoked_at", null);
-  if (roleLinksError) {
+  const roles = await fetchActiveRoleKeys(supabase, signIn.user.id);
+  if (roles.error) {
     await supabase.auth.signOut();
     return {
       message:
@@ -62,20 +59,7 @@ export async function loginAction(
     };
   }
 
-  const roleIds = (roleLinks ?? []).map((role) => role.role_id);
-  const { data: roles, error: rolesError } = roleIds.length
-    ? await supabase.from("roles").select("key").in("id", roleIds)
-    : { data: [], error: null };
-  if (rolesError) {
-    await supabase.auth.signOut();
-    return {
-      message:
-        "Não foi possível identificar seu acesso. Tente entrar novamente.",
-      success: false,
-    };
-  }
-
-  redirect(dashboardPathForRoles((roles ?? []).map((role) => role.key)));
+  redirect(dashboardPathForRoles(roles.keys));
 }
 
 export async function signupAction(

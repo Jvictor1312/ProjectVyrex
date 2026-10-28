@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { logoutAction } from "@/app/actions/auth";
-import { requireUser } from "@/lib/auth";
+import { requireUserWithRoles } from "@/lib/auth";
 import styles from "./internal.module.css";
 
 export const metadata: Metadata = { title: "Painel interno" };
@@ -49,7 +49,8 @@ export default async function InternalDashboard({
 }: {
   searchParams: SearchParams;
 }) {
-  const { supabase, user } = await requireUser();
+  const { supabase, user, roleKeys, rolesError } =
+    await requireUserWithRoles();
   const params = await searchParams;
   const search = stringParam(params.q)?.trim().slice(0, 80) ?? "";
   const rawStatus = stringParam(params.status) ?? "all";
@@ -63,22 +64,8 @@ export default async function InternalDashboard({
     Number.isInteger(rawPage) && rawPage > 0 ? Math.min(rawPage, 10000) : 1;
   const pageSize = 25;
 
-  const roleLinks = await supabase
-    .from("user_roles")
-    .select("role_id")
-    .eq("user_id", user.id)
-    .is("revoked_at", null);
-  if (roleLinks.error) redirect("/dashboard");
-
-  const roleIds = (roleLinks.data ?? []).map((link) => link.role_id);
-  if (roleIds.length === 0) redirect("/acesso-negado");
-
-  const roleRows = await supabase.from("roles").select("key").in("id", roleIds);
-  if (roleRows.error) redirect("/dashboard");
-
-  const roles = (roleRows.data ?? [])
-    .map((role) => role.key)
-    .filter((role) => role in roleLabels);
+  if (rolesError) redirect("/dashboard");
+  const roles = roleKeys.filter((role) => role in roleLabels);
   if (roles.length === 0) redirect("/acesso-negado");
 
   const primaryRole = roles.includes("admin")

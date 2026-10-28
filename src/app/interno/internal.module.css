@@ -325,6 +325,155 @@
   pointer-events: none;
 }
 
+/* Legibilidade e resposta ao toque: textos maiores e retorno visual em cada
+   elemento clicável. */
+.sideLink,
+.sideLinkActive {
+  border-radius: 10px;
+  border-left: 0;
+  padding: 10px 12px;
+  font-size: 14px;
+  transition:
+    background-color 140ms ease,
+    color 140ms ease,
+    transform 100ms ease;
+}
+.sideLink:hover {
+  background: #f0f1ee;
+  color: #121414;
+}
+.sideLinkActive {
+  background: #121414;
+  color: #fff;
+}
+.sideLink:active,
+.sideLinkActive:active,
+.logoutForm button:active,
+.filters button:active,
+.pagination a:active {
+  transform: scale(0.97);
+}
+.sideRoles span {
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 12px;
+}
+.logoutForm button {
+  border-radius: 10px;
+  font-size: 14px;
+  transition:
+    background-color 140ms ease,
+    transform 100ms ease;
+}
+.logoutForm button:hover {
+  background: #f0f1ee;
+}
+.pageHeader p:not(.eyebrow) {
+  font-size: 15px;
+}
+.userLabel {
+  font-size: 13px;
+}
+.summary {
+  overflow: hidden;
+  border-radius: 16px;
+}
+.metric span {
+  font-size: 13px;
+}
+.metric strong {
+  font-size: 28px;
+}
+.report {
+  border-radius: 16px;
+}
+.report h2 {
+  font-size: 15px;
+}
+.report > p,
+.reportRow,
+.reportRow strong {
+  font-size: 14px;
+}
+.filters label {
+  font-size: 13px;
+}
+.filters input,
+.filters select {
+  height: 44px;
+  border-radius: 10px;
+  font-size: 14px;
+}
+.filters button {
+  height: 44px;
+  padding: 0 20px;
+  border-radius: 999px;
+  font-size: 14px;
+  transition:
+    background-color 140ms ease,
+    transform 100ms ease;
+}
+.filters button:hover {
+  background: #2b2f2e;
+}
+.tableWrap {
+  border-radius: 16px;
+}
+.table th {
+  font-size: 12px;
+  letter-spacing: 0.4px;
+  text-transform: none;
+}
+.table td {
+  font-size: 14px;
+  transition: background-color 120ms ease;
+}
+.table td:first-child {
+  display: table-cell;
+}
+.table td:first-child strong,
+.table td:first-child small {
+  display: block;
+}
+.table td strong {
+  font-size: 15px;
+}
+.table td small {
+  font-size: 12px;
+}
+/* A linha inteira abre o cadastro: o link se estende sobre a linha. */
+.table tbody tr {
+  position: relative;
+}
+.table tbody tr:hover td {
+  background: #f4f5f2;
+}
+.table td a::after {
+  position: absolute;
+  inset: 0;
+  content: "";
+}
+.status {
+  border-radius: 999px;
+  padding: 5px 11px;
+  font-size: 13px;
+}
+.pagination {
+  font-size: 14px;
+}
+.pagination a {
+  display: inline-block;
+  padding: 8px 14px;
+  border: 1px solid #d8dcd7;
+  border-radius: 999px;
+  background: #fff;
+  text-decoration: none;
+  transition: transform 100ms ease;
+}
+.error {
+  font-size: 15px;
+}
+
 @media (max-width: 760px) {
   .shell {
     grid-template-columns: 1fr;
