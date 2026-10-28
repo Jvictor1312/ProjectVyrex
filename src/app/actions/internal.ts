@@ -308,6 +308,48 @@ export async function inviteInternalUserAction(
     };
   }
 
+  // E-mail que já tem conta (por exemplo, quem se cadastrou como criador):
+  // não há convite a enviar; a função de equipe é adicionada à conta que já
+  // existe e a pessoa continua entrando com a senha dela.
+  const { data: existingId, error: lookupError } = await adminClient.rpc(
+    "user_id_for_email",
+    { lookup_email: parsed.data.email },
+  );
+  if (lookupError) {
+    return {
+      message:
+        "Não foi possível conferir se este e-mail já tem conta. Tente de novo em instantes.",
+      success: false,
+    };
+  }
+  if (typeof existingId === "string" && existingId) {
+    const { data: profile } = await adminClient
+      .from("profiles")
+      .select("is_active")
+      .eq("id", existingId)
+      .maybeSingle();
+    if (profile && !profile.is_active) {
+      return {
+        message:
+          "Este e-mail pertence a uma conta desativada. Reative a conta antes de dar uma função a ela.",
+        success: false,
+      };
+    }
+    const { error: existingRoleError } = await supabase.rpc("set_user_role", {
+      target_user: existingId,
+      role_key: parsed.data.role,
+      enabled: true,
+    });
+    revalidatePath("/interno/equipe");
+    if (existingRoleError) {
+      return teamRuleError(existingRoleError.message) ?? denied;
+    }
+    return {
+      message: `${parsed.data.email} já tinha conta na Vyrex. A função foi adicionada; a pessoa entra com a senha que já usa e passa a ver a área da equipe.`,
+      success: true,
+    };
+  }
+
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
   const { data, error } = await adminClient.auth.admin.inviteUserByEmail(
     parsed.data.email,
@@ -319,7 +361,7 @@ export async function inviteInternalUserAction(
   if (error || !data.user) {
     return {
       message:
-        "Não foi possível enviar o convite. Confira o e-mail; se ele já tiver conta na Vyrex, atribua a função pela lista de colaboradores.",
+        "Não foi possível enviar o convite. Confira o e-mail e tente de novo.",
       success: false,
     };
   }

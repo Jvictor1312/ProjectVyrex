@@ -26,6 +26,12 @@ Atualizado em: 2026-10-28. Reescrito para mostrar só o estado atual e as pendê
 - [x] Prévia nova `/preview/criador/cadastro` (Meu cadastro, sem login).
 - [ ] Conferir no celular de verdade (iPhone e Android): barra de baixo, teclado sobre os campos, envio de prints pela galeria.
 
+### Feito em 2026-10-28 (colaboradores e vídeo)
+- [x] **Cadastrar colaborador com e-mail que já tem conta** (ex.: quem se cadastrou antes como criador): a função de equipe é adicionada à conta existente, sem convite; a pessoa entra com a senha que já usa. Migration `202610280008` aplicada (`user_id_for_email`, só o servidor executa) e 1 teste novo.
+- [x] **Envio do vídeo de apresentação** com porcentagem e barra de progresso, aviso ao sair da página no meio do envio e "Salvando…" ao final. O vídeo atual (24 MB) já toca rápido; a demora era o envio sem retorno visual.
+- [ ] **Tela do usuário com espaço vago e quadro torto:** não reproduzido nas prévias; aguardando print/endereço do usuário.
+- [ ] Sobrou no Storage uma cópia do vídeo enviada duas vezes (`presentation/112708a0-…mp4`, 24 MB, sem uso). Só apagar se o usuário autorizar.
+
 ### Decisões do usuário
 - [x] **Fonte:** Figtree servida pelo site (texto e marca); Georgia nos títulos, com Gelasio como substituta em aparelhos sem Georgia. Decidido em 2026-10-28.
 - [x] **"Desfazer envio"** e **apagar evidência no rascunho** implementados (migration `202610280005`, 4 testes PGlite). Regra do usuário: depois que a equipe começa a análise, o criador não altera nada. Migration já aplicada no banco real.

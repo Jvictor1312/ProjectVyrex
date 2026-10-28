@@ -141,6 +141,12 @@ before(async () => {
       "utf8",
     ),
   );
+  await database.exec(
+    await readFile(
+      new URL("../migrations/202610280008_user_id_for_email.sql", import.meta.url),
+      "utf8",
+    ),
+  );
   await database.query(
     "insert into auth.users (id, raw_user_meta_data) values ($1, '{}'::jsonb), ($2, '{}'::jsonb), ($3, '{}'::jsonb)",
     [creatorOne, creatorTwo, creatorThree],
@@ -986,6 +992,14 @@ test("creator can remove own CPF by saving an empty value", async () => {
   await asUser(creatorOne, () => database.query("select public.set_own_cpf('')"));
   const own = await asUser(creatorOne, () => database.query("select cpf from public.user_documents"));
   assert.equal(own.rows.length, 0);
+});
+
+// Convite para e-mail já cadastrado (202610280008).
+test("signed-in users cannot look up an account by e-mail", async () => {
+  await assert.rejects(
+    asUser(creatorTwo, () => database.query("select public.user_id_for_email('a@b.com')")),
+    /permission denied/i,
+  );
 });
 
 test("signed-in users cannot look up an e-mail by CPF", async () => {
