@@ -4,7 +4,8 @@ import { PresentationVideoForm } from "@/app/components/presentation-video-form"
 import { EligibilitySettingsForm } from "@/app/components/team-management";
 import { InternalShell } from "../internal-shell";
 import { auditDetailsSummary } from "@/lib/audit-labels";
-import { requireUserFast } from "@/lib/auth";
+import { fetchActiveRoleKeys, requireUserFast } from "@/lib/auth";
+import { isInternalRole, roleLabels } from "@/lib/labels";
 import { getPresentationVideoUrl } from "@/lib/site-media";
 import styles from "../internal.module.css";
 import teamStyles from "../team.module.css";
@@ -14,7 +15,7 @@ export const metadata: Metadata = { title: "Configurações" };
 
 export default async function EligibilitySettingsPage() {
   const { supabase, user, activeCheck, ensureActive } = await requireUserFast();
-  const [permission, activeResult, settingsResult, auditResult, videoUrl] =
+  const [permission, activeResult, settingsResult, auditResult, videoUrl, roleResult] =
     await Promise.all([
       supabase.rpc("has_permission", {
         permission_name: "creators.configure_eligibility",
@@ -34,6 +35,7 @@ export default async function EligibilitySettingsPage() {
         .order("created_at", { ascending: false })
         .limit(20),
       getPresentationVideoUrl(),
+      fetchActiveRoleKeys(supabase, user.id),
     ]);
   await ensureActive(activeResult);
   if (permission.error || !permission.data) redirect("/acesso-negado");
@@ -42,7 +44,12 @@ export default async function EligibilitySettingsPage() {
   const settings = settingsResult.data;
 
   return (
-    <InternalShell active="criterios" isAdmin={true} email={user.email}>
+    <InternalShell
+      active="criterios"
+      isAdmin={true}
+      roles={roleResult.keys.filter(isInternalRole).map((key) => roleLabels[key])}
+      email={user.email}
+      name={user.name}>
       <section className={styles.main}>
         <PageHeader
           title="Configurações"

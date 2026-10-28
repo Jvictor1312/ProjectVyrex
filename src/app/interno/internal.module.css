@@ -21,7 +21,14 @@
   min-height: 100svh;
   display: grid;
   grid-template-columns: 232px minmax(0, 1fr);
-  background: var(--bg);
+  /* A coluna do menu tem o fundo e a borda até o fim da página, mesmo em
+     páginas longas (o menu em si fica fixo no topo da tela). */
+  background: linear-gradient(
+    to right,
+    var(--surface) 231px,
+    var(--line) 231px 232px,
+    var(--bg) 232px
+  );
   color: var(--text);
   font-family: "Segoe UI", "Avenir Next", Avenir, system-ui, sans-serif;
   font-size: 14px;
@@ -578,6 +585,7 @@ td.empty {
   .shell {
     /* minmax(0, …) impede que uma tabela larga estique a página inteira. */
     grid-template-columns: minmax(0, 1fr);
+    background: var(--bg);
   }
   .sidebar {
     position: sticky;

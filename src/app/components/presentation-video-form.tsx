@@ -21,6 +21,7 @@ export function PresentationVideoForm({
   const [state, setState] = useState<FormState>({ message: "", success: false });
   const [progress, setProgress] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
+  const [confirmingRemoval, setConfirmingRemoval] = useState(false);
   const busy = pending || progress !== null;
 
   async function upload(file: File) {
@@ -83,21 +84,51 @@ export function PresentationVideoForm({
         >
           {progress ?? (currentUrl ? "Trocar vídeo" : "Enviar vídeo")}
         </button>
-        {currentUrl && (
+        {currentUrl && !confirmingRemoval && (
           <button
-            className={styles.secondary}
+            key="remove"
+            className={styles.danger}
             type="button"
             disabled={busy}
-            onClick={() =>
-              startTransition(async () =>
-                setState(await removePresentationVideoAction()),
-              )
-            }
+            onClick={() => setConfirmingRemoval(true)}
           >
-            Remover
+            Remover vídeo
           </button>
         )}
       </div>
+      {currentUrl && confirmingRemoval && (
+        <div className={styles.confirm} role="alert">
+          <p>
+            Remover o vídeo de apresentação? A tela de cadastro deixa de
+            mostrá-lo até um novo vídeo ser enviado.
+          </p>
+          <div className={styles.actions}>
+            <button
+              key="confirm-remove"
+              className={styles.dangerSolid}
+              type="button"
+              disabled={busy}
+              onClick={() =>
+                startTransition(async () => {
+                  setState(await removePresentationVideoAction());
+                  setConfirmingRemoval(false);
+                })
+              }
+            >
+              {pending ? "Removendo…" : "Confirmar remoção"}
+            </button>
+            <button
+              key="cancel-remove"
+              className={styles.secondary}
+              type="button"
+              disabled={busy}
+              onClick={() => setConfirmingRemoval(false)}
+            >
+              Manter vídeo
+            </button>
+          </div>
+        </div>
+      )}
       <p className={styles.hint}>MP4 ou WebM, até 50 MB.</p>
       {state.message && (
         <p

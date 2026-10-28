@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { ResolveDataRequestForm } from "@/app/components/privacy-forms";
 import { InternalShell } from "../internal-shell";
-import { requireUserFast } from "@/lib/auth";
+import { fetchActiveRoleKeys, requireUserFast } from "@/lib/auth";
+import { isInternalRole, roleLabels } from "@/lib/labels";
 import {
   dataRequestKindLabels,
   dataRequestStatusLabels,
@@ -21,7 +22,7 @@ const when = (value: string | null) =>
 export default async function PrivacyRequestsPage() {
   const { supabase, user, activeCheck, ensureActive } = await requireUserFast();
   // Permissão, conta ativa e pedidos (com o nome de quem pediu) numa rodada.
-  const [permission, activeResult, requestsResult] = await Promise.all([
+  const [permission, activeResult, requestsResult, roleResult] = await Promise.all([
     supabase.rpc("has_permission", {
       permission_name: "privacy.requests.manage",
     }),
@@ -33,6 +34,7 @@ export default async function PrivacyRequestsPage() {
       )
       .order("created_at", { ascending: false })
       .limit(100),
+    fetchActiveRoleKeys(supabase, user.id),
   ]);
   await ensureActive(activeResult);
   if (permission.error || !permission.data) redirect("/acesso-negado");
@@ -52,7 +54,12 @@ export default async function PrivacyRequestsPage() {
   );
 
   return (
-    <InternalShell active="privacidade" isAdmin={true} email={user.email}>
+    <InternalShell
+      active="privacidade"
+      isAdmin={true}
+      roles={roleResult.keys.filter(isInternalRole).map((key) => roleLabels[key])}
+      email={user.email}
+      name={user.name}>
       <section className={styles.main}>
         <PageHeader
           title="Pedidos de privacidade"

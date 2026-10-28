@@ -52,6 +52,7 @@ export async function InternalShell({
   isAdmin,
   roles = [],
   email,
+  name,
   logoutHref,
   children,
 }: {
@@ -59,6 +60,8 @@ export async function InternalShell({
   isAdmin: boolean;
   roles?: string[];
   email?: string | null;
+  // Nome de quem está logado (user_metadata.full_name); sem ele, usa o e-mail.
+  name?: string | null;
   // Nas prévias não há sessão: o botão vira um link para o login.
   logoutHref?: string;
   children: ReactNode;
@@ -66,7 +69,8 @@ export async function InternalShell({
   const cookieStore = await cookies();
   const theme =
     cookieStore.get("vyrex-internal-theme")?.value === "dark" ? "dark" : "light";
-  const who = email ?? "Conta da equipe";
+  const who = name?.trim() || email || "Conta da equipe";
+  const avatarName = name?.trim() || who.split("@")[0].replace(/[._+-]+/g, " ");
 
   return (
     <main className={styles.shell} data-theme={theme}>
@@ -84,9 +88,9 @@ export async function InternalShell({
         </nav>
         <div className={styles.sideFooter}>
           <div className={styles.sideUserBlock}>
-            <Avatar name={who.split("@")[0].replace(/[._+-]+/g, " ")} />
+            <Avatar name={avatarName} />
             <div>
-              <span className={styles.sideUser} title={who}>
+              <span className={styles.sideUser} title={email ?? who}>
                 {who}
               </span>
               {roles.length > 0 && (

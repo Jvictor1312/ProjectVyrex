@@ -18,6 +18,8 @@ export type QueueRow = {
   submittedAt: string | null;
   updatedAt: string;
   href: string;
+  // Conta de alguém da equipe (tem cadastro de criador vazio).
+  isStaff?: boolean;
 };
 
 const shortDate = (value: string | null) =>
@@ -47,6 +49,7 @@ export function CreatorQueue({
   title: string;
 }) {
   const filtered = search !== "" || status !== "all";
+  const staffOnPage = rows.filter((row) => row.isStaff).length;
 
   return (
     <section className={ui.panel} aria-label={title}>
@@ -56,7 +59,7 @@ export function CreatorQueue({
           <p>
             {total === null
               ? "Contagem indisponível"
-              : `${total.toLocaleString("pt-BR")} ${total === 1 ? "cadastro" : "cadastros"}${filtered ? " com os filtros atuais" : ""}`}
+              : `${total.toLocaleString("pt-BR")} ${total === 1 ? "cadastro" : "cadastros"}${filtered ? " com os filtros atuais" : ""}${staffOnPage > 0 ? ` · ${staffOnPage} ${staffOnPage === 1 ? "conta" : "contas"} da equipe nesta página, fora dos indicadores` : ""}`}
           </p>
         </div>
       </div>
@@ -131,6 +134,12 @@ export function CreatorQueue({
                   <tr key={row.id}>
                     <td data-label="Criador">
                       <strong>{row.name}</strong>
+                      {row.isStaff && (
+                        <>
+                          {" "}
+                          <Badge plain>Equipe</Badge>
+                        </>
+                      )}
                     </td>
                     <td data-label="Situação">
                       <Badge tone={creatorStatusTone(row.status)}>

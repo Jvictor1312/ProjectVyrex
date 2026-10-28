@@ -116,7 +116,9 @@
 
 .evidenceGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  /* Colunas de até 180px: dá para comparar os Stories lado a lado sem rolar
+     muito. Cada print abre em tamanho real ao clicar. */
+  grid-template-columns: repeat(auto-fill, minmax(150px, 180px));
   gap: 14px;
 }
 .evidenceCard {

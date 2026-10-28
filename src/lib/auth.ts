@@ -27,6 +27,13 @@ export async function fetchActiveRoleKeys(
   return { keys, error };
 }
 
+// O nome informado no cadastro vem dentro do próprio token (user_metadata),
+// então dá para exibi-lo sem consultar o banco.
+function nameFromClaims(claims: { user_metadata?: unknown }): string | null {
+  const metadata = claims.user_metadata as { full_name?: unknown } | undefined;
+  return typeof metadata?.full_name === "string" ? metadata.full_name : null;
+}
+
 async function authenticate(withRoles: boolean) {
   if (!isSupabaseConfigured()) {
     await cookies();
@@ -43,7 +50,7 @@ async function authenticate(withRoles: boolean) {
     redirect("/login");
   }
   const data = {
-    user: { id: claims.sub, email: claims.email ?? null },
+    user: { id: claims.sub, email: claims.email ?? null, name: nameFromClaims(claims) },
   };
 
   // O perfil e as funções são buscados juntos para economizar uma ida ao banco.
@@ -85,7 +92,7 @@ export async function requireUserFast() {
   const claims = claimsData?.claims;
   if (error || !claims?.sub) redirect("/login");
 
-  const user = { id: claims.sub, email: claims.email ?? null };
+  const user = { id: claims.sub, email: claims.email ?? null, name: nameFromClaims(claims) };
   const activeCheck = supabase
     .from("profiles")
     .select("is_active")

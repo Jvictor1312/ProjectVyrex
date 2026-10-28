@@ -12,8 +12,17 @@ import {
 } from "@/app/components/internal-actions";
 import { InternalShell } from "../internal-shell";
 import { fetchActiveRoleKeys, requireUserFast } from "@/lib/auth";
-import { creatorStatusTone, platformLabels, roleLabels } from "@/lib/labels";
-import { Badge } from "../ui";
+import {
+  accountVerificationLabels,
+  accountVerificationTones,
+  categoryLabel,
+  creatorStatusTone,
+  evidenceStatusLabels,
+  evidenceStatusTones,
+  platformLabels,
+  roleLabels,
+} from "@/lib/labels";
+import { Badge, Notice } from "../ui";
 import styles from "../internal-detail.module.css";
 
 export const metadata: Metadata = { title: "Ficha do criador" };
@@ -233,6 +242,7 @@ export default async function CreatorInternalDetail({
         .filter((role) => role !== "influencer")
         .map((role) => roleNames[role] ?? role)}
       email={user.email}
+      name={user.name}
     >
       <div className={styles.page}>
         <Link className={styles.back} href="/interno">
@@ -254,11 +264,14 @@ export default async function CreatorInternalDetail({
           <p>{creator.biography || "Sem descrição informada."}</p>
           <div className={styles.categories}>
             {creatorCategories.map((category) => (
-              <span key={category}>{category}</span>
+              <span key={category}>{categoryLabel(category)}</span>
             ))}
           </div>
           {creator.decision_reason && (
-            <p className="decision-reason">{creator.decision_reason}</p>
+            // O tom acompanha a decisão: aprovação não aparece como erro.
+            <Notice tone={creatorStatusTone(creator.status)}>
+              <strong>Justificativa da decisão:</strong> {creator.decision_reason}
+            </Notice>
           )}
         </section>
 
@@ -285,12 +298,15 @@ export default async function CreatorInternalDetail({
                     </strong>
                     <span>
                       {account.followers_reported.toLocaleString("pt-BR")}{" "}
-                      seguidores informados ·{" "}
-                      {account.verification_status === "verified"
-                        ? "verificada"
-                        : account.verification_status === "rejected"
-                          ? "rejeitada"
-                          : "não verificada"}
+                      seguidores informados
+                    </span>
+                    <span>
+                      <Badge
+                        tone={accountVerificationTones[account.verification_status] ?? "neutral"}
+                      >
+                        {accountVerificationLabels[account.verification_status] ??
+                          account.verification_status}
+                      </Badge>
                     </span>
                     {publicProfileUrl && (
                       <a
@@ -342,15 +358,11 @@ export default async function CreatorInternalDetail({
                     ) : (
                       <div className="evidence-empty">Prévia indisponível</div>
                     )}
-                    <strong>
-                      {item.review_status === "approved"
-                        ? "Aprovada"
-                        : item.review_status === "rejected"
-                          ? "Rejeitada"
-                          : item.review_status === "changes_requested"
-                            ? "Correção solicitada"
-                            : "Aguardando análise"}
-                    </strong>
+                    <span>
+                      <Badge tone={evidenceStatusTones[item.review_status] ?? "neutral"}>
+                        {evidenceStatusLabels[item.review_status] ?? item.review_status}
+                      </Badge>
+                    </span>
                     <span>
                       {new Date(
                         `${item.story_published_on}T12:00:00`,
@@ -360,7 +372,9 @@ export default async function CreatorInternalDetail({
                     </span>
                     {item.creator_notes && <p>{item.creator_notes}</p>}
                     {item.review_reason && (
-                      <p className="decision-reason">{item.review_reason}</p>
+                      <Notice tone={evidenceStatusTones[item.review_status] ?? "neutral"}>
+                        {item.review_reason}
+                      </Notice>
                     )}
                     {canReviewNow && (
                       <EvidenceReviewForm evidenceId={item.id} />

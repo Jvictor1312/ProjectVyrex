@@ -111,6 +111,7 @@ export default async function InternalTeamPage() {
       isAdmin={true}
       roles={currentRoles.map((key) => roleLabels[key])}
       email={user.email}
+      name={user.name}
     >
       <section className={styles.main}>
         <TeamDirectory

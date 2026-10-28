@@ -5,6 +5,7 @@ import { CreatorQueue } from "./creator-queue";
 import { requireUserWithRoles } from "@/lib/auth";
 import {
   creatorStatusKeys,
+  internalRoleKeys,
   isInternalRole,
   platformLabels,
   roleLabels,
@@ -135,6 +136,7 @@ export default async function InternalDashboard({
     managerAssignmentsResult,
     socialAccountsResult,
     decisionTimesResult,
+    staffResult,
   ] = await Promise.all([
     creatorsQuery,
     adminOnly(countByStatus(), noCount),
@@ -154,16 +156,50 @@ export default async function InternalDashboard({
         "creator_id, manager_id, person:profiles!relationship_assignments_manager_id_fkey(full_name)",
       )
       .is("ended_at", null),
-    supabase.from("social_accounts").select("platform"),
+    supabase.from("social_accounts").select("creator_id, platform"),
     adminOnly(
       supabase
         .from("creator_profiles")
-        .select("submitted_at, decided_at")
+        .select("user_id, submitted_at, decided_at")
         .not("submitted_at", "is", null)
         .not("decided_at", "is", null),
       { data: null, error: null },
     ),
+    // Contas da equipe também têm um cadastro de criador (vazio). Elas
+    // aparecem na lista com a etiqueta "Equipe" e ficam fora dos indicadores.
+    supabase
+      .from("user_roles")
+      .select(
+        "user_id, roles!inner(key), profile:profiles!user_roles_user_id_fkey(creator:creator_profiles!creator_profiles_user_id_fkey(status))",
+      )
+      .is("revoked_at", null)
+      .in("roles.key", [...internalRoleKeys]),
   ]);
+
+  type StaffRow = {
+    user_id: string;
+    profile:
+      | { creator: { status: string } | { status: string }[] | null }
+      | { creator: { status: string } | { status: string }[] | null }[]
+      | null;
+  };
+  const first = <T,>(value: T | T[] | null | undefined) =>
+    Array.isArray(value) ? value[0] : value;
+  const staffStatus = new Map<string, string | null>();
+  for (const row of (staffResult.data ?? []) as StaffRow[]) {
+    staffStatus.set(row.user_id, first(first(row.profile)?.creator)?.status ?? null);
+  }
+  const staffStatuses = [...staffStatus.values()];
+  // Desconta as contas da equipe de cada indicador (total ou por situação).
+  const withoutStaff = (count: number | null, status?: CreatorStatus) =>
+    count === null
+      ? null
+      : Math.max(
+          0,
+          count -
+            staffStatuses.filter((value) => value !== null && (!status || value === status))
+              .length,
+        );
 
   const countBy = <T,>(items: T[], key: (item: T) => string) => {
     const counts = new Map<string, number>();
@@ -172,7 +208,10 @@ export default async function InternalDashboard({
   };
   const recruiterCounts = countBy(recruiterAssignmentsResult.data ?? [], (a) => a.recruiter_id);
   const managerCounts = countBy(managerAssignmentsResult.data ?? [], (a) => a.manager_id);
-  const socialCounts = countBy(socialAccountsResult.data ?? [], (a) => a.platform);
+  const socialCounts = countBy(
+    (socialAccountsResult.data ?? []).filter((account) => !staffStatus.has(account.creator_id)),
+    (a) => a.platform,
+  );
 
   const staffNames = new Map<string, string>();
   for (const row of [
@@ -188,7 +227,9 @@ export default async function InternalDashboard({
       .sort((a, b) => b.count - a.count);
 
   const analysisDays = (decisionTimesResult.data ?? [])
-    .filter((entry) => entry.submitted_at && entry.decided_at)
+    .filter(
+      (entry) => entry.submitted_at && entry.decided_at && !staffStatus.has(entry.user_id),
+    )
     .map(
       (entry) =>
         (new Date(entry.decided_at!).getTime() - new Date(entry.submitted_at!).getTime()) /
@@ -223,6 +264,7 @@ export default async function InternalDashboard({
       isAdmin={roles.includes("admin")}
       roles={roles.map((role) => roleLabels[role])}
       email={user.email}
+      name={user.name}
     >
       <section className={styles.main}>
         <PageHeader title={heading.title} description={heading.description} />
@@ -232,11 +274,23 @@ export default async function InternalDashboard({
             <Stats
               label="Indicadores dos cadastros"
               items={[
-                { label: "Cadastros no total", value: formatCount(totalResult.count) },
-                { label: "Aguardando análise", value: formatCount(submittedResult.count) },
-                { label: "Em análise", value: formatCount(reviewResult.count) },
-                { label: "Com correção pendente", value: formatCount(correctionsResult.count) },
-                { label: "Aprovados", value: formatCount(approvedResult.count) },
+                { label: "Criadores cadastrados", value: formatCount(withoutStaff(totalResult.count)) },
+                {
+                  label: "Aguardando análise",
+                  value: formatCount(withoutStaff(submittedResult.count, "submitted")),
+                },
+                {
+                  label: "Em análise",
+                  value: formatCount(withoutStaff(reviewResult.count, "under_review")),
+                },
+                {
+                  label: "Com correção pendente",
+                  value: formatCount(withoutStaff(correctionsResult.count, "changes_requested")),
+                },
+                {
+                  label: "Aprovados",
+                  value: formatCount(withoutStaff(approvedResult.count, "approved")),
+                },
                 {
                   label: "Tempo médio de análise",
                   value: averageAnalysis,
@@ -273,6 +327,7 @@ export default async function InternalDashboard({
             submittedAt: creator.submitted_at,
             updatedAt: creator.updated_at,
             href: `/interno/${creator.user_id}`,
+            isStaff: staffStatus.has(creator.user_id),
           }))}
           total={creatorResult.count ?? null}
           search={search}
