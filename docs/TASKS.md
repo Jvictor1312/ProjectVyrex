@@ -14,6 +14,11 @@ Atualizado em: 2026-10-28. Reescrito para mostrar só o estado atual e as pendê
 
 ## Pendências
 
+### Feito em 2026-10-28 (sessão e CPF)
+- [x] **Continuar logado:** a página inicial reconhece quem já entrou ("Ir para o meu painel"); `/login` e `/cadastro` levam direto ao painel; o `proxy` renova a sessão também em `/`, `/login` e `/cadastro`.
+- [x] **CPF opcional** em Configurações (tabela `user_documents`, só o próprio usuário lê; dígitos e duplicidade conferidos no banco). **Recuperação por CPF ou e-mail:** com CPF, a tela mostra o e-mail mascarado e envia as instruções para ele; o e-mail completo nunca vai ao navegador. Migration `202610280007` aplicada; 5 testes novos.
+- [ ] Testar a recuperação por CPF de ponta a ponta: salvar um CPF real em Configurações e pedir a recuperação informando o CPF (envia e-mail de verdade).
+
 ### Decisões do usuário
 - [x] **Fonte:** Figtree servida pelo site (texto e marca); Georgia nos títulos, com Gelasio como substituta em aparelhos sem Georgia. Decidido em 2026-10-28.
 - [x] **"Desfazer envio"** e **apagar evidência no rascunho** implementados (migration `202610280005`, 4 testes PGlite). Regra do usuário: depois que a equipe começa a análise, o criador não altera nada. Migration já aplicada no banco real.
