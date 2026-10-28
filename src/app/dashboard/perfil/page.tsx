@@ -1,20 +1,19 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
 import { CreatorNav } from "@/app/components/creator-nav";
 import {
   CreatorWizard,
   CreatorProfileForm,
-  EvidenceUploadForm,
   SocialAccountForm,
   SubmitApplicationButton,
 } from "@/app/components/creator-forms";
+import { EvidenceBoard } from "@/app/components/evidence-board";
 import { requireUser } from "@/lib/auth";
 
 export const metadata: Metadata = { title: "Completar perfil" };
 
 const evidenceStatus: Record<string, string> = {
-  pending: "Aguardando validação",
+  pending: "Enviada",
   approved: "Validada",
   rejected: "Rejeitada",
   changes_requested: "Correção solicitada",
@@ -60,7 +59,7 @@ export default async function CreatorProfilePage() {
   const signedUrls = evidence.length
     ? await supabase.storage.from("story-evidence").createSignedUrls(
         evidence.map((item) => item.storage_path),
-        60,
+        600,
       )
     : { data: [] };
   const urlByPath = new Map(
@@ -122,18 +121,11 @@ export default async function CreatorProfilePage() {
       </header>
       <CreatorNav />
       <section className="profile-content">
-        <p className="eyebrow">
-          <span /> CADASTRO DO CRIADOR
-        </p>
-        <h1>Seu perfil, no seu ritmo.</h1>
-        <p className="profile-lede">
-          Salve etapas incompletas e volte depois. Só encaminharemos seu perfil
-          quando você enviar as informações para análise manual.
-        </p>
+        <h1>Meu cadastro</h1>
+        <p className="profile-lede">Tudo é salvo enquanto você preenche.</p>
         {hasLoadError && (
           <div className="setup-warning" role="alert">
-            Não foi possível carregar os dados. Confirme as variáveis do
-            Supabase e aplique as migrations documentadas no README.
+            Não foi possível carregar seus dados. Recarregue a página.
           </div>
         )}
 
@@ -143,13 +135,13 @@ export default async function CreatorProfilePage() {
               title: "Perfil",
               panelId: "perfil",
               complete: Boolean(profile?.public_name.trim()),
-              help: "Informe como você quer ser apresentado. O rascunho é salvo automaticamente no servidor depois de uma pequena pausa.",
+              help: "Como você quer ser apresentado.",
             },
             {
               title: "Redes sociais",
               panelId: "redes",
               complete: accounts.length > 0,
-              help: "Informe seu perfil público e os seguidores declarados. Não existe mínimo eliminatório; a audiência será avaliada com nicho, localização e compatibilidade com cada campanha.",
+              help: "Seu perfil público e quantos seguidores você tem.",
             },
             {
               title: "Evidências",
@@ -162,13 +154,13 @@ export default async function CreatorProfilePage() {
                     (!earliestStoryDate ||
                       item.story_published_on >= earliestStoryDate),
                 ),
-              help: `Envie os cinco Stories mais recentes, do mais novo (posição 1) ao mais antigo (posição 5). Cada imagem só conta como enviada depois da confirmação; a captura não comprova as métricas automaticamente.`,
+              help: "Os 5 Stories mais recentes, do mais novo (1) ao mais antigo (5).",
             },
             {
               title: "Revisão e envio",
               panelId: "revisao",
               complete: reviewIssues.length === 0,
-              help: "Confira os dados e as pendências antes de enviar. A equipe fará a análise manual. Aprovação significa elegibilidade, não garantia de campanha, contratação ou pagamento.",
+              help: "Confira tudo e envie para a equipe.",
             },
           ]}
         >
@@ -266,73 +258,35 @@ export default async function CreatorProfilePage() {
             <div className="section-heading">
               <span className="principle-number">03</span>
               <div>
-                <h2>As cinco evidências</h2>
-                <p>
-                  Envie os Stories mais recentes. Cada um precisa informar pelo
-                  menos{" "}
-                  {(settings?.minimum_story_views ?? 1000).toLocaleString(
-                    "pt-BR",
-                  )}{" "}
-                  visualizações.
-                </p>
+                <h2>Evidências</h2>
+                <p>Toque em cada quadro e envie o print do Story.</p>
               </div>
             </div>
-            <div className="evidence-grid">
-              {[1, 2, 3, 4, 5].map((position) => {
+            <EvidenceBoard
+              slots={[1, 2, 3, 4, 5].map((position) => {
                 const item = evidenceSlots.get(position);
-                const imageUrl = item
-                  ? urlByPath.get(item.storage_path)
-                  : undefined;
-                return (
-                  <article className="evidence-item" key={position}>
-                    <span className="evidence-index">0{position}</span>
-                    {imageUrl ? (
-                      <Image
-                        src={imageUrl}
-                        alt={`Evidência do Story ${position}`}
-                        width={300}
-                        height={400}
-                        unoptimized
-                      />
-                    ) : (
-                      <div className="evidence-empty">
-                        {item ? "Prévia indisponível" : "Sem evidência"}
-                      </div>
-                    )}
-                    <strong>
-                      {item
-                        ? (evidenceStatus[item.review_status] ?? "Em análise")
-                        : "Pendente"}
-                    </strong>
-                    {item && (
-                      <span>
-                        {new Date(
-                          `${item.story_published_on}T12:00:00`,
-                        ).toLocaleDateString("pt-BR")}{" "}
-                        · {item.views_reported.toLocaleString("pt-BR")}{" "}
-                        visualizações
-                      </span>
-                    )}
-                    {item?.review_reason && (
-                      <p className="evidence-reason">{item.review_reason}</p>
-                    )}
-                  </article>
-                );
+                return {
+                  position,
+                  uploaded: Boolean(item),
+                  imageUrl:
+                    (item && urlByPath.get(item.storage_path)) || undefined,
+                  statusLabel: item
+                    ? (evidenceStatus[item.review_status] ?? "Em análise")
+                    : "Pendente",
+                  meta: item
+                    ? `${item.views_reported.toLocaleString("pt-BR")} visualizações`
+                    : undefined,
+                  reason: item?.review_reason,
+                  needsAttention:
+                    item?.review_status === "rejected" ||
+                    item?.review_status === "changes_requested",
+                };
               })}
-            </div>
-            {canEdit ? (
-              <EvidenceUploadForm
-                socialAccounts={accounts}
-                existingPositions={evidence.map((item) => item.position)}
-                minimumViews={minimumViews}
-                maxStoryAgeDays={maxStoryAgeDays}
-              />
-            ) : (
-              <p className="field-hint">
-                O envio de evidências está bloqueado enquanto este cadastro não
-                estiver em rascunho ou correção.
-              </p>
-            )}
+              socialAccounts={accounts}
+              minimumViews={minimumViews}
+              maxStoryAgeDays={maxStoryAgeDays}
+              canEdit={canEdit}
+            />
           </section>
 
           <section

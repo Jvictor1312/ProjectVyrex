@@ -1,13 +1,11 @@
 "use client";
 
-import Image from "next/image";
 import type { ReactNode } from "react";
 import { useActionState, useEffect, useRef, useState } from "react";
 import {
   saveCreatorProfileAction,
   saveSocialAccountAction,
   submitCreatorApplicationAction,
-  uploadStoryEvidenceAction,
 } from "@/app/actions/creator";
 import { categoriesList, socialPlatforms } from "@/lib/validation/creator";
 import type { FormState } from "@/lib/validation/auth";
@@ -337,164 +335,6 @@ export function SocialAccountForm({
           : initialAccount
             ? "Salvar alterações"
             : "Adicionar rede"}
-      </button>
-    </form>
-  );
-}
-
-export function EvidenceUploadForm({
-  socialAccounts,
-  existingPositions,
-  minimumViews,
-  maxStoryAgeDays,
-}: {
-  socialAccounts: { id: string; platform: string; handle: string }[];
-  existingPositions: number[];
-  minimumViews: number;
-  maxStoryAgeDays: number | null;
-}) {
-  const [state, action, pending] = useActionState(
-    uploadStoryEvidenceAction,
-    initialState,
-  );
-  const evidenceInput = useRef<HTMLInputElement>(null);
-  const [preview, setPreview] = useState<{ file: File; url: string } | null>(
-    null,
-  );
-
-  useEffect(() => {
-    if (state.success) {
-      setPreview(null);
-      if (evidenceInput.current) evidenceInput.current.value = "";
-    }
-  }, [state]);
-
-  useEffect(() => {
-    return () => {
-      if (preview) URL.revokeObjectURL(preview.url);
-    };
-  }, [preview]);
-
-  return (
-    <form action={action} className="editor-form">
-      <div className="field-row">
-        <label className="field">
-          <span>Posição da evidência</span>
-          <select name="position" defaultValue="" required>
-            {[1, 2, 3, 4, 5].map((position) => (
-              <option key={position} value={position}>
-                {position}. Story{" "}
-                {existingPositions.includes(position)
-                  ? "(substituir)"
-                  : "(vazio)"}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label className="field">
-          <span>Rede relacionada</span>
-          <select
-            name="socialAccountId"
-            defaultValue=""
-            required
-            disabled={socialAccounts.length === 0}
-          >
-            <option value="" disabled>
-              Selecione uma rede
-            </option>
-            {socialAccounts.map((account) => (
-              <option value={account.id} key={account.id}>
-                {platformLabels[
-                  account.platform as keyof typeof platformLabels
-                ] ?? account.platform}{" "}
-                · @{account.handle}
-              </option>
-            ))}
-          </select>
-        </label>
-      </div>
-      <div className="field-row">
-        <label className="field">
-          <span>Data aproximada da publicação</span>
-          <input
-            name="storyPublishedOn"
-            type="date"
-            required
-            max={new Date().toISOString().slice(0, 10)}
-          />
-        </label>
-        <label className="field">
-          <span>Visualizações informadas</span>
-          <input
-            name="viewsReported"
-            type="number"
-            inputMode="numeric"
-            min={0}
-            max={2147483647}
-            step={1}
-            required
-          />
-        </label>
-      </div>
-      <label className="field">
-        <span>Imagem da evidência</span>
-        <input
-          ref={evidenceInput}
-          name="evidence"
-          type="file"
-          accept="image/jpeg,image/png,image/webp"
-          required
-          onChange={(event) => {
-            const file = event.currentTarget.files?.[0] ?? null;
-            setPreview(file ? { file, url: URL.createObjectURL(file) } : null);
-          }}
-        />
-      </label>
-      {preview && (
-        <div className="evidence-preview">
-          <Image
-            src={preview.url}
-            alt="Prévia da imagem selecionada"
-            width={96}
-            height={128}
-            unoptimized
-          />
-          <div>
-            <strong>{preview.file.name}</strong>
-            <span>{(preview.file.size / (1024 * 1024)).toFixed(1)} MB</span>
-            <button
-              className="quiet-button"
-              type="button"
-              onClick={() => {
-                setPreview(null);
-                if (evidenceInput.current) evidenceInput.current.value = "";
-              }}
-            >
-              Remover imagem
-            </button>
-          </div>
-        </div>
-      )}
-      <p className="field-hint">
-        JPEG, PNG ou WebP, até 8 MB. Informe pelo menos{" "}
-        {minimumViews.toLocaleString("pt-BR")} visualizações.{" "}
-        {maxStoryAgeDays === null
-          ? "Não há limite de idade configurado."
-          : `As evidências devem ter até ${maxStoryAgeDays} dias.`}{" "}
-        A equipe confere os dados manualmente; uma imagem não é validação
-        automática.
-      </p>
-      <label className="field">
-        <span>Observações (opcional)</span>
-        <textarea name="creatorNotes" rows={2} maxLength={500} />
-      </label>
-      <ActionMessage state={state} />
-      <button
-        className="button button-dark"
-        type="submit"
-        disabled={pending || socialAccounts.length === 0}
-      >
-        {pending ? "Enviando..." : "Salvar evidência"}
       </button>
     </form>
   );

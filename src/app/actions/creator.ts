@@ -104,17 +104,20 @@ export async function saveSocialAccountAction(
         .select("id")
         .single();
 
-  return result.error || !result.data
-    ? {
-        message:
-          "Não foi possível salvar a rede social. Verifique os dados e tente novamente.",
-        success: false,
-      }
-    : {
-        message:
-          "Rede social salva. Os números informados ainda serão verificados pela equipe.",
-        success: true,
-      };
+  if (result.error || !result.data) {
+    return {
+      message:
+        "Não foi possível salvar a rede social. Verifique os dados e tente novamente.",
+      success: false,
+    };
+  }
+
+  revalidatePath("/dashboard/perfil");
+  revalidatePath("/dashboard");
+  return {
+    message: "Rede social salva. A equipe vai conferir os números.",
+    success: true,
+  };
 }
 
 export async function uploadStoryEvidenceAction(
@@ -211,9 +214,10 @@ export async function uploadStoryEvidenceAction(
         .remove([existing.data.storage_path]);
     }
 
+    revalidatePath("/dashboard/perfil");
+    revalidatePath("/dashboard");
     return {
-      message:
-        "Evidência salva para análise manual. O envio não confirma as visualizações informadas.",
+      message: `Evidência ${parsed.data.position} salva.`,
       success: true,
     };
   } catch {
