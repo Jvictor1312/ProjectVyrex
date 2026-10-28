@@ -41,7 +41,7 @@ O usuário acompanha tudo pelo VS Code, com o site aberto. **Dê mais empenho a 
 - Projeto na nuvem `zofxrohoilwjtzbcruse` (nome "Vyrex", região us-east-1). Chaves públicas em `.env.local`; `SUPABASE_SERVICE_ROLE_KEY` ainda é placeholder.
 - As 5 migrations de `supabase/migrations/` já estão aplicadas no banco (aplicadas pelo SQL Editor; não existe a tabela `supabase_migrations.schema_migrations`). Novas migrations devem ser aditivas e não destrutivas.
 - Critérios de elegibilidade atuais no banco: 0 seguidores mínimos e 1.000 visualizações por evidência (a migration `202610150004` alterou os valores iniciais de 3.000/2.000 citados nas diretrizes).
-- Para consultas administrativas é preciso um access token do Supabase (`sbp_...`) fornecido pelo usuário na sessão. Nunca grave o token em arquivo.
+- O access token do Supabase (`sbp_...`) está salvo, a pedido do usuário, na variável de ambiente do usuário do Windows `SUPABASE_ACCESS_TOKEN`. Use-a para a Management API e o Supabase CLI. Nunca escreva o valor em arquivos do projeto, logs ou mensagens.
 
 ## Documentação
 
