@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { requireUserFast } from "@/lib/auth";
-import { CreatorShell } from "../creator-shell";
 import { CreatorMessages } from "./creator-messages";
 
 export const metadata: Metadata = { title: "Mensagens" };
@@ -29,12 +28,12 @@ export default async function CreatorMessagesPage() {
   await ensureActive(activeResult);
 
   return (
-    <CreatorShell>
+    <>
       <CreatorMessages
         hasLoadError={Boolean(messagesResult.error || notificationsResult.error)}
         messages={messagesResult.data ?? []}
         notifications={notificationsResult.data ?? []}
       />
-    </CreatorShell>
+    </>
   );
 }

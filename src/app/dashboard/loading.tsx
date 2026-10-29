@@ -1,5 +1,5 @@
 import { PageLoading } from "@/app/components/page-loading";
 
 export default function Loading() {
-  return <PageLoading label="Carregando seu painel…" />;
+  return <PageLoading inline label="Carregando…" />;
 }

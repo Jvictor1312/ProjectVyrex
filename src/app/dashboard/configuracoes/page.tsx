@@ -10,7 +10,6 @@ import {
   dataRequestKindLabels,
   dataRequestStatusLabels,
 } from "@/lib/validation/privacy";
-import { CreatorShell } from "../creator-shell";
 import styles from "../dashboard.module.css";
 import { formatCpf } from "@/lib/validation/cpf";
 
@@ -40,7 +39,7 @@ export default async function CreatorSettingsPage() {
   const requests = requestsResult.data ?? [];
 
   return (
-    <CreatorShell>
+    <>
       <section className="dashboard-content">
         <h1>Configurações</h1>
         <p className="dashboard-email">
@@ -97,6 +96,6 @@ export default async function CreatorSettingsPage() {
           )}
         </details>
       </section>
-    </CreatorShell>
+    </>
   );
 }

@@ -1,8 +1,10 @@
 import { VyrexMark } from "./vyrex-logo";
 
-export function PageLoading({ label }: { label: string }) {
+// inline: dentro de uma moldura que já tem o <main> (área do criador).
+export function PageLoading({ label, inline = false }: { label: string; inline?: boolean }) {
+  const Root = inline ? "div" : "main";
   return (
-    <main className="page-loading" aria-busy="true">
+    <Root className="page-loading" aria-busy="true">
       <p className="page-loading-label" role="status">
         <span className="brand-mark" aria-hidden="true">
           <VyrexMark />
@@ -14,6 +16,6 @@ export function PageLoading({ label }: { label: string }) {
         <span />
         <span />
       </div>
-    </main>
+    </Root>
   );
 }

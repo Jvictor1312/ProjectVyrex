@@ -1,7 +1,6 @@
 import { requireUserFast } from "@/lib/auth";
 import { historyEvidenceSelect, historyStoryPosition } from "@/lib/history";
 import { defaultRequiredEvidence } from "@/lib/labels";
-import { CreatorShell } from "./creator-shell";
 import { CreatorOverview, nextStepFor } from "./creator-overview";
 
 export default async function CreatorDashboardPage() {
@@ -90,7 +89,7 @@ export default async function CreatorDashboardPage() {
   const status = creatorProfile?.status ?? "incomplete";
 
   return (
-    <CreatorShell>
+    <>
       <CreatorOverview
         name={
           creatorProfile?.public_name ||
@@ -127,6 +126,6 @@ export default async function CreatorDashboardPage() {
         }))}
         hasLoadError={hasLoadError}
       />
-    </CreatorShell>
+    </>
   );
 }

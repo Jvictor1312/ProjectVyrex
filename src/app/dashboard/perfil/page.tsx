@@ -5,7 +5,6 @@ import {
   defaultRequiredEvidence,
   evidenceStatusLabels,
 } from "@/lib/labels";
-import { CreatorShell } from "../creator-shell";
 import { CreatorProfileView } from "./creator-profile-view";
 
 export const metadata: Metadata = { title: "Meu cadastro" };
@@ -136,7 +135,7 @@ export default async function CreatorProfilePage() {
   }
 
   return (
-    <CreatorShell>
+    <>
       <CreatorProfileView
         lede={
           canEdit
@@ -191,6 +190,6 @@ export default async function CreatorProfilePage() {
         maxStoryAgeDays={maxStoryAgeDays}
         reviewIssues={reviewIssues}
       />
-    </CreatorShell>
+    </>
   );
 }
