@@ -153,6 +153,12 @@ before(async () => {
       "utf8",
     ),
   );
+  await database.exec(
+    await readFile(
+      new URL("../migrations/202610290002_shared_rate_limit.sql", import.meta.url),
+      "utf8",
+    ),
+  );
   await database.query(
     "insert into auth.users (id, raw_user_meta_data) values ($1, '{}'::jsonb), ($2, '{}'::jsonb), ($3, '{}'::jsonb)",
     [creatorOne, creatorTwo, creatorThree],
@@ -1131,6 +1137,40 @@ test("dashboard report sums assignments in the database and respects access rule
       .exec("set role anon")
       .then(() => database.query("select public.internal_dashboard_report()"))
       .finally(() => database.exec("reset role")),
+    /permission denied/i,
+  );
+});
+
+// Limite de tentativas compartilhado (202610290002).
+test("shared rate limit blocks after the limit and restarts after the window", async () => {
+  const key = "a".repeat(64);
+  const consume = async () =>
+    (await database.query("select public.consume_rate_limit($1, 2, 900) as ok", [key])).rows[0].ok;
+  assert.deepEqual([await consume(), await consume(), await consume(), await consume()], [
+    true,
+    true,
+    false,
+    false,
+  ]);
+  // Janela vencida: a mesma linha recome?a do zero, sem apagar nada.
+  await database.query(
+    "update public.rate_limit_counters set window_started_at = now() - interval '1 hour' where key = $1",
+    [key],
+  );
+  assert.equal(await consume(), true);
+  const rows = await database.query("select hits from public.rate_limit_counters where key = $1", [key]);
+  assert.deepEqual(rows.rows, [{ hits: 1 }]);
+});
+
+test("signed-in users cannot use or read the rate limit counters", async () => {
+  await assert.rejects(
+    asUser(creatorTwo, () =>
+      database.query("select public.consume_rate_limit($1, 5, 60)", ["b".repeat(64)]),
+    ),
+    /permission denied/i,
+  );
+  await assert.rejects(
+    asUser(creatorTwo, () => database.query("select * from public.rate_limit_counters")),
     /permission denied/i,
   );
 });

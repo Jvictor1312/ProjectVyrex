@@ -1,10 +1,14 @@
 import "server-only";
+import { createHash } from "node:crypto";
 import { headers } from "next/headers";
+import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 
-// Limite de tentativas por endereço de rede, em memória (vale por instância
-// do servidor). Protege login, cadastro e recuperação contra tentativas em
-// massa. Numa hospedagem com várias instâncias, cada uma tem o seu contador;
-// o Supabase mantém os próprios limites como segunda camada.
+// Limite de tentativas. Protege login, cadastro e recuperação contra
+// tentativas em massa. O contador fica no banco (consume_rate_limit,
+// migration 202610290002) e vale para todos os servidores ao mesmo tempo.
+// Se o banco não responder, o contador em memória (por servidor) assume, para
+// o login não parar por causa do limite. O Supabase mantém os próprios limites
+// como segunda camada.
 const attempts = new Map<string, number[]>();
 const maxTrackedKeys = 10_000;
 
@@ -28,6 +32,25 @@ export async function rateLimit(
   const key = extraKey
     ? `${bucket}:account:${extraKey.trim().toLowerCase()}`
     : `${bucket}:ip:${await clientAddress()}`;
+
+  const shared = await sharedRateLimit(key, limit, windowSeconds);
+  if (shared !== null) return { allowed: shared };
+  return memoryRateLimit(key, limit, windowSeconds);
+}
+
+// O banco recebe só o resumo (SHA-256) da chave: nada de e-mail ou IP gravado.
+async function sharedRateLimit(key: string, limit: number, windowSeconds: number) {
+  const supabase = createSupabaseAdminClient();
+  if (!supabase) return null;
+  const { data, error } = await supabase.rpc("consume_rate_limit", {
+    counter_key: createHash("sha256").update(key).digest("hex"),
+    max_hits: limit,
+    window_seconds: windowSeconds,
+  });
+  return error || typeof data !== "boolean" ? null : data;
+}
+
+function memoryRateLimit(key: string, limit: number, windowSeconds: number) {
   const now = Date.now();
   const windowStart = now - windowSeconds * 1000;
   const recent = (attempts.get(key) ?? []).filter((time) => time > windowStart);
