@@ -1,5 +1,5 @@
-/* Mensagens e Configurações do criador. Escala: seções 18px (serifado),
-   texto 14px, apoio 13px. */
+/* Configurações do criador (Mensagens tem o próprio messages.module.css).
+   Escala: seções 18px (serifado), texto 14px, apoio 13px. */
 .statusDescription {
   max-width: 650px;
   margin: 8px 0 0;
@@ -21,71 +21,9 @@
   font-weight: 400;
 }
 
-.notificationHeading {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 12px;
-}
-
-.notificationList {
-  margin-top: 20px;
-  border-top: 1px solid #dce0da;
-}
-
-.notificationItem {
-  display: grid;
-  gap: 6px;
-  padding: 14px 0;
-  border-bottom: 1px solid #eceeeb;
-}
-
-.notificationHeading h2 {
-  margin: 0;
-  font-family: Georgia, var(--font-serif), "Times New Roman", serif;
-  font-size: 18px;
-  font-weight: 400;
-}
-
-.notificationHeading h3 {
-  margin: 0;
-  font-size: 15px;
-}
-
-.notificationItem p {
-  margin: 0;
-  color: #4b524e;
-  font-size: 14px;
-  line-height: 1.6;
-  white-space: pre-wrap;
-  overflow-wrap: anywhere;
-}
-
-.notificationItem time,
 .historySection li time {
   color: #5f6461;
   font-size: 13px;
-}
-
-.notificationUnread,
-.notificationRead {
-  flex: 0 0 auto;
-  font-size: 13px;
-}
-
-.notificationUnread {
-  color: #8d3e28;
-  font-weight: 600;
-}
-
-.notificationRead {
-  color: #5f6461;
-}
-
-.empty {
-  color: #5f6461;
-  font-size: 14px;
-  line-height: 1.6;
 }
 
 .historySection li {

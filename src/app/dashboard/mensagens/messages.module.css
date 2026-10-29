@@ -1,0 +1,261 @@
+/* Mensagens do criador. Mesma linguagem da Visão geral: painéis brancos com
+   borda fina, cantos de 12px, título serifado e textos em cinza grafite. */
+
+.page {
+  display: grid;
+  gap: 24px;
+}
+
+/* Mesma escala do título de "Meu cadastro" (globals.css, área do criador). */
+.header h1 {
+  margin: 0;
+  font-size: clamp(26px, 4vw, 32px);
+  line-height: 1.15;
+}
+
+.header p {
+  max-width: 560px;
+  margin: 10px 0 0;
+  color: #5f6461;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+/* Computador: mensagens à esquerda (texto mais longo), avisos à direita. */
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr);
+  align-items: start;
+  gap: 20px;
+}
+
+.panel {
+  min-width: 0;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #fff;
+}
+
+.notices {
+  scroll-margin-top: 96px;
+}
+
+.panelHeader {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 18px 22px 16px;
+  border-bottom: 1px solid #ecedeb;
+}
+
+.panelHeader h2 {
+  margin: 0;
+  font-family: Georgia, var(--font-serif), serif;
+  font-size: 20px;
+  font-weight: 400;
+  line-height: 1.25;
+}
+
+.count {
+  flex: none;
+  color: #5f6461;
+  font-size: 13px;
+}
+
+.countNew {
+  color: var(--ink);
+  font-weight: 650;
+}
+
+.list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.list > li + li {
+  border-top: 1px solid #ecedeb;
+}
+
+/* Mensagem: marca da Vyrex, quem enviou, quando e o texto. */
+.message {
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1fr);
+  gap: 14px;
+  padding: 18px 22px;
+}
+
+.sender {
+  display: grid;
+  width: 32px;
+  height: 32px;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--ink);
+  color: #fff;
+}
+
+.sender svg {
+  width: 12px;
+  height: 12px;
+}
+
+.messageBody {
+  min-width: 0;
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 4px 12px;
+}
+
+.meta strong,
+.meta h3 {
+  margin: 0;
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 650;
+}
+
+.meta time {
+  color: #5f6461;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+
+.message p,
+.notice p {
+  margin: 6px 0 0;
+  color: #3d423f;
+  font-size: 14px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+/* Aviso: título, data, texto e "marcar como lida" quando ainda é novo. */
+.notice {
+  position: relative;
+  padding: 16px 22px;
+}
+
+/* O aviso novo ganha um traço à esquerda, além da etiqueta "Novo". */
+.noticeNew::before {
+  position: absolute;
+  top: 18px;
+  bottom: 18px;
+  left: 0;
+  width: 2px;
+  border-radius: 0 2px 2px 0;
+  background: var(--ink);
+  content: "";
+}
+
+.newTag {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 1px 7px;
+  border: 1px solid var(--ink);
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.5;
+  vertical-align: 1px;
+}
+
+.noticeAction {
+  margin-top: 8px;
+}
+
+.noticeAction form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.noticeAction :global(.quiet-button) {
+  min-height: 32px;
+  margin-left: -12px;
+  font-size: 13px;
+}
+
+.noticeAction :global(.form-message) {
+  margin: 0;
+  font-size: 13px;
+}
+
+/* Estado vazio: discreto, explica o que vai aparecer ali. */
+.empty {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 26px 22px 28px;
+}
+
+.emptyIcon {
+  display: grid;
+  flex: none;
+  width: 40px;
+  height: 40px;
+  place-items: center;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  color: #5f6461;
+}
+
+.emptyIcon svg {
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.5;
+}
+
+.emptyTitle {
+  margin: 2px 0 0;
+  color: var(--ink);
+  font-size: 15px;
+  font-weight: 650;
+}
+
+.emptyText {
+  max-width: 380px;
+  margin: 4px 0 0;
+  color: #5f6461;
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+@media (max-width: 900px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 760px) {
+  .page {
+    gap: 18px;
+  }
+
+  .panelHeader,
+  .message,
+  .notice,
+  .empty {
+    padding-right: 18px;
+    padding-left: 18px;
+  }
+
+  /* Celular: "marcar como lida" com área de toque de 44px. */
+  .noticeAction :global(.quiet-button) {
+    min-height: 44px;
+  }
+
+  .notices {
+    scroll-margin-top: 76px;
+  }
+}

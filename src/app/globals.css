@@ -2283,3 +2283,434 @@ button.signup-showcase-toggle:focus-visible {
     padding: 0 6px;
   }
 }
+
+/* ==========================================================================
+   Meu cadastro (área do criador): acabamento das etapas.
+   Mesma identidade (preto e branco, Georgia nos títulos, Figtree no texto);
+   a etapa aberta fica num painel branco, como os cartões da Visão geral.
+   Vale só dentro de .dashboard-page (tela real e prévias). Vem depois das
+   regras de celular acima, então repete no fim os mínimos de toque.
+   ========================================================================== */
+
+/* Etapas do assistente: número que cabe no círculo, traço na etapa atual. */
+.dashboard-page .creator-wizard-steps {
+  gap: 12px;
+  margin-bottom: 20px;
+}
+.dashboard-page .wizard-step-group {
+  gap: 6px;
+  border-bottom-color: var(--line);
+  transition: border-color 0.15s ease;
+}
+.dashboard-page .wizard-step-group:has(.wizard-step.active) {
+  border-bottom-color: var(--ink);
+}
+.dashboard-page .wizard-step {
+  gap: 10px;
+  padding: 8px 2px;
+  font-weight: 500;
+}
+.dashboard-page .wizard-step:hover {
+  color: var(--ink);
+}
+.dashboard-page .wizard-step.active {
+  font-weight: 650;
+}
+.dashboard-page .wizard-step-number {
+  border-color: #c4c8c3;
+  color: #5f6461;
+  font-size: 12px;
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+.dashboard-page .wizard-step-number.complete {
+  border-color: var(--ink);
+  color: var(--ink);
+}
+.dashboard-page .wizard-step.active .wizard-step-number {
+  border-color: var(--ink);
+  background: var(--ink);
+  color: #fff;
+}
+.dashboard-page .wizard-step-help > summary {
+  width: 22px;
+  height: 22px;
+  border-color: var(--line);
+  color: #5f6461;
+  font-size: 12px;
+  transition:
+    border-color 0.15s ease,
+    color 0.15s ease;
+}
+.dashboard-page .wizard-step-help > summary:hover,
+.dashboard-page .wizard-step-help[open] > summary {
+  border-color: var(--ink);
+  color: var(--ink);
+}
+.dashboard-page .wizard-step-help > p {
+  border-radius: 10px;
+}
+
+/* A etapa aberta: painel branco com borda fina. */
+.dashboard-page .creator-wizard-panels > .profile-section {
+  padding: 28px 32px 32px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: #fff;
+}
+.dashboard-page .creator-wizard-panels > .profile-section + .profile-section {
+  margin-top: 16px;
+}
+
+/* Título da etapa: número pequeno acima, título serifado, descrição. */
+.dashboard-page .section-heading {
+  display: block;
+  margin-bottom: 24px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #ecedeb;
+}
+.dashboard-page .section-heading .principle-number {
+  display: block;
+  margin-bottom: 8px;
+  padding: 0;
+  color: #5f6461;
+  font-size: 12px;
+  font-weight: 650;
+  letter-spacing: 0.08em;
+}
+.dashboard-page .section-heading h2 {
+  font-size: 24px;
+}
+.dashboard-page .section-heading p {
+  max-width: 620px;
+  margin-top: 8px;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* Campos: rótulo firme, campo de 44px, foco preto com halo leve. */
+.dashboard-page .editor-form {
+  max-width: 640px;
+}
+.dashboard-page .editor-form .field {
+  gap: 7px;
+  margin: 0 0 20px;
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 600;
+}
+.dashboard-page .editor-form input:not([type="checkbox"]),
+.dashboard-page .editor-form select,
+.dashboard-page .editor-form textarea {
+  min-height: 44px;
+  padding: 10px 13px;
+  border: 1px solid #d4d8d3;
+  border-radius: 10px;
+  font-weight: 400;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+.dashboard-page .editor-form textarea {
+  min-height: 112px;
+  line-height: 1.55;
+}
+.dashboard-page .editor-form input:not([type="checkbox"]):hover,
+.dashboard-page .editor-form select:hover,
+.dashboard-page .editor-form textarea:hover {
+  border-color: #b4b9b3;
+}
+.dashboard-page .editor-form input:not([type="checkbox"]):focus,
+.dashboard-page .editor-form select:focus,
+.dashboard-page .editor-form textarea:focus {
+  border-color: var(--ink);
+  box-shadow: 0 0 0 3px #1013130f;
+}
+.dashboard-page .editor-form ::placeholder {
+  color: #8a8f8b;
+}
+.dashboard-page .editor-form .field-row {
+  gap: 16px;
+}
+.dashboard-page .editor-form .field-hint {
+  margin: -10px 0 20px;
+}
+
+/* Categorias: pílulas. Marcada = preta, com um traço de "concluído". */
+.dashboard-page .category-fieldset {
+  margin: 4px 0 24px;
+}
+.dashboard-page .category-fieldset legend {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 10px;
+  margin-bottom: 12px;
+  font-size: 13px;
+  font-weight: 600;
+}
+.category-hint {
+  color: #5f6461;
+  font-weight: 400;
+}
+/* São 12 categorias: grade de 4 colunas (2 no celular), sem sobra solta. */
+.dashboard-page .category-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+.dashboard-page .category-option {
+  position: relative;
+  justify-content: center;
+  gap: 0;
+  min-height: 40px;
+  padding: 0 12px;
+  border: 1px solid #d4d8d3;
+  border-radius: 10px;
+  text-align: center;
+  background: #fff;
+  color: #3d423f;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition:
+    border-color 0.15s ease,
+    background-color 0.15s ease,
+    color 0.15s ease;
+  user-select: none;
+}
+/* A caixa de seleção continua no lugar (teclado e leitor de tela), invisível. */
+.dashboard-page .category-option input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  opacity: 0;
+}
+.dashboard-page .category-option span::before {
+  display: inline-block;
+  width: 0;
+  height: 9px;
+  margin: 0 0 1px;
+  border-right: 1.6px solid currentColor;
+  border-bottom: 1.6px solid currentColor;
+  content: "";
+  opacity: 0;
+  transform: rotate(45deg) scale(0.6);
+  transition:
+    width 0.15s ease,
+    margin 0.15s ease,
+    opacity 0.15s ease,
+    transform 0.15s ease;
+}
+.dashboard-page .category-option:hover {
+  border-color: var(--ink);
+  color: var(--ink);
+}
+.dashboard-page .category-option:has(input:checked) {
+  border-color: var(--ink);
+  background: var(--ink);
+  color: #fff;
+}
+.dashboard-page .category-option:has(input:checked) span::before {
+  width: 4.5px;
+  margin: 0 9px 2px 1px;
+  opacity: 1;
+  transform: rotate(45deg) scale(1);
+}
+
+/* Salvamento: automático; o botão fica discreto, como apoio. */
+.dashboard-page .autosave-row {
+  gap: 12px;
+  padding-top: 20px;
+  border-top: 1px solid #ecedeb;
+}
+.dashboard-page .autosave-row .button-dark {
+  border: 1px solid #d4d8d3;
+  background: #fff;
+  color: var(--ink);
+}
+.dashboard-page .autosave-row .button-dark:hover {
+  border-color: var(--ink);
+  background: #fff;
+}
+.dashboard-page .autosave-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 13px;
+}
+.dashboard-page .autosave-saved::before {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  content: "";
+}
+
+/* Redes sociais cadastradas. */
+.dashboard-page .account-list {
+  margin: 0 0 20px;
+  border-top: 0;
+}
+.dashboard-page .account-row {
+  gap: 10px 18px;
+  padding: 16px 0;
+  border-bottom-color: #ecedeb;
+}
+.dashboard-page .account-row:first-child {
+  padding-top: 0;
+}
+.dashboard-page .account-row strong {
+  font-size: 15px;
+  font-weight: 650;
+}
+.dashboard-page .account-verification {
+  padding: 3px 10px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+}
+.dashboard-page .verification-verified {
+  border-color: var(--ink);
+  color: var(--ink);
+}
+.dashboard-page .verification-rejected {
+  border-color: #e3c4bf;
+}
+.dashboard-page .account-edit summary {
+  color: var(--ink);
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-color: #b4b9b3;
+  text-underline-offset: 3px;
+}
+.dashboard-page .add-account .quiet-button {
+  min-height: 40px;
+  padding: 0 16px;
+  border: 1px solid #d4d8d3;
+  border-radius: 999px;
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 600;
+}
+.dashboard-page .add-account .quiet-button:hover {
+  border-color: var(--ink);
+  background: transparent;
+}
+
+/* Revisão: resumo em duas colunas e as pendências antes do envio. */
+.dashboard-page .application-review {
+  gap: 0 32px;
+  margin-bottom: 24px;
+  border-top: 0;
+}
+.dashboard-page .application-review > div {
+  padding: 0 0 16px;
+  border-bottom: 0;
+}
+.dashboard-page .application-review dt {
+  font-size: 12px;
+  font-weight: 650;
+  letter-spacing: 0.06em;
+}
+.dashboard-page .application-review dd {
+  color: var(--ink);
+  font-size: 15px;
+}
+.review-issues {
+  padding: 16px 18px;
+  border-radius: 10px;
+  background: var(--paper);
+  font-size: 14px;
+  line-height: 1.6;
+}
+.review-issues strong {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 14px;
+  font-weight: 650;
+}
+.review-issues ul {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  color: #3d423f;
+}
+.review-issues li {
+  position: relative;
+  padding-left: 16px;
+}
+.review-issues li::before {
+  position: absolute;
+  top: 0.65em;
+  left: 2px;
+  width: 5px;
+  height: 5px;
+  border: 1.4px solid currentColor;
+  border-radius: 50%;
+  content: "";
+}
+.review-ready {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  color: var(--ink);
+  font-size: 14px;
+}
+.review-ready::before {
+  flex: none;
+  width: 6px;
+  height: 11px;
+  margin: 0 5px 3px;
+  border-right: 1.8px solid currentColor;
+  border-bottom: 1.8px solid currentColor;
+  content: "";
+  transform: rotate(45deg);
+}
+
+/* Navegação entre etapas, abaixo do painel. */
+.dashboard-page .creator-wizard-navigation {
+  margin-top: 18px;
+  padding-top: 0;
+  border-top: 0;
+}
+
+@media (max-width: 760px) {
+  .dashboard-page .creator-wizard-panels > .profile-section {
+    padding: 22px 18px 24px;
+  }
+  .dashboard-page .section-heading h2 {
+    font-size: 21px;
+  }
+  /* Celular: campos de 48px e opções com área de toque de 44px. */
+  .dashboard-page .editor-form input:not([type="checkbox"]),
+  .dashboard-page .editor-form select {
+    min-height: 48px;
+  }
+  .dashboard-page .category-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .dashboard-page .category-option {
+    min-height: 44px;
+  }
+  .dashboard-page .add-account .quiet-button {
+    min-height: 44px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dashboard-page .category-option,
+  .dashboard-page .category-option span::before,
+  .dashboard-page .wizard-step-group,
+  .dashboard-page .editor-form input,
+  .dashboard-page .editor-form select,
+  .dashboard-page .editor-form textarea {
+    transition: none;
+  }
+}

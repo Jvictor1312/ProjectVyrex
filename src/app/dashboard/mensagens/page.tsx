@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
-import { NotificationReadButton } from "@/app/components/notification-read-button";
 import { requireUserFast } from "@/lib/auth";
 import { CreatorShell } from "../creator-shell";
-import styles from "../dashboard.module.css";
+import { CreatorMessages } from "./creator-messages";
 
 export const metadata: Metadata = { title: "Mensagens" };
 
@@ -28,67 +27,14 @@ export default async function CreatorMessagesPage() {
     ],
   );
   await ensureActive(activeResult);
-  const messages = messagesResult.data ?? [];
-  const notifications = notificationsResult.data ?? [];
 
   return (
     <CreatorShell>
-      <section className="dashboard-content">
-        <h1>Mensagens</h1>
-        {(messagesResult.error || notificationsResult.error) && (
-          <p className="setup-warning" role="alert">
-            Não foi possível carregar tudo. Recarregue a página.
-          </p>
-        )}
-
-        <section className={styles.historySection} aria-labelledby="equipe">
-          <h2 id="equipe">Mensagens da equipe</h2>
-          {messages.length === 0 ? (
-            <p className={styles.empty}>A equipe ainda não enviou mensagens. Quando enviar, elas aparecem aqui.</p>
-          ) : (
-            <div className={styles.notificationList}>
-              {messages.map((message) => (
-                <article className={styles.notificationItem} key={message.id}>
-                  <p>{message.body}</p>
-                  <time dateTime={message.created_at}>
-                    {new Date(message.created_at).toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" })}
-                  </time>
-                </article>
-              ))}
-            </div>
-          )}
-        </section>
-
-        <section className={styles.historySection} aria-labelledby="avisos">
-          <h2 id="avisos">Avisos</h2>
-          {notifications.length === 0 ? (
-            <p className={styles.empty}>Nenhum aviso no momento. Mudanças na situação do seu cadastro aparecem aqui.</p>
-          ) : (
-            <div className={styles.notificationList}>
-              {notifications.map((notification) => (
-                <article
-                  className={styles.notificationItem}
-                  key={notification.id}
-                >
-                  <div className={styles.notificationHeading}>
-                    <h3>{notification.title}</h3>
-                    {!notification.read_at && (
-                      <span className={styles.notificationUnread}>Novo</span>
-                    )}
-                  </div>
-                  <p>{notification.body}</p>
-                  <time dateTime={notification.created_at}>
-                    {new Date(notification.created_at).toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" })}
-                  </time>
-                  {!notification.read_at && (
-                    <NotificationReadButton notificationId={notification.id} />
-                  )}
-                </article>
-              ))}
-            </div>
-          )}
-        </section>
-      </section>
+      <CreatorMessages
+        hasLoadError={Boolean(messagesResult.error || notificationsResult.error)}
+        messages={messagesResult.data ?? []}
+        notifications={notificationsResult.data ?? []}
+      />
     </CreatorShell>
   );
 }

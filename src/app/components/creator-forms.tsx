@@ -77,8 +77,28 @@ export function CreatorWizard({
                   aria-label={`Etapa ${index + 1}: ${step.title}, ${step.complete ? "concluída" : "pendente"}`}
                   onClick={() => goTo(index)}
                 >
-                  <span className="wizard-step-number" aria-hidden="true">
-                    {step.complete ? "✓" : `0${index + 1}`}
+                  <span
+                    className={
+                      step.complete
+                        ? "wizard-step-number complete"
+                        : "wizard-step-number"
+                    }
+                    aria-hidden="true"
+                  >
+                    {step.complete ? (
+                      <svg viewBox="0 0 12 12" width="11" height="11">
+                        <path
+                          d="M2.5 6.2 5 8.5l4.5-5"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="1.8"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                    ) : (
+                      index + 1
+                    )}
                   </span>
                   <span>{step.title}</span>
                 </button>
@@ -220,7 +240,10 @@ export function CreatorProfileForm({
         />
       </label>
       <fieldset className="category-fieldset">
-        <legend>Categorias de conteúdo</legend>
+        <legend>
+          Categorias de conteúdo
+          <span className="category-hint">Escolha uma ou mais.</span>
+        </legend>
         <div className="category-grid">
           {categoriesList.map((category) => (
             <label className="category-option" key={category}>

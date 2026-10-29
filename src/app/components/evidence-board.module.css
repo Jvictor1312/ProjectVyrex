@@ -30,7 +30,8 @@
   padding: 0;
   border: 1.5px dashed #b9bcb9;
   border-radius: 12px;
-  background: #fff;
+  /* Levemente cinza: o quadro fica sobre o painel branco da etapa. */
+  background: #fafaf8;
   color: var(--ink);
   font: inherit;
 }
@@ -159,9 +160,9 @@ button.tile:disabled {
   display: grid;
   gap: 16px;
   padding: 18px 20px;
-  border: 1px solid var(--line);
+  border: 0;
   border-radius: 12px;
-  background: #fff;
+  background: var(--paper);
 }
 
 .detailsTitle {
