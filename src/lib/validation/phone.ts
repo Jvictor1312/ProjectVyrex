@@ -12,10 +12,5 @@ export function normalizePhone(input: string): string | null {
   return phone.number;
 }
 
-export function maskPhone(e164: string): string {
-  const digits = e164.replace(/\D/g, "");
-  return `(••) •••••-${digits.slice(-4)}`;
-}
-
 export const invalidPhoneMessage =
   "Informe um telefone válido com DDD, por exemplo (11) 98765-4321.";

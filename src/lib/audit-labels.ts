@@ -3,6 +3,10 @@ import { roleLabels } from "@/lib/labels";
 // Textos legíveis para os registros de auditoria (audit_logs).
 const actionLabels: Record<string, string> = {
   "creator.application.submitted": "Cadastro enviado para análise",
+  "creator.application.withdrawn": "Envio desfeito pelo criador",
+  "creator.evidence.removed": "Evidência apagada pelo criador",
+  "creator.social_account.verification_reset": "Rede editada pelo criador (verificação refeita)",
+  "user.cpf.changed": "CPF da conta alterado",
   "creator.evidence.reviewed": "Evidência analisada",
   "creator.decision.recorded": "Decisão final registrada",
   "creator.responsibles.changed": "Responsáveis alterados",

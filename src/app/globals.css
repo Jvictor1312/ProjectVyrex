@@ -1214,13 +1214,11 @@ button.signup-showcase-toggle:focus-visible {
   background: var(--green);
   color: #fff;
 }
-.wizard-step-help,
-.info-help {
+.wizard-step-help {
   position: relative;
   flex: 0 0 auto;
 }
-.wizard-step-help > summary,
-.info-help > summary {
+.wizard-step-help > summary {
   display: grid;
   width: 28px;
   height: 28px;
@@ -1233,17 +1231,14 @@ button.signup-showcase-toggle:focus-visible {
   font-weight: 700;
   list-style: none;
 }
-.wizard-step-help > summary::-webkit-details-marker,
-.info-help > summary::-webkit-details-marker {
+.wizard-step-help > summary::-webkit-details-marker {
   display: none;
 }
-.wizard-step-help > summary:focus-visible,
-.info-help > summary:focus-visible {
+.wizard-step-help > summary:focus-visible {
   outline: 2px solid var(--green);
   outline-offset: 2px;
 }
-.wizard-step-help > p,
-.info-help-panel {
+.wizard-step-help > p {
   position: absolute;
   z-index: 20;
   top: calc(100% + 8px);
@@ -1261,13 +1256,6 @@ button.signup-showcase-toggle:focus-visible {
 }
 .wizard-step-help > p {
   right: -4px;
-}
-.info-help-panel strong {
-  font-size: 14px;
-}
-.info-help-panel p {
-  margin: 6px 0 0;
-  color: var(--muted);
 }
 .creator-wizard[data-active-step="0"]
   [data-wizard-step]:not([data-wizard-step="0"]),
@@ -2214,12 +2202,10 @@ button.signup-showcase-toggle:focus-visible {
     min-height: 44px;
   }
   /* O "i" de ajuda continua pequeno na tela, mas a área de toque tem 44px. */
-  .wizard-step-help > summary,
-  .info-help > summary {
+  .wizard-step-help > summary {
     position: relative;
   }
-  .wizard-step-help > summary::before,
-  .info-help > summary::before {
+  .wizard-step-help > summary::before {
     position: absolute;
     inset: -8px;
     content: "";
