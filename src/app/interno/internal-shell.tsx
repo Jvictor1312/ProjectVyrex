@@ -2,6 +2,7 @@ import Link from "next/link";
 import { cookies } from "next/headers";
 import type { ReactNode } from "react";
 import { logoutAction } from "@/app/actions/auth";
+import { SkipLink } from "@/app/components/skip-link";
 import { VyrexLogo } from "@/app/components/vyrex-logo";
 import styles from "./internal.module.css";
 import { ThemeToggle } from "./theme-toggle";
@@ -75,6 +76,7 @@ export async function InternalShell({
 
   return (
     <main className={styles.shell} data-theme={theme}>
+      <SkipLink />
       <aside className={styles.sidebar}>
         <Link className={styles.brand} href="/interno">
           <VyrexLogo className={styles.brandLogo} />
@@ -114,7 +116,9 @@ export async function InternalShell({
           </div>
         </div>
       </aside>
-      {children}
+      <div id="conteudo" className={styles.content} tabIndex={-1}>
+        {children}
+      </div>
     </main>
   );
 }

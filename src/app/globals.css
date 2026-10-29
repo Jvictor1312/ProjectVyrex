@@ -1888,6 +1888,49 @@ button.signup-showcase-toggle:focus-visible {
 .field textarea {
   border-radius: 12px;
 }
+/* Listas e caixas de texto da ficha do criador (área da equipe): mesma
+   moldura dos campos de interno/ui.module.css. Sem ela, o campo não aparecia
+   e a lista tinha só 17px de altura. As cores vêm do tema da área da equipe. */
+.internal-action-form .field select,
+.internal-action-form .field textarea,
+.internal-review-form .field select,
+.internal-review-form .field textarea {
+  width: 100%;
+  min-height: 40px;
+  padding: 0 10px;
+  border: 1px solid var(--line-strong);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-size: 14px;
+}
+.internal-action-form .field textarea,
+.internal-review-form .field textarea {
+  min-height: 88px;
+  padding: 8px 10px;
+  resize: vertical;
+}
+.internal-action-form .field select:focus-visible,
+.internal-action-form .field textarea:focus-visible,
+.internal-review-form .field select:focus-visible,
+.internal-review-form .field textarea:focus-visible {
+  border-color: var(--text);
+  outline: 2px solid var(--text);
+  outline-offset: -1px;
+}
+@media (max-width: 760px) {
+  .internal-action-form .field select,
+  .internal-review-form .field select {
+    min-height: 44px;
+  }
+  .internal-action-form .field select,
+  .internal-action-form .field textarea,
+  .internal-review-form .field select,
+  .internal-review-form .field textarea {
+    font-size: 16px;
+  }
+}
 .auth-page {
   background: var(--paper);
 }
@@ -2011,6 +2054,26 @@ button.signup-showcase-toggle:focus-visible {
   overflow: hidden;
   clip: rect(0 0 0 0);
   white-space: nowrap;
+}
+/* "Pular para o conteúdo": fora da tela até receber o foco do teclado. */
+.skip-link {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  z-index: 100;
+  padding: 10px 16px;
+  border-radius: 8px;
+  background: #111;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 650;
+  transform: translateY(-200%);
+}
+.skip-link:focus {
+  transform: none;
+}
+#conteudo:focus {
+  outline: none;
 }
 
 .autosave-row {

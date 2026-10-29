@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { BrandContact } from "./components/brand-contact";
+import { SkipLink } from "./components/skip-link";
 import { VyrexLogo } from "./components/vyrex-logo";
 import styles from "./home.module.css";
 import { getSignedInUser } from "@/lib/auth";
@@ -60,6 +61,7 @@ export default async function HomePage() {
 
   return (
     <main className="landing">
+      <SkipLink />
       <header className="topbar">
         <Link className="brand" href="/" aria-label="Vyrex, página inicial">
           <VyrexLogo decorative />
@@ -83,7 +85,12 @@ export default async function HomePage() {
         </nav>
       </header>
 
-      <section className={styles.hero} aria-labelledby="hero-title">
+      <section
+        id="conteudo"
+        tabIndex={-1}
+        className={styles.hero}
+        aria-labelledby="hero-title"
+      >
         <div className={styles.heroCopy}>
           <h1 id="hero-title" className={styles.heroTitle}>
             Criadores e marcas, na mesma órbita.
