@@ -6,6 +6,8 @@ Plataforma Next.js que apoia a operação de marketing de influência da VYREX c
 
 A base inclui autenticação Supabase, cadastro do criador, redes sociais, upload privado de evidências, decisão manual com histórico, painéis por função, controle de responsáveis, gestão de equipe, critérios de elegibilidade, auditoria, área de privacidade/configurações do criador, solicitações de privacidade tratadas pelo admin e páginas 403/404/erro. O projeto ainda depende de configuração de um projeto Supabase antes de autenticar usuários reais.
 
+> **Vai continuar o projeto?** Comece por [`docs/PASSAGEM.md`](docs/PASSAGEM.md): onde o trabalho parou, o que fica fora do git (chaves e contas de teste), como rodar os testes e as próximas tarefas.
+
 ## Requisitos
 
 - Node.js 22.6 ou superior (usado pelo Next.js e pelo runner de testes nativo). Verificado localmente com Node.js 24.20.0.
@@ -34,7 +36,7 @@ SUPABASE_SERVICE_ROLE_KEY=SUA_CHAVE_SERVICE_ROLE_PRIVADA
 ## Configuração Supabase
 
 1. Crie um projeto Supabase e copie Project URL e anon key para `.env.local`.
-2. No SQL Editor do projeto, execute **em ordem** as migrations `202610140001_initial_platform.sql`, `202610150001_data_requests.sql`, `202610150002_social_account_updates.sql` e `202610150003_submission_profile_name.sql`. A primeira cria tabelas, funções, políticas RLS e o bucket privado `story-evidence`; a segunda adiciona solicitações de privacidade; a terceira permite corrigir dados de uma rede social e invalida/audita a verificação anterior; a quarta impede enviar cadastro sem nome público.
+2. No SQL Editor do projeto, execute **em ordem de nome** todas as migrations de `supabase/migrations/` (13 arquivos, de `202610140001_initial_platform.sql` a `202610280008_user_id_for_email.sql`). A primeira cria tabelas, funções, políticas RLS e o bucket privado `story-evidence`; as seguintes são aditivas (privacidade, redes, critérios, vídeo, 3 evidências obrigatórias, CPF, endurecimento de segurança etc.).
 3. Em Authentication > URL Configuration, configure `http://localhost:3000` como Site URL e permita `http://localhost:3000/auth/callback`. Adicione os endereços equivalentes de cada ambiente implantado.
 4. Ative confirmação de e-mail e configure o provedor de e-mail/SMTP. Em produção, utilize um provedor e limites de envio adequados.
 5. Para convites de colaboradores, configure `SUPABASE_SERVICE_ROLE_KEY` no ambiente server-side do desenvolvimento/hosting, nunca nas variáveis públicas.

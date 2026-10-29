@@ -4,8 +4,9 @@ Atualizado em: 2026-10-28. Reescrito para mostrar só o estado atual e as pendê
 
 ## Estado atual (verificado)
 
-- **Ambiente:** Supabase na nuvem (`zofxrohoilwjtzbcruse`) com as 8 migrations aplicadas; `.env.local` com URL, chave pública (formato antigo `eyJ`) e chave de serviço nova (`sb_secret_`). Servidor local em `localhost:3000`.
-- **Verificações:** `npm run typecheck`, `npm run lint`, `npm test` (35/35, PGlite) e `npm run build` passam.
+- **Passagem para outro colaborador:** comece por `docs/PASSAGEM.md` (onde paramos, o que fica fora do git e próximas tarefas).
+- **Ambiente:** Supabase na nuvem (`zofxrohoilwjtzbcruse`) com as 13 migrations aplicadas (até `202610280008`); `.env.local` com URL, chave pública (formato antigo `eyJ`) e chave de serviço nova (`sb_secret_`). Servidor local em `localhost:3000`. Projeto de testes `ukwnnrrqmrvfwtbjjrbi` com servidor em `localhost:3001`.
+- **Verificações:** `npm run typecheck`, `npm run lint`, `npm test` (47/47, PGlite), `npm run test:e2e` (55 aprovados, 3 pulados de propósito), `npm run test:flows` (10/10) e `npm run build` passam.
 - **Área do criador (`/dashboard`):** visão geral, meu cadastro (wizard, perfil com salvamento automático, redes, evidências, revisão e envio), mensagens e configurações (dados, senha, privacidade). Menu no topo. Evidências: vários prints de uma vez, dados por Story, um botão salva todos; os que falham ficam marcados ("Não foi salvo") e o botão vira "Tentar enviar de novo".
 - **Área interna (`/interno`):** visão geral adaptada a cada função (indicadores sem as contas da equipe; busca por nome público ou do cadastro; filtros por situação, responsável e período), ficha do criador (conferência de redes e evidências, decisão, responsáveis, histórico), gestão de colaboradores (convite, funções, desativação com confirmação, histórico), configurações (critérios e vídeo) e pedidos de privacidade.
 - **Padrões:** vocabulário único em `src/lib/labels.ts`; componentes da área interna em `src/app/interno/ui.tsx`; escala visual (título 24–32px, seção 16–20px, texto 14px, campos e botões 38–40px).
@@ -58,7 +59,9 @@ Atualizado em: 2026-10-28. Reescrito para mostrar só o estado atual e as pendê
 
 ### Técnicas (podem ser feitas sem o usuário)
 - [x] **Testes automáticos de navegador** (Playwright, `npm run test:e2e`): públicas, proteção de rotas, recuperação neutra, área do criador e da equipe só leitura, em computador e celular. Liberado pelo usuário em 2026-10-28.
-- [ ] Usuário: guardar as senhas das contas de teste com `scripts/set-test-credentials.ps1` para liberar os testes com login.
+- [x] Usuário guardou as senhas das contas de teste com `scripts/set-test-credentials.ps1` (testes com login liberados).
+- [x] **Projeto Supabase de testes** e fluxo completo do cadastro (`npm run test:flows`, 10/10).
+- [ ] Mostrar `creatorStatusDescriptions` (`src/lib/labels.ts`, ainda sem uso) na visão geral do criador.
 - [ ] **Busca sem acento:** "joao" não encontra "João". Exige a extensão `unaccent` (migration aditiva) ou uma coluna normalizada.
 - [ ] **Barra de progresso por arquivo** no envio de evidências: as Server Actions não informam o progresso do upload; exigiria enviar direto ao Storage pelo navegador.
 - [ ] **Painéis separados por função:** hoje `/interno` é um painel único que se adapta à função; avaliar se a operação precisa de telas próprias.
