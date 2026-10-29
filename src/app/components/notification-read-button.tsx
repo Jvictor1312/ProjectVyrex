@@ -20,7 +20,7 @@ export function NotificationReadButton({
     <form action={action}>
       <input type="hidden" name="notificationId" value={notificationId} />
       <button className="quiet-button" type="submit" disabled={pending}>
-        {pending ? "Atualizando..." : "Marcar como lida"}
+        {pending ? "Atualizando…" : "Marcar como lida"}
       </button>
       {state.message && (
         <span className="form-message" role="status" aria-live="polite">

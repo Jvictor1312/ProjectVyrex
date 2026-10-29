@@ -36,7 +36,7 @@ export default async function TeamDashboardPreview() {
           label="Indicadores dos cadastros"
           items={[
             { label: "Cadastros no total", value: "128" },
-            { label: "Aguardando análise", value: "16" },
+            { label: "Enviados para análise", value: "16" },
             { label: "Em análise", value: "9" },
             { label: "Com correção pendente", value: "7" },
             { label: "Aprovados", value: "54" },

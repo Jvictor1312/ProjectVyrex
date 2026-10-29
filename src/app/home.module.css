@@ -225,7 +225,7 @@
 
 .steps ol {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 20px;
   margin: 0;
   padding: 0;
@@ -440,6 +440,13 @@
   .audiences,
   .closing {
     grid-template-columns: 1fr;
+  }
+}
+
+/* Entre tablet e computador pequeno: as 4 etapas em duas colunas. */
+@media (min-width: 901px) and (max-width: 1180px) {
+  .steps ol {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 

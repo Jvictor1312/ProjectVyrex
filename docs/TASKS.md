@@ -33,6 +33,14 @@ Atualizado em: 2026-10-28. Reescrito para mostrar só o estado atual e as pendê
 - [x] **Histórico administrativo agrupado e recolhido** (Colaboradores e Configurações): alterações no mesmo alvo com até 10 minutos entre elas viram subalterações da primeira; a seção começa sempre fechada. Regra em `src/lib/audit-groups.ts`, com teste.
 - [ ] Sobrou no Storage uma cópia do vídeo enviada duas vezes (`presentation/112708a0-…mp4`, 24 MB, sem uso). Só apagar se o usuário autorizar.
 
+### Feito em 2026-10-28 (textos, acessibilidade e segurança)
+- [x] **Textos revisados:** página inicial sem promessas sem base (não existe área para marcas; a aprovação não garante campanha), 4 etapas reais em "Como funciona", dúvidas novas (custo, critérios da análise); cadastro explica o que vem depois; login com saudação neutra; confirmação de e-mail orienta sobre spam; envio para análise explica as consequências; critérios das evidências (3 obrigatórias, 4 e 5 opcionais, prazo, visualizações, formatos e 8 MB) junto do quadro; mensagens técnicas trocadas por orientações; reticências padronizadas.
+- [x] **Situações:** Enviado para análise, Correções solicitadas, Não aprovado, Cadastro suspenso (vocabulário único em `src/lib/labels.ts`; a ficha da equipe deixou de ter uma lista própria).
+- [x] **Busca e compartilhamento:** título e descrição reais, Open Graph, `robots.txt` e `X-Robots-Tag: noindex` nas áreas com login, prévias e retornos de autenticação.
+- [x] **Confirmações que sumiam:** rede social salva, encaminhamento e decisão final (depois da decisão, a equipe volta à lista com aviso).
+- [ ] **Segurança, próximo passo antes de publicar:** CSP com *nonce* (tirar `'unsafe-inline'`) e limite de tentativas compartilhado entre instâncias (hoje em memória).
+- [ ] **Revisão jurídica** dos termos e da política (o texto não foi alterado no conteúdo).
+
 ### Decisões do usuário
 - [x] **Fonte:** Figtree servida pelo site (texto e marca); Georgia nos títulos, com Gelasio como substituta em aparelhos sem Georgia. Decidido em 2026-10-28.
 - [x] **"Desfazer envio"** e **apagar evidência no rascunho** implementados (migration `202610280005`, 4 testes PGlite). Regra do usuário: depois que a equipe começa a análise, o criador não altera nada. Migration já aplicada no banco real.

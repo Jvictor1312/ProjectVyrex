@@ -17,7 +17,7 @@ import {
 } from "@/lib/labels";
 import { CreatorShell } from "../creator-shell";
 
-export const metadata: Metadata = { title: "Completar perfil" };
+export const metadata: Metadata = { title: "Meu cadastro" };
 
 // Para o criador, "pendente" significa que a evidência foi enviada e espera
 // a conferência da equipe.
@@ -283,9 +283,12 @@ export default async function CreatorProfilePage() {
               <div>
                 <h2>Evidências</h2>
                 <p>
-                  Escolha os prints dos Stories (pode selecionar vários de uma
-                  vez), preencha os dados de cada um e salve tudo junto. Os
-                  marcados com * são obrigatórios.
+                  Envie 3 prints de Stories (os quadros 1, 2 e 3, marcados com
+                  *); o 4 e o 5 são opcionais. Cada Story precisa ter
+                  {maxStoryAgeDays === null ? "" : ` até ${maxStoryAgeDays} dias e`} pelo menos{" "}
+                  {minimumViews.toLocaleString("pt-BR")} visualizações visíveis no
+                  print. Aceitamos JPEG, PNG ou WebP de até 8 MB. Dá para
+                  escolher vários prints de uma vez e salvar tudo junto.
                 </p>
               </div>
             </div>
@@ -397,7 +400,12 @@ export default async function CreatorProfilePage() {
               <span className="principle-number">05</span>
               <div>
                 <h2>Enviar para análise</h2>
-                <p>A equipe confere tudo e responde por aqui.</p>
+                <p>
+                  A equipe confere sua rede social e seus Stories e responde
+                  pela sua conta. Enquanto a análise não começar, você pode
+                  desfazer o envio; depois, só será possível editar se a
+                  equipe pedir correções. Enviar não garante aprovação.
+                </p>
               </div>
             </div>
             {profile?.decision_reason && (

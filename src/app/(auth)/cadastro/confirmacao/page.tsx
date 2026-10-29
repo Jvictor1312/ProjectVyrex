@@ -15,11 +15,12 @@ export default function SignupConfirmationPage() {
           <p className="eyebrow">
             <span /> VYREX / CRIADORES
           </p>
-          <h1 id="confirmation-title">Confira seu e-mail.</h1>
+          <h1 id="confirmation-title">Agora, confirme seu e-mail.</h1>
           <p>
-            Se o cadastro puder ser concluído, as próximas instruções serão
-            enviadas ao endereço informado. Após confirmar o e-mail, entre para
-            continuar seu perfil. Já tem uma conta com esse e-mail? Entre com sua senha ou use{" "}
+            Se o cadastro puder ser concluído, enviamos um link de confirmação
+            para o e-mail informado. Abra a mensagem e toque no link; depois,
+            entre na sua conta para completar o perfil. Não chegou em alguns
+            minutos? Confira as pastas de spam e promoções. Já tem uma conta com esse e-mail? Entre com sua senha ou use{" "}
             <Link href="/recuperar-senha">Esqueci minha senha</Link>.
           </p>
         </div>

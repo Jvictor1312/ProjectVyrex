@@ -52,7 +52,7 @@ export function DataRequestForm() {
       </label>
       <ActionMessage state={state} />
       <button className="button button-dark" type="submit" disabled={pending}>
-        {pending ? "Registrando..." : "Registrar solicitação"}
+        {pending ? "Registrando…" : "Registrar solicitação"}
       </button>
     </form>
   );
@@ -80,7 +80,7 @@ export function ResolveDataRequestForm({ requestId }: { requestId: string }) {
       </label>
       <ActionMessage state={state} />
       <button className="button button-dark" type="submit" disabled={pending}>
-        {pending ? "Salvando..." : "Atualizar solicitação"}
+        {pending ? "Salvando…" : "Atualizar solicitação"}
       </button>
     </form>
   );
@@ -168,7 +168,7 @@ export function PasswordForm() {
       />
       <ActionMessage state={state} />
       <button className="button button-dark" type="submit" disabled={pending}>
-        {pending ? "Alterando..." : "Alterar senha"}
+        {pending ? "Alterando…" : "Alterar senha"}
       </button>
     </form>
   );

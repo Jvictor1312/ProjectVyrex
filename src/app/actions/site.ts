@@ -33,7 +33,7 @@ export async function savePresentationVideoAction(
     return { message: "Arquivo de vídeo inválido.", success: false };
   }
   const { supabase, user, allowed, path: previous } = await currentVideoPath();
-  if (!allowed) return { message: "Acesso negado.", success: false };
+  if (!allowed) return { message: "Você não tem permissão para alterar o vídeo de apresentação.", success: false };
 
   const { error } = await supabase
     .from("site_settings")
@@ -59,7 +59,7 @@ export async function savePresentationVideoAction(
 
 export async function removePresentationVideoAction(): Promise<FormState> {
   const { supabase, user, allowed, path } = await currentVideoPath();
-  if (!allowed) return { message: "Acesso negado.", success: false };
+  if (!allowed) return { message: "Você não tem permissão para alterar o vídeo de apresentação.", success: false };
   if (!path) return { message: "Não há vídeo para remover.", success: false };
 
   const { error } = await supabase

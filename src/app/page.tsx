@@ -5,32 +5,43 @@ import styles from "./home.module.css";
 import { getSignedInUser } from "@/lib/auth";
 
 const facts = [
-  { title: "Cadastro gratuito", text: "Leva poucos minutos" },
-  { title: "Sem mínimo de seguidores", text: "Quem está começando entra" },
-  { title: "Análise humana", text: "Cada perfil é conferido" },
+  { title: "Cadastro gratuito", text: "Não custa nada" },
+  { title: "Sem mínimo de seguidores", text: "Quem está começando também pode" },
+  { title: "Análise humana", text: "Pessoas conferem cada perfil" },
 ];
 
+// As etapas reais do cadastro, na ordem em que acontecem.
 const steps = [
-  { title: "Crie seu perfil", text: "Conte quem você é e informe suas redes." },
-  { title: "Envie 3 Stories", text: "Prints recentes com 1.000+ visualizações." },
-  { title: "Entre na rede", text: "Aprovado, seu perfil fica visível às marcas." },
+  { title: "Crie sua conta", text: "Leva poucos minutos e é gratuito." },
+  { title: "Complete seu perfil", text: "Conte sobre seu conteúdo e informe sua rede social." },
+  { title: "Envie 3 Stories", text: "Prints de até 7 dias, com pelo menos 1.000 visualizações cada." },
+  { title: "Acompanhe a análise", text: "A equipe confere tudo e responde pela sua conta." },
 ];
 
 const faq = [
   {
+    question: "Preciso pagar alguma coisa?",
+    answer: "Não. Criar a conta e enviar o cadastro para análise é gratuito.",
+  },
+  {
     question: "Ser aprovado garante campanha ou pagamento?",
     answer:
-      "Não. A aprovação coloca seu perfil na base de criadores elegíveis para futuras campanhas.",
+      "Não. A aprovação coloca seu perfil na base de criadores que a Vyrex considera ao planejar campanhas. A participação em cada campanha depende do perfil que a marca procura.",
+  },
+  {
+    question: "O que conta na análise?",
+    answer:
+      "A equipe confere sua rede social e os prints de 3 Stories recentes (de até 7 dias), cada um com pelo menos 1.000 visualizações. Não existe número mínimo de seguidores.",
   },
   {
     question: "Quem vê os prints que eu envio?",
     answer:
-      "Só você e a equipe autorizada. Os arquivos ficam em armazenamento privado.",
+      "Só você e as pessoas da equipe responsáveis pela análise. Os arquivos ficam em armazenamento privado, sem endereço público.",
   },
   {
     question: "E se faltar alguma coisa no meu cadastro?",
     answer:
-      "A equipe pede a correção e você acompanha tudo pelas mensagens da plataforma.",
+      "A equipe pede a correção, você ajusta o que foi indicado e envia de novo. Tudo fica registrado na sua conta.",
   },
 ];
 
@@ -78,9 +89,10 @@ export default async function HomePage() {
             Criadores e marcas, na mesma órbita.
           </h1>
           <p className={styles.heroText}>
-            A Vyrex é uma agência de marketing de influência. Cadastre seu
-            perfil de criador, mostre seus resultados e entre na rede que as
-            marcas consultam para suas campanhas.
+            A Vyrex é uma agência de marketing de influência. Crie seu perfil
+            de criador, mostre o alcance dos seus Stories e, depois da análise
+            da nossa equipe, passe a fazer parte da base de criadores que
+            consideramos ao planejar campanhas com marcas.
           </p>
           <div className={styles.heroActions}>
             {signedIn ? (
@@ -156,11 +168,11 @@ export default async function HomePage() {
         <article className={styles.audienceDark}>
           <h2>Para criadores</h2>
           <p>
-            Um perfil organizado, analisado por pessoas, pronto para ser
-            encontrado por marcas.
+            Um cadastro simples, analisado por pessoas, para você ser
+            considerado nas campanhas que a Vyrex planeja.
           </p>
           <Link className={styles.linkLight} href="/cadastro">
-            Começar agora →
+            Começar meu cadastro →
           </Link>
         </article>
         <article className={styles.audienceLight}>

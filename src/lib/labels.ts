@@ -45,12 +45,23 @@ export type CreatorStatus = (typeof creatorStatusKeys)[number];
 
 export const creatorStatusLabels: Record<CreatorStatus, string> = {
   incomplete: "Cadastro incompleto",
-  submitted: "Aguardando análise",
+  submitted: "Enviado para análise",
   under_review: "Em análise",
-  changes_requested: "Correção solicitada",
+  changes_requested: "Correções solicitadas",
   approved: "Aprovado",
-  rejected: "Rejeitado",
-  suspended: "Suspenso",
+  rejected: "Não aprovado",
+  suspended: "Cadastro suspenso",
+};
+
+// O que cada situação significa para o criador, em uma frase.
+export const creatorStatusDescriptions: Record<CreatorStatus, string> = {
+  incomplete: "Ainda faltam dados. Complete o cadastro e envie para análise.",
+  submitted: "Seu cadastro chegou à equipe e aguarda o início da análise.",
+  under_review: "A equipe está conferindo sua rede social e seus Stories.",
+  changes_requested: "A equipe pediu ajustes. Corrija o que foi indicado e envie de novo.",
+  approved: "Seu perfil faz parte da base de criadores da Vyrex.",
+  rejected: "Seu cadastro não foi aprovado. Veja a resposta da equipe em Mensagens.",
+  suspended: "Seu cadastro está suspenso. Veja a orientação da equipe em Mensagens.",
 };
 
 // Tom visual de cada situação. A cor sempre acompanha o texto, nunca o substitui.
@@ -103,7 +114,7 @@ export const categoryLabel = (key: string) => categoryLabels[key] ?? key;
 export const evidenceStatusLabels: Record<string, string> = {
   pending: "Aguardando conferência",
   approved: "Aprovada",
-  rejected: "Rejeitada",
+  rejected: "Recusada",
   changes_requested: "Correção solicitada",
 };
 
@@ -118,7 +129,7 @@ export const evidenceStatusTones: Record<string, Tone> = {
 export const accountVerificationLabels: Record<string, string> = {
   unverified: "Não verificada",
   verified: "Verificada",
-  rejected: "Rejeitada",
+  rejected: "Precisa de ajuste",
 };
 
 export const accountVerificationTones: Record<string, Tone> = {

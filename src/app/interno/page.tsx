@@ -373,7 +373,7 @@ export default async function InternalDashboard({
               items={[
                 { label: "Criadores cadastrados", value: formatCount(withoutStaff(totalResult.count)) },
                 {
-                  label: "Aguardando análise",
+                  label: "Enviados para análise",
                   value: formatCount(withoutStaff(submittedResult.count, "submitted")),
                 },
                 {

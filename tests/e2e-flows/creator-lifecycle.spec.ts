@@ -73,7 +73,7 @@ test("2. criador preenche perfil, rede, evidências e envia", async ({ page }) =
   await page.getByRole("button", { name: /^Etapa 4:/ }).click();
   await page.getByRole("button", { name: "Enviar para análise" }).click();
   await expect(page).toHaveURL(/\/dashboard$/);
-  await expect(page.getByText("Aguardando análise").first()).toBeVisible();
+  await expect(page.getByText("Enviado para análise").first()).toBeVisible();
 });
 
 test("3. administrador atribui recrutador e gestora", async ({ browser }) => {

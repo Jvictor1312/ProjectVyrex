@@ -25,7 +25,7 @@ const invalidForm: FormState = {
 };
 const setupMessage: FormState = {
   message:
-    "A autenticação ainda não foi configurada neste ambiente. Configure o projeto Supabase para continuar.",
+    "O acesso está temporariamente indisponível. Tente novamente em alguns minutos.",
   success: false,
 };
 
@@ -64,7 +64,7 @@ export async function loginAction(
     await supabase.auth.signOut();
     return {
       message:
-        "Não foi possível identificar seu acesso. Tente entrar novamente.",
+        "Não conseguimos confirmar o seu acesso agora. Tente entrar novamente.",
       success: false,
     };
   }
@@ -116,7 +116,7 @@ export async function signupAction(
   if (error) {
     return {
       message:
-        "Não foi possível concluir o cadastro agora. Confira os dados e tente novamente.",
+        "Não conseguimos concluir o cadastro agora. Confira os dados e tente novamente em alguns minutos.",
       success: false,
     };
   }

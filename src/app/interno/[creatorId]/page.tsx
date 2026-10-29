@@ -16,6 +16,7 @@ import {
   accountVerificationLabels,
   accountVerificationTones,
   categoryLabel,
+  creatorStatusLabel,
   creatorStatusTone,
   evidenceStatusLabels,
   evidenceStatusTones,
@@ -27,26 +28,17 @@ import styles from "../internal-detail.module.css";
 
 export const metadata: Metadata = { title: "Ficha do criador" };
 
-const statusLabels: Record<string, string> = {
-  incomplete: "Cadastro incompleto",
-  submitted: "Aguardando análise",
-  under_review: "Em análise",
-  changes_requested: "Correção solicitada",
-  approved: "Aprovado",
-  rejected: "Rejeitado",
-  suspended: "Suspenso",
-};
-
 const historyLabels: Record<string, string> = {
-  submitted: "Cadastro encaminhado",
+  submitted: "Cadastro enviado pelo criador",
+  withdrawn: "Envio desfeito pelo criador",
   forwarded: "Encaminhado para validação",
   evidence_approved: "Evidência aprovada",
-  evidence_rejected: "Evidência rejeitada",
+  evidence_rejected: "Evidência recusada",
   evidence_changes_requested: "Correção de evidência solicitada",
   social_account_verified: "Rede social verificada",
-  social_account_rejected: "Rede social rejeitada",
+  social_account_rejected: "Rede social precisa de ajuste",
   approved: "Cadastro aprovado",
-  rejected: "Cadastro rejeitado",
+  rejected: "Cadastro não aprovado",
   changes_requested: "Correções solicitadas",
   suspended: "Cadastro suspenso",
   reinstated: "Cadastro reativado",
@@ -255,7 +247,7 @@ export default async function CreatorInternalDetail({
             {creator.region ? `, ${creator.region.trim()}` : ""}
           </p>
           <Badge tone={creatorStatusTone(creator.status)}>
-            {statusLabels[creator.status] ?? creator.status}
+            {creatorStatusLabel(creator.status)}
           </Badge>
         </section>
 

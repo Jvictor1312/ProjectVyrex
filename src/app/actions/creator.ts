@@ -54,7 +54,7 @@ export async function saveCreatorProfileAction(
   if (error || !data) {
     return {
       message:
-        "Não foi possível salvar o perfil. Verifique se o banco já foi configurado.",
+        "Não conseguimos salvar o perfil agora. Tente novamente em alguns minutos.",
       success: false,
     };
   }

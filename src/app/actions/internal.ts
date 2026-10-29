@@ -20,7 +20,7 @@ const internalRoles = [
 ] as const;
 
 const denied: FormState = {
-  message: "A ação não foi autorizada ou não pode ser aplicada neste estágio.",
+  message: "Você não tem permissão para esta ação, ou ela não se aplica à situação atual do cadastro.",
   success: false,
 };
 

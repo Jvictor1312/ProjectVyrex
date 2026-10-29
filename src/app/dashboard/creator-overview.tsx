@@ -35,7 +35,7 @@ const journey = [
   { title: "Envie para análise", text: "Revise e envie. Dá para desfazer o envio enquanto a análise não começa." },
   { title: "A equipe analisa", text: "Pessoas da equipe conferem sua rede e as visualizações dos Stories." },
   { title: "Resultado", text: "Aprovação, pedido de correção ou resposta da equipe, sempre avisados aqui." },
-  { title: "Campanhas", text: "Perfis aprovados entram na rede que as marcas consultam." },
+  { title: "Campanhas", text: "Aprovado, seu perfil entra na base que a Vyrex considera ao planejar campanhas. Isso não garante campanha." },
 ];
 
 function journeyStage(status: string) {

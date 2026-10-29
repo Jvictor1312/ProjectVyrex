@@ -17,13 +17,24 @@ const serif = Gelasio({
   preload: false,
 });
 
+const description =
+  "Agência de marketing de influência. Crie seu perfil de criador, envie os resultados dos seus Stories e, depois da análise da equipe, faça parte da base de criadores considerada nas campanhas da Vyrex.";
+
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"),
   title: {
-    default: "Vyrex | Sua presença, novas possibilidades",
+    default: "Vyrex | Marketing de influência para criadores e marcas",
     template: "%s | Vyrex",
   },
-  description:
-    "A VYREX aproxima marcas e criadores com estratégia de marketing de influência, tecnologia própria e gestão de campanhas.",
+  description,
+  applicationName: "Vyrex",
+  openGraph: {
+    type: "website",
+    locale: "pt_BR",
+    siteName: "Vyrex",
+    title: "Vyrex | Marketing de influência para criadores e marcas",
+    description,
+  },
 };
 
 // Celular: a página ocupa a tela toda (inclusive ao redor do "risco" do

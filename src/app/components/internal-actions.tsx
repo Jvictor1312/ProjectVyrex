@@ -38,7 +38,7 @@ function Submit({
 }) {
   return (
     <button className="button button-dark" type="submit" disabled={pending}>
-      {pending ? "Salvando..." : children}
+      {pending ? "Salvando…" : children}
     </button>
   );
 }
@@ -289,7 +289,7 @@ export function FinalDecisionForm({
               type="submit"
               disabled={pending}
             >
-              {pending ? "Salvando..." : "Confirmar"}
+              {pending ? "Salvando…" : "Confirmar"}
             </button>
             <button
               className="quiet-button"

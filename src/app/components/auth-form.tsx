@@ -108,13 +108,13 @@ const content: Record<
   { title: string; description: string; submit: string }
 > = {
   login: {
-    title: "Bem-vindo de volta.",
-    description: "Acesse seu espaço Vyrex.",
+    title: "Que bom ver você de novo.",
+    description: "Entre na sua conta Vyrex.",
     submit: "Entrar",
   },
   signup: {
     title: "Vamos começar.",
-    description: "Crie sua conta de criador em poucos passos.",
+    description: "Crie sua conta gratuita. Depois, você completa o perfil, informa sua rede social e envia 3 prints de Stories para a análise da equipe.",
     submit: "Criar minha conta",
   },
   recovery: {
@@ -235,7 +235,7 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
         type="submit"
         disabled={pending}
       >
-        {pending ? "Aguarde..." : copy.submit}
+        {pending ? "Aguarde…" : copy.submit}
         <span aria-hidden="true">↗</span>
       </button>
 
@@ -246,7 +246,7 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
           )}
           {mode === "login" && (
             <span>
-              Primeira vez por aqui? <Link href="/cadastro">Criar conta</Link>
+              Ainda não tem conta? <Link href="/cadastro">Criar conta</Link>
             </span>
           )}
           {mode === "recovery" && <Link href="/login">Voltar para entrar</Link>}

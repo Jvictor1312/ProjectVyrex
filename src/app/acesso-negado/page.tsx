@@ -8,14 +8,15 @@ export default function AccessDeniedPage() {
   return (
     <main className={styles.page}>
       <p className={styles.code}>ERRO 403</p>
-      <h1>Acesso negado</h1>
+      <h1>Você não tem acesso a esta área</h1>
       <p>
-        Sua conta não tem permissão para abrir esta área. Se você acredita que
-        isso é um engano, peça a um administrador para revisar suas funções.
+        Sua conta não tem permissão para abrir esta página. Se você faz parte
+        da equipe e acredita que isso é um engano, peça a um administrador para
+        revisar suas funções.
       </p>
       <div className={styles.actions}>
         <Link className="button button-dark" href="/dashboard">
-          Área do criador
+          Ir para a minha conta
         </Link>
         <Link className="button" href="/">
           Ir para o início

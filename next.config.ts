@@ -55,7 +55,18 @@ const nextConfig: NextConfig = {
     },
   },
   async headers() {
-    return [{ source: "/:path*", headers: securityHeaders }];
+    // Áreas com login e prévias: nunca indexadas por buscadores.
+    const noIndex = [{ key: "X-Robots-Tag", value: "noindex, nofollow" }];
+    return [
+      { source: "/:path*", headers: securityHeaders },
+      { source: "/dashboard/:path*", headers: noIndex },
+      { source: "/dashboard", headers: noIndex },
+      { source: "/interno/:path*", headers: noIndex },
+      { source: "/interno", headers: noIndex },
+      { source: "/preview/:path*", headers: noIndex },
+      { source: "/auth/:path*", headers: noIndex },
+      { source: "/redefinir-senha", headers: noIndex },
+    ];
   },
 };
 
