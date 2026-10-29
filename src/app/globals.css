@@ -511,11 +511,11 @@ h1 em {
   display: grid;
   align-content: center;
   justify-items: center;
-  gap: 8px;
+  gap: 6px;
   width: 196px;
   max-width: 88%;
   aspect-ratio: 1;
-  padding: 20px;
+  padding: 14px;
   border: 1px solid #fff;
   border-radius: 50%;
   background: #f5f6f3;
@@ -544,20 +544,114 @@ h1 em {
   outline-offset: 18px;
 }
 .signup-orb-word {
-  width: 112px;
+  width: 84px;
   height: auto;
 }
 .signup-orb-prompt {
-  color: #5c625e;
-  font-size: 12px;
-  font-weight: 600;
+  color: #101211;
+  font-size: 13px;
+  font-weight: 700;
+}
+/* Palco da esfera: anel pulsando + órbita com uma pequena esfera. */
+.signup-orb-stage {
+  position: relative;
+  display: grid;
+  width: 270px;
+  max-width: 100%;
+  aspect-ratio: 1;
+  place-items: center;
+}
+.signup-orb-stage > * {
+  grid-area: 1 / 1;
+}
+.signup-orb-pulse {
+  width: 196px;
+  aspect-ratio: 1;
+  border: 1px solid #ffffff73;
+  border-radius: 50%;
+  pointer-events: none;
+  animation: signup-orb-pulse 2.6s ease-out infinite;
+}
+.signup-orb-orbit {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border: 1px dashed #ffffff2e;
+  border-radius: 50%;
+  pointer-events: none;
+  animation: signup-orb-orbit 16s linear infinite;
+}
+.signup-orb-satellite {
+  position: absolute;
+  top: -5px;
+  left: calc(50% - 5px);
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #f5f6f3;
+  box-shadow: 0 0 14px #ffffffa6;
+}
+@keyframes signup-orb-pulse {
+  0% {
+    opacity: 0.8;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.35);
+  }
+}
+@keyframes signup-orb-orbit {
+  to {
+    transform: rotate(360deg);
+  }
+}
+/* Botão de play dentro da esfera: deixa claro que ali tem um vídeo. */
+.signup-orb-play {
+  display: grid;
+  width: 46px;
+  height: 46px;
+  place-items: center;
+  border-radius: 50%;
+  background: #101211;
+  color: #fff;
+  transition: transform 180ms ease-out;
+}
+.signup-orb-play svg {
+  width: 20px;
+  height: 20px;
+  margin-left: 3px;
+  fill: currentColor;
+}
+.signup-orb:hover,
+.signup-orb:focus-visible {
+  box-shadow:
+    0 20px 60px #00000066,
+    0 0 0 8px #ffffff17;
+}
+.signup-orb:hover .signup-orb-play,
+.signup-orb:focus-visible .signup-orb-play {
+  transform: scale(1.12);
+}
+.signup-showcase-copy {
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+}
+.signup-showcase-tagline {
+  max-width: 290px;
+  margin: 0;
+  color: #fff;
+  font-family: Georgia, var(--font-serif), "Times New Roman", serif;
+  font-size: 30px;
+  line-height: 1.15;
 }
 .signup-showcase-instruction {
   max-width: 300px;
   margin: 0;
   color: #d0d4d1;
-  font-size: 13px;
-  line-height: 1.7;
+  font-size: 14px;
+  line-height: 1.6;
 }
 .signup-showcase-bottom {
   position: relative;
@@ -1596,10 +1690,27 @@ textarea[aria-invalid="true"] {
     padding: 25px 7%;
   }
   .signup-showcase-center {
-    gap: 24px;
+    gap: 14px;
+    padding: 22px 0 18px;
   }
   .signup-orb {
-    width: 150px;
+    width: 158px;
+  }
+  .signup-orb-stage {
+    width: 216px;
+  }
+  .signup-orb-pulse {
+    width: 158px;
+  }
+  .signup-orb-word {
+    width: 72px;
+  }
+  .signup-orb-play {
+    width: 40px;
+    height: 40px;
+  }
+  .signup-showcase-tagline {
+    font-size: 24px;
   }
   .signup-showcase-instruction {
     max-width: 340px;
@@ -1627,10 +1738,27 @@ textarea[aria-invalid="true"] {
     padding: 25px 7%;
   }
   .signup-showcase-center {
-    gap: 24px;
+    gap: 14px;
+    padding: 22px 0 18px;
   }
   .signup-orb {
-    width: 150px;
+    width: 158px;
+  }
+  .signup-orb-stage {
+    width: 216px;
+  }
+  .signup-orb-pulse {
+    width: 158px;
+  }
+  .signup-orb-word {
+    width: 72px;
+  }
+  .signup-orb-play {
+    width: 40px;
+    height: 40px;
+  }
+  .signup-showcase-tagline {
+    font-size: 24px;
   }
   .signup-showcase-instruction {
     max-width: 340px;
@@ -1831,6 +1959,11 @@ textarea[aria-invalid="true"] {
   .signup-orb,
   .signup-orb::before {
     transition: none;
+  }
+  /* Sem pulsar nem girar: ficam o anel e a órbita parados. */
+  .signup-orb-pulse,
+  .signup-orb-orbit {
+    animation: none !important;
   }
 }
 

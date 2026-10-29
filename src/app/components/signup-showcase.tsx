@@ -104,20 +104,44 @@ function SignupShowcase({
         </Link>
 
         <div className="signup-showcase-center">
-          <button
-            ref={orbRef}
-            className="signup-orb"
-            type="button"
-            aria-haspopup="dialog"
-            aria-expanded={dialogOpen}
-            onClick={() => setDialogOpen(true)}
-          >
-            <VyrexLogo className="signup-orb-word" />
-            <span className="signup-orb-prompt">Conheça a empresa</span>
-          </button>
-          <p className="signup-showcase-instruction">
-            Apresente seu trabalho para a nossa equipe.
-          </p>
+          {/* Anel pulsando e uma pequena esfera em órbita (o mesmo motivo da
+              página inicial): chamam o olho para a esfera, que é o botão. */}
+          <div className="signup-orb-stage">
+            <span className="signup-orb-pulse" aria-hidden="true" />
+            <span className="signup-orb-orbit" aria-hidden="true">
+              <span className="signup-orb-satellite" />
+            </span>
+            <button
+              ref={orbRef}
+              className="signup-orb"
+              type="button"
+              aria-haspopup="dialog"
+              aria-expanded={dialogOpen}
+              onClick={() => setDialogOpen(true)}
+            >
+              <VyrexLogo className="signup-orb-word" decorative />
+              {videoUrl && (
+                <span className="signup-orb-play" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" focusable="false">
+                    <path d="M8 5.5v13l11-6.5z" />
+                  </svg>
+                </span>
+              )}
+              <span className="signup-orb-prompt">
+                {videoUrl ? "Assistir apresentação" : "Conheça a Vyrex"}
+              </span>
+            </button>
+          </div>
+          <div className="signup-showcase-copy">
+            <p className="signup-showcase-tagline">
+              Criadores e marcas, na mesma órbita.
+            </p>
+            <p className="signup-showcase-instruction">
+              {videoUrl
+                ? "Toque na esfera e conheça a Vyrex em vídeo."
+                : "Apresente seu trabalho para a nossa equipe."}
+            </p>
+          </div>
         </div>
 
         <button

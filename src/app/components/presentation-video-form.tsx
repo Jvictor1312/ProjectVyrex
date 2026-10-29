@@ -11,6 +11,27 @@ import styles from "./presentation-video-form.module.css";
 
 const maximumBytes = 50 * 1024 * 1024;
 const acceptedTypes = ["video/mp4", "video/webm"];
+// HD: abaixo disso o vídeo fica borrado na janela do cadastro, que ocupa
+// quase a tela inteira no computador. Vale para vídeo deitado ou em pé.
+const minimumShortSide = 720;
+
+// Lê largura e altura do arquivo no próprio navegador, antes de enviar.
+function readVideoSize(file: File) {
+  return new Promise<{ width: number; height: number } | null>((resolve) => {
+    const url = URL.createObjectURL(file);
+    const video = document.createElement("video");
+    video.preload = "metadata";
+    video.onloadedmetadata = () => {
+      resolve({ width: video.videoWidth, height: video.videoHeight });
+      URL.revokeObjectURL(url);
+    };
+    video.onerror = () => {
+      resolve(null);
+      URL.revokeObjectURL(url);
+    };
+    video.src = url;
+  });
+}
 
 // Envia o arquivo direto ao Storage informando o progresso (o cliente do
 // Supabase não informa). Mesmo endereço e mesmas regras de acesso do
@@ -71,6 +92,19 @@ export function PresentationVideoForm({
     }
     if (file.size > maximumBytes) {
       setState({ message: "O vídeo precisa ter até 50 MB.", success: false });
+      return;
+    }
+    const size = await readVideoSize(file);
+    if (!size) {
+      setState({ message: "Não foi possível ler esse vídeo. Tente outro arquivo.", success: false });
+      return;
+    }
+    if (Math.min(size.width, size.height) < minimumShortSide) {
+      setState({
+        message: `Esse vídeo tem ${size.width}×${size.height} pixels e ficaria borrado na tela de cadastro. Envie em HD (1280×720) ou mais; 1920×1080 é o ideal.`,
+        success: false,
+      });
+      if (input.current) input.current.value = "";
       return;
     }
 
@@ -184,7 +218,10 @@ export function PresentationVideoForm({
           </span>
         </div>
       )}
-      <p className={styles.hint}>MP4 ou WebM, até 50 MB.</p>
+      <p className={styles.hint}>
+        MP4 ou WebM, até 50 MB, em HD (1280×720) ou mais; 1920×1080 é o ideal.
+        Para caber em 50 MB com boa qualidade, prefira um vídeo de 1 a 2 minutos.
+      </p>
       {state.message && (
         <p
           className={state.success ? "form-message success" : "form-message error"}
