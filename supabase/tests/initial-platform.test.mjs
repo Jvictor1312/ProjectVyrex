@@ -147,6 +147,12 @@ before(async () => {
       "utf8",
     ),
   );
+  await database.exec(
+    await readFile(
+      new URL("../migrations/202610290001_search_and_dashboard_report.sql", import.meta.url),
+      "utf8",
+    ),
+  );
   await database.query(
     "insert into auth.users (id, raw_user_meta_data) values ($1, '{}'::jsonb), ($2, '{}'::jsonb), ($3, '{}'::jsonb)",
     [creatorOne, creatorTwo, creatorThree],
@@ -1074,4 +1080,57 @@ test("each evidence review in the history points to its own Story, readable by t
     { action: "evidence_approved", position: 2 },
     { action: "evidence_approved", position: 3 },
   ]);
+});
+
+// Busca sem acento e resumo do painel (202610290001).
+test("search finds names regardless of accents and case", async () => {
+  await database.query(
+    "update public.creator_profiles set public_name = 'João Ávila' where user_id = $1",
+    [creatorOne],
+  );
+  const found = await asUser(administrator, () =>
+    database.query(
+      "select user_id from public.creator_profiles where public_name_search like '%' || public.search_text($1) || '%'",
+      ["JOAO avila"],
+    ),
+  );
+  assert.deepEqual(found.rows.map((row) => row.user_id), [creatorOne]);
+  // Quem não pode ver o cadastro também não o encontra pela busca.
+  const hidden = await asUser(unassignedRecruiter, () =>
+    database.query(
+      "select user_id from public.creator_profiles where public_name_search like '%joao%'",
+    ),
+  );
+  assert.equal(hidden.rows.length, 0);
+});
+
+test("dashboard report sums assignments in the database and respects access rules", async () => {
+  const report = async (userId) =>
+    (await asUser(userId, () => database.query("select public.internal_dashboard_report() as r")))
+      .rows[0].r;
+
+  const admin = await report(administrator);
+  assert.deepEqual(
+    admin.recruiters.map(({ id, count }) => ({ id, count })),
+    [{ id: assignedRecruiter, count: 1 }],
+  );
+  assert.deepEqual(
+    admin.managers.map(({ id, count }) => ({ id, count })),
+    [{ id: relationshipManager, count: 1 }],
+  );
+  // Redes de contas da equipe ficam fora; a do criador do histórico entra.
+  assert.ok(admin.platforms.some((row) => row.key === "instagram" && row.count >= 1));
+
+  // O criador não enxerga atribuições nem redes de outros.
+  const creator = await report(creatorTwo);
+  assert.deepEqual(creator.recruiters, []);
+  assert.deepEqual(creator.managers, []);
+
+  await assert.rejects(
+    database
+      .exec("set role anon")
+      .then(() => database.query("select public.internal_dashboard_report()"))
+      .finally(() => database.exec("reset role")),
+    /permission denied/i,
+  );
 });

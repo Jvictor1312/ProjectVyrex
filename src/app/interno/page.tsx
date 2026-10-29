@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { InternalShell } from "./internal-shell";
 import { CreatorQueue } from "./creator-queue";
 import { requireUserWithRoles } from "@/lib/auth";
+import { normalizeSearch } from "@/lib/search";
 import {
   creatorStatusKeys,
   internalRoleKeys,
@@ -123,7 +124,11 @@ export default async function InternalDashboard({
   const rawPeriod = stringParam(params.periodo) ?? "";
   const period = rawPeriod in periodOptions ? (rawPeriod as keyof typeof periodOptions) : "";
   // Caracteres com significado na sintaxe de filtros do banco viram espaço.
-  const safeSearch = search.replace(/[,()*%\\"'.:]/g, " ").replace(/\s+/g, " ").trim();
+  // A busca compara sem acento e sem diferenciar maiúsculas (colunas *_search).
+  const safeSearch = normalizeSearch(search)
+    .replace(/[,()*%\\"'.:]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
 
   // Pré-consultas só quando há busca ou filtro de responsável.
   const assignmentIds = async (table: "recruiter_assignments" | "relationship_assignments") => {
@@ -135,7 +140,7 @@ export default async function InternalDashboard({
   };
   const [nameMatches, assigned] = await Promise.all([
     safeSearch
-      ? supabase.from("profiles").select("id").ilike("full_name", `%${safeSearch}%`).limit(200)
+      ? supabase.from("profiles").select("id").like("full_name_search", `%${safeSearch}%`).limit(200)
       : Promise.resolve({ data: [] as { id: string }[] }),
     responsible
       ? Promise.all([
@@ -156,7 +161,7 @@ export default async function InternalDashboard({
     // Nome público OU nome do cadastro.
     const ids = (nameMatches.data ?? []).map((row) => row.id);
     creatorsQuery = creatorsQuery.or(
-      [`public_name.ilike.%${safeSearch}%`, ...(ids.length ? [`user_id.in.(${ids.join(",")})`] : [])].join(","),
+      [`public_name_search.like.%${safeSearch}%`, ...(ids.length ? [`user_id.in.(${ids.join(",")})`] : [])].join(","),
     );
   }
   if (assigned) {
@@ -197,10 +202,7 @@ export default async function InternalDashboard({
     reviewResult,
     correctionsResult,
     approvedResult,
-    recruiterAssignmentsResult,
-    managerAssignmentsResult,
-    socialAccountsResult,
-    decisionTimesResult,
+    reportResult,
     staffResult,
     responsibleResult,
   ] = await Promise.all([
@@ -210,27 +212,8 @@ export default async function InternalDashboard({
     adminOnly(countByStatus("under_review"), noCount),
     adminOnly(countByStatus("changes_requested"), noCount),
     adminOnly(countByStatus("approved"), noCount),
-    supabase
-      .from("recruiter_assignments")
-      .select(
-        "creator_id, recruiter_id, person:profiles!recruiter_assignments_recruiter_id_fkey(full_name)",
-      )
-      .is("ended_at", null),
-    supabase
-      .from("relationship_assignments")
-      .select(
-        "creator_id, manager_id, person:profiles!relationship_assignments_manager_id_fkey(full_name)",
-      )
-      .is("ended_at", null),
-    supabase.from("social_accounts").select("creator_id, platform"),
-    adminOnly(
-      supabase
-        .from("creator_profiles")
-        .select("user_id, submitted_at, decided_at")
-        .not("submitted_at", "is", null)
-        .not("decided_at", "is", null),
-      { data: null, error: null },
-    ),
+    // Carteiras, redes e tempo de análise já somados no banco (só administrador).
+    adminOnly(supabase.rpc("internal_dashboard_report"), { data: null, error: null }),
     // Contas da equipe também têm um cadastro de criador (vazio). Elas
     // aparecem na lista com a etiqueta "Equipe" e ficam fora dos indicadores.
     supabase
@@ -291,44 +274,24 @@ export default async function InternalDashboard({
               .length,
         );
 
-  const countBy = <T,>(items: T[], key: (item: T) => string) => {
-    const counts = new Map<string, number>();
-    for (const item of items) counts.set(key(item), (counts.get(key(item)) ?? 0) + 1);
-    return counts;
+  type DashboardReport = {
+    recruiters: { id: string; name: string | null; count: number }[];
+    managers: { id: string; name: string | null; count: number }[];
+    platforms: { key: string; count: number }[];
+    decisions: number;
+    average_days: number | null;
   };
-  const recruiterCounts = countBy(recruiterAssignmentsResult.data ?? [], (a) => a.recruiter_id);
-  const managerCounts = countBy(managerAssignmentsResult.data ?? [], (a) => a.manager_id);
-  const socialCounts = countBy(
-    (socialAccountsResult.data ?? []).filter((account) => !staffStatus.has(account.creator_id)),
-    (a) => a.platform,
-  );
+  const report = reportResult.data as DashboardReport | null;
+  const toReport = (rows: { name: string; count: number }[]) =>
+    [...rows].sort((a, b) => b.count - a.count);
+  const staffReport = (rows: DashboardReport["recruiters"] = []) =>
+    toReport(rows.map((row) => ({ name: row.name ?? "Sem nome", count: row.count })));
 
-  const staffNames = new Map<string, string>();
-  for (const row of [
-    ...(recruiterAssignmentsResult.data ?? []).map((item) => ({ id: item.recruiter_id, person: item.person })),
-    ...(managerAssignmentsResult.data ?? []).map((item) => ({ id: item.manager_id, person: item.person })),
-  ]) {
-    const name = accountName(row.person);
-    if (name) staffNames.set(row.id, name);
-  }
-  const toReport = (counts: Map<string, number>, label: (key: string) => string) =>
-    [...counts]
-      .map(([key, count]) => ({ name: label(key), count }))
-      .sort((a, b) => b.count - a.count);
-
-  const analysisDays = (decisionTimesResult.data ?? [])
-    .filter(
-      (entry) => entry.submitted_at && entry.decided_at && !staffStatus.has(entry.user_id),
-    )
-    .map(
-      (entry) =>
-        (new Date(entry.decided_at!).getTime() - new Date(entry.submitted_at!).getTime()) /
-        86_400_000,
-    );
   // Média só com amostra mínima, para não exibir um número enganoso.
+  const decisionCount = report?.decisions ?? 0;
   const averageAnalysis =
-    analysisDays.length >= 5
-      ? `${(analysisDays.reduce((total, days) => total + days, 0) / analysisDays.length).toLocaleString("pt-BR", { maximumFractionDigits: 1 })} dias`
+    decisionCount >= 5 && report?.average_days != null
+      ? `${report.average_days.toLocaleString("pt-BR", { maximumFractionDigits: 1 })} dias`
       : "—";
 
   const creators = creatorResult.data ?? [];
@@ -391,7 +354,7 @@ export default async function InternalDashboard({
                 {
                   label: "Tempo médio de análise",
                   value: averageAnalysis,
-                  hint: analysisDays.length < 5 ? "(a partir de 5 decisões)" : undefined,
+                  hint: decisionCount < 5 ? "(a partir de 5 decisões)" : undefined,
                 },
               ]}
             />
@@ -399,17 +362,22 @@ export default async function InternalDashboard({
               <Report
                 title="Carteira por recrutador"
                 empty="Nenhum criador atribuído a recrutadores."
-                rows={toReport(recruiterCounts, (id) => staffNames.get(id) ?? "Sem nome")}
+                rows={staffReport(report?.recruiters)}
               />
               <Report
                 title="Carteira por gestor de relacionamento"
                 empty="Nenhum criador atribuído a gestores."
-                rows={toReport(managerCounts, (id) => staffNames.get(id) ?? "Sem nome")}
+                rows={staffReport(report?.managers)}
               />
               <Report
                 title="Redes declaradas"
                 empty="Nenhuma rede social cadastrada ainda."
-                rows={toReport(socialCounts, (key) => platformLabels[key] ?? key)}
+                rows={toReport(
+                  (report?.platforms ?? []).map((row) => ({
+                    name: platformLabels[row.key] ?? row.key,
+                    count: row.count,
+                  })),
+                )}
               />
             </div>
           </>

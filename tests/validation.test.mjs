@@ -18,6 +18,7 @@ import { safeLocalRedirectPath } from "../src/lib/security/redirect.ts";
 import { dashboardPathForRoles } from "../src/lib/auth-routing.ts";
 import { groupAuditEntries } from "../src/lib/audit-groups.ts";
 import { historyEntryLabel, historyStoryPosition } from "../src/lib/history.ts";
+import { normalizeSearch } from "../src/lib/search.ts";
 import { isLoopbackSupabaseUrl } from "../scripts/seed-local-test-users.mjs";
 
 const validSignup = {
@@ -293,4 +294,8 @@ test("history entries about evidence name the Story they refer to", () => {
   // Três conferências seguidas deixam de parecer repetidas.
   const labels = [1, 2, 3].map((position) => historyEntryLabel("Evidência aprovada", position));
   assert.equal(new Set(labels).size, 3);
+});
+
+test("search text drops accents and case like the database", () => {
+  assert.equal(normalizeSearch("JOÃO Ávila Conceição"), "joao avila conceicao");
 });

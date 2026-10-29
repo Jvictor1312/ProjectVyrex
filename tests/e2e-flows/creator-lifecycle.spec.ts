@@ -11,7 +11,7 @@ test.describe.configure({ mode: "serial" });
 const stamp = Date.now();
 const creator = {
   name: `Teste Fluxo ${stamp}`,
-  publicName: `Fluxo ${stamp}`,
+  publicName: `Fluxo Ação ${stamp}`,
   email: `criador.fluxo.${stamp}@vyrex.test`,
   password: `${randomBytes(12).toString("base64url")}aA1!`,
 };
@@ -78,7 +78,8 @@ test("2. criador preenche perfil, rede, evidências e envia", async ({ page }) =
 
 test("3. administrador atribui recrutador e gestora", async ({ browser }) => {
   const { context, page } = await loginAs(browser, "ADMIN", /\/interno/);
-  await page.goto(`/interno?q=${encodeURIComponent(creator.publicName)}`);
+  // Busca sem acento e em maiúsculas: "FLUXO ACAO" acha "Fluxo Ação".
+  await page.goto(`/interno?q=${encodeURIComponent(`FLUXO ACAO ${stamp}`)}`);
   await page.getByRole("link", { name: "Abrir ficha" }).first().click();
   await expect(page).toHaveURL(/\/interno\/[0-9a-f-]{36}$/);
   creatorId = page.url().split("/").pop()!;
