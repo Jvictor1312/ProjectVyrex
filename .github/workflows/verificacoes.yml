@@ -1,0 +1,47 @@
+# Verificações automáticas a cada envio para a main e em cada pull request.
+# Nenhuma senha é necessária: os testes do banco usam um Postgres na memória
+# (PGlite) e o build não consulta o Supabase. Os testes de navegador
+# (test:e2e e test:flows) continuam rodando na máquina de desenvolvimento,
+# porque usam as contas de teste.
+name: Verificações
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: verificacoes-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verificar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      # Valores de exemplo (públicos e falsos), só para o build montar a
+      # política de conteúdo. Nada é consultado durante o build.
+      NEXT_PUBLIC_SUPABASE_URL: https://exemplo.supabase.co
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: chave-de-exemplo
+      NEXT_PUBLIC_SITE_URL: http://localhost:3000
+      NEXT_TELEMETRY_DISABLED: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: Tipos
+        run: npm run typecheck
+      - name: Padrões de código
+        run: npm run lint
+      - name: Regras e banco (PGlite)
+        run: npm test
+      - name: Build de produção
+        run: npm run build
+      - name: Dependências sem falhas de segurança conhecidas
+        run: npm audit --omit=dev --audit-level=high
