@@ -170,3 +170,4 @@ vite.config.ts.timestamp-*
 /.next-test/
 /playwright-report-flows/
 /.next-prod/
+/backups/
