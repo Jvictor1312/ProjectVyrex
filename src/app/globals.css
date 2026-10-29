@@ -1665,13 +1665,34 @@ textarea[aria-invalid="true"] {
   font-size: 58px;
 }
 .legal-page h2 {
-  margin: 34px 0 8px;
-  font-size: 15px;
+  margin: 38px 0 10px;
+  font-size: 18px;
 }
-.legal-page article > p:not(.eyebrow) {
+.legal-page article > p:not(.eyebrow),
+.legal-page article > ul {
   color: #565e59;
-  font-size: 13px;
-  line-height: 1.8;
+  font-size: 15px;
+  line-height: 1.75;
+}
+.legal-page article > ul {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding-left: 20px;
+  list-style: disc;
+}
+.legal-page article > p + p,
+.legal-page article > ul + p,
+.legal-page article > h1 + p {
+  margin-top: 14px;
+}
+.legal-page article strong {
+  color: var(--ink);
+}
+.legal-page article a {
+  color: var(--ink);
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 .legal-page .legal-alert {
   margin: 25px 0;

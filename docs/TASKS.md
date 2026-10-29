@@ -68,7 +68,8 @@ Atualizado em: 2026-10-29. Reescrito para mostrar só o estado atual e as pendê
 - [x] **Confirmações que sumiam:** rede social salva, encaminhamento e decisão final (depois da decisão, a equipe volta à lista com aviso).
 - [x] **Limite de tentativas compartilhado** entre instâncias (no banco). Feito em 2026-10-29.
 - [x] **CSP com *nonce*** (2026-10-29): `src/lib/security/csp.ts` monta a política e `src/proxy.ts` sorteia um nonce por página; o layout usa `connection()` para montar as páginas na hora. Scripts sem nonce e HTML injetado com `onerror` são bloqueados (conferido no build de produção em `localhost:3002`); estilos seguem com `'unsafe-inline'` (o React grava `style=`). Build de teste: `$env:NEXT_DIST_DIR=".next-prod"; npm run build`.
-- [ ] **Revisão jurídica** dos termos e da política (o texto não foi alterado no conteúdo).
+- [x] **Termos e Política de privacidade reescritos** (2026-10-29, LGPD, sem advogado, por decisão do dono). Dados em `src/lib/legal.ts`.
+- [ ] **Nome do responsável** nos Termos e na Política: preencher `ownerName` em `src/lib/legal.ts` (hoje é um texto de exemplo). Obrigatório antes de publicar.
 
 ### Decisões do usuário
 - [x] **Fonte:** Figtree servida pelo site (texto e marca); Georgia nos títulos, com Gelasio como substituta em aparelhos sem Georgia. Decidido em 2026-10-28.
@@ -81,7 +82,7 @@ Atualizado em: 2026-10-29. Reescrito para mostrar só o estado atual e as pendê
 - [ ] **Testes com contas reais de todas as funções:** convidar recrutador, gestor de relacionamento e analista de validação pela tela de colaboradores; criar uma conta de criador em rascunho para testar o salvamento real das evidências e o fluxo completo (envio, triagem, validação, correção, decisão).
 - [x] **E-mails em português** com remetente da Vyrex: SMTP próprio e modelos aplicados em 2026-10-29.
 - [ ] **SMS** (recuperação por celular): exige provedor (Twilio, MessageBird ou Vonage).
-- [ ] **Termos e política de privacidade:** rascunhos; precisam de revisão jurídica.
+- [ ] **Termos e política (opcional):** revisão por advogado, se o dono quiser.
 - [ ] **Publicação:** só com autorização. Antes: configurar as variáveis de ambiente na hospedagem, Site URL e callbacks do Auth.
 - **Segurança das chaves: o dono decidiu não trocar (2026-10-29).** Registro histórico: a chave secreta e a `service_role` antiga foram coladas na conversa em 2026-10-28. Trocar a secreta; migrar a chave pública para `sb_publishable_` e então desativar as chaves antigas (JWT). O token de acesso (`sbp_`) também foi colado na conversa: apagar e gerar outro em supabase.com/dashboard/account/tokens.
 

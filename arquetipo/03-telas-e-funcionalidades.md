@@ -12,7 +12,7 @@ As 31 rotas do site, agrupadas por quem acessa. Todas têm versão para celular 
 | `/login` | Entrar. Leva ao painel certo: equipe → `/interno`, criador → `/dashboard`. |
 | `/recuperar-senha` | Pede e-mail **ou CPF**. A resposta é sempre a mesma, exista ou não a conta. Depois do envio: aviso para olhar o Spam (remetente e assunto), botão "Reenviar em m:ss" liberado a cada 3 minutos e até 3 envios por hora para o mesmo e-mail ou CPF; no fim, o botão some e a tela explica quando tentar de novo. O servidor aplica os mesmos limites (`src/lib/recovery-limits.ts`). |
 | `/redefinir-senha` | Nova senha (chega pelo link do e-mail). |
-| `/termos`, `/privacidade` | Rascunhos jurídicos (marcados como "documento preliminar"). |
+| `/termos`, `/privacidade` | Termos de uso e Política de privacidade (LGPD), versão de 29/10/2026, escritos pelo Claude sem revisão de advogado. Responsável: pessoa física; contato `suportevyrex@gmail.com`; marcas recebem só nome completo e perfis nas redes; dados guardados por até 5 anos após o fim do cadastro; 18 anos ou mais. Os dados variáveis ficam em `src/lib/legal.ts`, e a versão vai para o cadastro de cada conta. |
 | `/acesso-negado` | Página 403 (sem permissão). |
 | qualquer endereço inexistente | Página 404. Erros inesperados mostram uma página 500 sem detalhes técnicos. |
 

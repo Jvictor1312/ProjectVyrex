@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { fetchActiveRoleKeys } from "@/lib/auth";
+import { legal } from "@/lib/legal";
 import { rateLimit, tooManyAttempts } from "@/lib/rate-limit";
 import { recoveryCooldownSeconds, recoveryMaxSends } from "@/lib/recovery-limits";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
@@ -105,8 +106,8 @@ export async function signupAction(
       data: {
         full_name: parsed.data.fullName,
         ...(phone ? { phone } : {}),
-        terms_version: "draft-2026-10-14",
-        privacy_version: "draft-2026-10-14",
+        terms_version: legal.version,
+        privacy_version: legal.version,
       },
       emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"}/auth/callback?next=/dashboard`,
     },
