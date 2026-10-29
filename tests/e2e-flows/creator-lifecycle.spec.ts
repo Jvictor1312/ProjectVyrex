@@ -147,5 +147,12 @@ test("8. criador vê a aprovação, a mensagem e o histórico", async ({ page })
   await expect(page.getByText("Aprovado").first()).toBeVisible();
   await expect(page.getByText("Seu perfil foi aprovado")).toBeVisible();
   await expect(page.getByText("Recebemos seu cadastro (teste automático).").first()).toBeVisible();
-  await expect(page.getByText("Cadastro aprovado").first()).toBeVisible();
+  // O histórico começa recolhido; abre com um clique.
+  const history = page.locator("details", { has: page.locator("#history-title") });
+  await history.locator("summary").click();
+  await expect(history.getByText("Cadastro aprovado")).toBeVisible();
+  // Cada conferência de evidência mostra o Story (antes, três linhas iguais).
+  for (const position of [1, 2, 3]) {
+    await expect(history.getByText(`Evidência aprovada · Story ${position}`)).toBeVisible();
+  }
 });

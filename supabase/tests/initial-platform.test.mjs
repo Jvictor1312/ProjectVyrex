@@ -1008,3 +1008,70 @@ test("signed-in users cannot look up an e-mail by CPF", async () => {
     /permission denied/i,
   );
 });
+
+// Histórico: cada conferência de evidência é um registro próprio, ligado ao
+// Story conferido. As telas precisam ler essa ligação (evidence_id) para não
+// mostrar linhas idênticas ("Evidência aprovada" três vezes).
+test("each evidence review in the history points to its own Story, readable by the creator", async () => {
+  const reviewedCreator = "10000000-0000-4000-8000-000000000005";
+  await database.query(
+    "insert into auth.users (id, raw_user_meta_data) values ($1, '{}'::jsonb)",
+    [reviewedCreator],
+  );
+  const account = await database.query(
+    `insert into public.social_accounts (creator_id, platform, handle, profile_url, followers_reported)
+     values ($1, 'instagram', 'historico', 'https://www.instagram.com/historico', 500)
+     returning id`,
+    [reviewedCreator],
+  );
+  const evidenceIds = [];
+  for (const position of [1, 2, 3]) {
+    const row = await database.query(
+      `insert into public.metric_evidence (
+         creator_id, social_account_id, position, storage_path, content_type,
+         size_bytes, story_published_on, views_reported
+       ) values ($1, $2, $3, $4, 'image/webp', 100, current_date, 1500)
+       returning id`,
+      [reviewedCreator, account.rows[0].id, position, `${reviewedCreator}/story-${position}.webp`],
+    );
+    evidenceIds.push(row.rows[0].id);
+  }
+  await database.query(
+    "update public.creator_profiles set public_name = 'Histórico', status = 'submitted' where user_id = $1",
+    [reviewedCreator],
+  );
+  for (const evidenceId of evidenceIds) {
+    await asUser(validator, () =>
+      database.query("select public.review_story_evidence($1, 'approved', null)", [evidenceId]),
+    );
+  }
+
+  // Sem a ligação com a evidência, as três linhas são indistinguíveis.
+  const withoutEvidence = await asUser(reviewedCreator, () =>
+    database.query(
+      "select action, reason from public.review_history where creator_id = $1",
+      [reviewedCreator],
+    ),
+  );
+  assert.equal(
+    new Set(withoutEvidence.rows.map((row) => JSON.stringify(row))).size,
+    1,
+  );
+
+  // Com a ligação (o que as telas passam a ler), cada linha mostra seu Story.
+  const withEvidence = await asUser(reviewedCreator, () =>
+    database.query(
+      `select rh.action, me.position
+       from public.review_history rh
+       left join public.metric_evidence me on me.id = rh.evidence_id
+       where rh.creator_id = $1
+       order by me.position`,
+      [reviewedCreator],
+    ),
+  );
+  assert.deepEqual(withEvidence.rows, [
+    { action: "evidence_approved", position: 1 },
+    { action: "evidence_approved", position: 2 },
+    { action: "evidence_approved", position: 3 },
+  ]);
+});

@@ -17,6 +17,7 @@ import { normalizeEvidenceImage } from "../src/lib/evidence/normalize.ts";
 import { safeLocalRedirectPath } from "../src/lib/security/redirect.ts";
 import { dashboardPathForRoles } from "../src/lib/auth-routing.ts";
 import { groupAuditEntries } from "../src/lib/audit-groups.ts";
+import { historyEntryLabel, historyStoryPosition } from "../src/lib/history.ts";
 import { isLoopbackSupabaseUrl } from "../scripts/seed-local-test-users.mjs";
 
 const validSignup = {
@@ -278,4 +279,18 @@ test("audit history groups changes to the same target within 10 minutes", () => 
     groups.map((group) => [group.primary.id, group.children.map((child) => child.id)]),
     [["5", []], ["1", ["2", "3"]], ["4", []]],
   );
+});
+test("history entries about evidence name the Story they refer to", () => {
+  // O Supabase devolve a evidência ligada como objeto ou como lista.
+  assert.equal(historyStoryPosition({ position: 2 }), 2);
+  assert.equal(historyStoryPosition([{ position: 3 }]), 3);
+  assert.equal(historyStoryPosition(null), null);
+  assert.equal(historyStoryPosition([]), null);
+
+  assert.equal(historyEntryLabel("Evidência aprovada", 2), "Evidência aprovada · Story 2");
+  assert.equal(historyEntryLabel("Cadastro enviado", null), "Cadastro enviado");
+
+  // Três conferências seguidas deixam de parecer repetidas.
+  const labels = [1, 2, 3].map((position) => historyEntryLabel("Evidência aprovada", position));
+  assert.equal(new Set(labels).size, 3);
 });

@@ -13,6 +13,11 @@ import {
 import { InternalShell } from "../internal-shell";
 import { fetchActiveRoleKeys, requireUserFast } from "@/lib/auth";
 import {
+  historyEntryLabel,
+  historyEvidenceSelect,
+  historyStoryPosition,
+} from "@/lib/history";
+import {
   accountVerificationLabels,
   accountVerificationTones,
   categoryLabel,
@@ -104,7 +109,7 @@ export default async function CreatorInternalDetail({
     supabase
       .from("review_history")
       .select(
-        "id, actor_id, action, outcome, reason, created_at, actor:profiles!review_history_actor_id_fkey(full_name)",
+        `id, actor_id, action, outcome, reason, created_at, actor:profiles!review_history_actor_id_fkey(full_name), ${historyEvidenceSelect}`,
       )
       .eq("creator_id", creatorId)
       .order("created_at", { ascending: false })
@@ -409,7 +414,12 @@ export default async function CreatorInternalDetail({
             <ol className={styles.history}>
               {history.map((entry) => (
                 <li key={entry.id}>
-                  <strong>{historyLabels[entry.action] ?? entry.action}</strong>
+                  <strong>
+                    {historyEntryLabel(
+                      historyLabels[entry.action] ?? entry.action,
+                      historyStoryPosition(entry.evidence),
+                    )}
+                  </strong>
                   <span>
                     {new Date(entry.created_at).toLocaleString("pt-BR")} ·{" "}
                     {actorName(entry.actor)}

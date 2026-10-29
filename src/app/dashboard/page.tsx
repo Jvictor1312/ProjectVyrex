@@ -1,4 +1,5 @@
 import { requireUserFast } from "@/lib/auth";
+import { historyEvidenceSelect, historyStoryPosition } from "@/lib/history";
 import { defaultRequiredEvidence } from "@/lib/labels";
 import { CreatorShell } from "./creator-shell";
 import { CreatorOverview, nextStepFor } from "./creator-overview";
@@ -34,12 +35,15 @@ export default async function CreatorDashboardPage() {
       .eq("user_id", user.id)
       .order("created_at", { ascending: false })
       .limit(3),
+    // O Story ligado a cada conferência de evidência distingue as linhas
+    // (sem ele, três aprovações seguidas pareciam a mesma linha repetida).
+    // O histórico começa recolhido, então cabe a jornada completa.
     supabase
       .from("review_history")
-      .select("id, action, reason, created_at")
+      .select(`id, action, reason, created_at, ${historyEvidenceSelect}`)
       .eq("creator_id", user.id)
       .order("created_at", { ascending: false })
-      .limit(5),
+      .limit(15),
     supabase
       .from("social_accounts")
       .select("id", { count: "exact", head: true })
@@ -114,7 +118,13 @@ export default async function CreatorDashboardPage() {
         )}
         messages={messageResult.data ?? []}
         notifications={notificationResult.data ?? []}
-        history={historyResult.data ?? []}
+        history={(historyResult.data ?? []).map((entry) => ({
+          id: entry.id,
+          action: entry.action,
+          reason: entry.reason,
+          created_at: entry.created_at,
+          storyPosition: historyStoryPosition(entry.evidence),
+        }))}
         hasLoadError={hasLoadError}
       />
     </CreatorShell>

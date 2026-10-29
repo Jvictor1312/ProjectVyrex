@@ -69,6 +69,27 @@ export default function CreatorDashboardPreview() {
             created_at: "2026-10-26T09:15:00Z",
           },
           {
+            id: "h5",
+            action: "evidence_changes_requested",
+            reason: "A captura não mostra o número de visualizações.",
+            created_at: "2026-10-26T09:10:00Z",
+            storyPosition: 3,
+          },
+          {
+            id: "h4",
+            action: "evidence_approved",
+            reason: null,
+            created_at: "2026-10-26T09:06:00Z",
+            storyPosition: 2,
+          },
+          {
+            id: "h3",
+            action: "evidence_approved",
+            reason: null,
+            created_at: "2026-10-26T09:05:00Z",
+            storyPosition: 1,
+          },
+          {
             id: "h1",
             action: "submitted",
             reason: null,

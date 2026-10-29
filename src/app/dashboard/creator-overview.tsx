@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { WithdrawApplicationButton } from "@/app/components/creator-forms";
+import { historyEntryLabel } from "@/lib/history";
 import {
   creatorStatusLabel,
   creatorStatusTone,
@@ -150,6 +151,8 @@ export type CreatorOverviewProps = {
     action: string;
     reason: string | null;
     created_at: string;
+    // Story conferido, quando o registro é sobre uma evidência.
+    storyPosition?: number | null;
   }[];
   hasLoadError: boolean;
 };
@@ -276,29 +279,43 @@ export function CreatorOverview({
         </ol>
       </section>
 
-      <section className={styles.history} aria-labelledby="history-title">
-        <h2 id="history-title">Histórico</h2>
+      {/* Começa recolhido: o histórico é consulta, não a tarefa do momento. */}
+      <details className={styles.history}>
+        <summary>
+          <span className={styles.historyTitle}>
+            <h2 id="history-title">Histórico</h2>
+            <span className={styles.historyCount}>
+              {history.length === 0
+                ? "Nenhum registro"
+                : `${history.length} ${history.length === 1 ? "registro" : "registros"}`}
+            </span>
+          </span>
+          <span className={styles.historyToggle} aria-hidden="true" />
+        </summary>
         {history.length === 0 ? (
           <p className={styles.empty}>
             Cada etapa do seu cadastro (envio, análise, decisões) fica
             registrada aqui.
           </p>
         ) : (
-          <ol>
+          <ol aria-labelledby="history-title">
             {history.map((entry) => (
               <li key={entry.id}>
                 <time dateTime={entry.created_at}>
                   {shortDate(entry.created_at)}
                 </time>
                 <span>
-                  {historyLabels[entry.action] ?? "Atualização do cadastro"}
+                  {historyEntryLabel(
+                    historyLabels[entry.action] ?? "Atualização do cadastro",
+                    entry.storyPosition ?? null,
+                  )}
                   {entry.reason && <small>{entry.reason}</small>}
                 </span>
               </li>
             ))}
           </ol>
         )}
-      </section>
+      </details>
       </div>
 
       <aside className={styles.feed} aria-label="Mensagens e avisos">
