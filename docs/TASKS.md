@@ -24,7 +24,8 @@ Atualizado em: 2026-10-29. Reescrito para mostrar só o estado atual e as pendê
 - [x] Login, cadastro e senha não apagam mais o que foi digitado quando o servidor recusa (era o comportamento padrão do React 19).
 - [x] **Tela de cadastro:** esfera com botão de play, anel pulsando e órbita; frase "Criadores e marcas, na mesma órbita."; o envio do vídeo recusa arquivos abaixo de HD (commit `f6177ef`).
 - [x] **Vídeo de teste tirado da tela** (2026-10-29, a pedido do dono): era um desenho do Pato Donald (Disney), 320×240, sem relação com a Vyrex. Só o campo `site_settings.presentation_video_path` foi esvaziado; o arquivo continua no Storage (`site-media/presentation/e033326e-d9dd-4922-a803-47481dde520b.mp4`). A esfera agora mostra "Conheça a Vyrex" e a janela avisa que o vídeo virá em breve.
-- [ ] **SMTP próprio e troca das chaves (dono):** passo a passo em `docs/GUIA_SMTP_E_CHAVES.md`; as chaves são gravadas por `scripts/trocar-chaves.ps1` (às escondidas). Depois de cada etapa o Claude aplica os modelos de e-mail e confere o site.
+- [x] **SMTP próprio** (2026-10-29): Gmail da Vyrex configurado pelo dono; modelos em português aplicados pela Management API (assuntos "Confirme seu e-mail na Vyrex" e "Recupere sua senha da Vyrex"). Falta o dono confirmar que um e-mail de teste chegou.
+- [ ] **Troca das chaves (dono):** passo a passo em `docs/GUIA_SMTP_E_CHAVES.md`, parte B; as chaves são gravadas por `scripts/trocar-chaves.ps1` (às escondidas). Depois o Claude confere o site.
 - [x] **Vídeo de apresentação da Vyrex enviado pelo dono** (conferido em 2026-10-29: 1920×1080, 61 s, 10,5 MB).
 - [x] **Suspender e reativar cadastros** (migration `202610290004`, aplicada no de testes e no real): só administrador, só aprovados, motivo obrigatório, aviso ao criador, histórico e auditoria. Seção na ficha do criador; teste PGlite e etapa 9 do fluxo completo.
 - [ ] **Decisões do dono:** onde guardar as cópias de segurança e com que frequência (e se os prints do Storage entram); hospedagem (limite de envio por requisição, ex.: 4,5 MB na Vercel, contra prints de até 8 MB); regra da situação `suspended`; serviço de alertas para o log (ex.: Sentry).
@@ -76,7 +77,7 @@ Atualizado em: 2026-10-29. Reescrito para mostrar só o estado atual e as pendê
 ### Dependem do usuário ou de serviços externos
 - [x] **Migration `202610280005` aplicada no Supabase** em 2026-10-28 pela Management API (token salvo na variável do Windows `SUPABASE_ACCESS_TOKEN`). Conferido: funções criadas, só usuários logados executam, a API já as reconhece.
 - [ ] **Testes com contas reais de todas as funções:** convidar recrutador, gestor de relacionamento e analista de validação pela tela de colaboradores; criar uma conta de criador em rascunho para testar o salvamento real das evidências e o fluxo completo (envio, triagem, validação, correção, decisão).
-- [ ] **E-mails em português** com remetente da Vyrex: exige SMTP próprio no Supabase. Modelos prontos em `supabase/templates/`.
+- [x] **E-mails em português** com remetente da Vyrex: SMTP próprio e modelos aplicados em 2026-10-29.
 - [ ] **SMS** (recuperação por celular): exige provedor (Twilio, MessageBird ou Vonage).
 - [ ] **Termos e política de privacidade:** rascunhos; precisam de revisão jurídica.
 - [ ] **Publicação:** só com autorização. Antes: configurar as variáveis de ambiente na hospedagem, Site URL e callbacks do Auth.

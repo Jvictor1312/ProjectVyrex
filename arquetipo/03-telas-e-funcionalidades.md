@@ -50,4 +50,4 @@ Menu lateral (no celular, abas no topo): **Operação** (Visão geral) e, só pa
 
 ## Avisos automáticos ao criador
 
-O criador recebe um aviso na área de Mensagens quando a equipe manda mensagem, pede correções ou toma a decisão final (o título do aviso muda conforme a decisão). Por e-mail chegam só os do Supabase: confirmação de conta e recuperação de senha. Eles ainda estão em inglês, até haver SMTP próprio.
+O criador recebe um aviso na área de Mensagens quando a equipe manda mensagem, pede correções ou toma a decisão final (o título do aviso muda conforme a decisão). Por e-mail chegam só os do Supabase: confirmação de conta e recuperação de senha. Eles saem pelo SMTP próprio da Vyrex (Gmail), em português, com os modelos de `supabase/templates/`.
