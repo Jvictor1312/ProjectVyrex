@@ -270,15 +270,7 @@ export default async function CreatorProfilePage() {
                 ))}
               </div>
             )}
-            {canEdit &&
-              (accounts.length === 0 ? (
-                <SocialAccountForm />
-              ) : (
-                <details className="account-edit add-account">
-                  <summary>+ Adicionar outra rede</summary>
-                  <SocialAccountForm />
-                </details>
-              ))}
+            {canEdit && <SocialAccountForm startCollapsed={accounts.length > 0} />}
           </section>
 
           <section

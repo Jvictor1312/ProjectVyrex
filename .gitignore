@@ -167,3 +167,5 @@ vite.config.ts.timestamp-*
 /playwright/.auth/
 /playwright-report/
 /test-results/
+/.next-test/
+/playwright-report-flows/

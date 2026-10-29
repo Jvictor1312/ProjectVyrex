@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { z } from "zod";
 import { requireSession } from "@/lib/auth";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
@@ -235,10 +236,10 @@ export async function recordFinalDecisionAction(
   });
   if (error) return denied;
   refreshCreator(parsed.data.targetCreator);
-  return {
-    message: "Decisão registrada e notificada ao criador.",
-    success: true,
-  };
+  // Depois da decisão o cadastro pode sair da fila de quem decidiu (o analista
+  // só vê cadastros em validação). Em vez de cair numa página "não
+  // encontrada", a pessoa volta para a lista com a confirmação.
+  redirect(`/interno?decisao=${parsed.data.decision}`);
 }
 
 export async function assignCreatorResponsiblesAction(

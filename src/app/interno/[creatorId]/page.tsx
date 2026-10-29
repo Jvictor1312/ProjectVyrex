@@ -386,14 +386,17 @@ export default async function CreatorInternalDetail({
           )}
         </section>
 
-        {canRecruit && creator.status === "submitted" && (
-          <RecruiterControls creatorId={creatorId} />
+        {canRecruit && (
+          <RecruiterControls
+            creatorId={creatorId}
+            canForward={creator.status === "submitted"}
+          />
         )}
         {canRelate && <RelationshipControls creatorId={creatorId} />}
-        {canDecideNow && (
+        {canValidate && (
           <section className={styles.section}>
             <h2>Decisão final</h2>
-            <FinalDecisionForm creatorId={creatorId} />
+            <FinalDecisionForm creatorId={creatorId} open={canDecideNow} />
           </section>
         )}
         {assignmentProps && (

@@ -44,6 +44,9 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+  // O servidor de testes (porta 3001, banco de testes) usa outra pasta de
+  // build para rodar ao lado do servidor normal (veja scripts/dev-test.ps1).
+  distDir: process.env.NEXT_DIST_DIR || ".next",
   poweredByHeader: false,
   devIndicators: false,
   experimental: {

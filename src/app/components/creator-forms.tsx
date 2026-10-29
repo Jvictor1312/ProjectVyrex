@@ -258,6 +258,7 @@ export function CreatorProfileForm({
 
 export function SocialAccountForm({
   initialAccount,
+  startCollapsed = false,
 }: {
   initialAccount?: {
     id: string;
@@ -266,13 +267,39 @@ export function SocialAccountForm({
     profileUrl: string;
     followersReported: number;
   };
+  // Para adicionar outra rede: começa fechado, atrás de um botão. O formulário
+  // fica sempre no mesmo lugar da tela, então a confirmação de "rede salva"
+  // continua visível depois que a lista de redes é atualizada.
+  startCollapsed?: boolean;
 }) {
   const [state, action, pending] = useActionState(
     saveSocialAccountAction,
     initialState,
   );
+  const [open, setOpen] = useState(!startCollapsed);
+  const [formKey, setFormKey] = useState(0);
+
+  // Depois de adicionar uma rede, o formulário fecha e fica limpo para a próxima.
+  useEffect(() => {
+    if (state.success && !initialAccount) {
+      setOpen(false);
+      setFormKey((key) => key + 1);
+    }
+  }, [state, initialAccount]);
+
+  if (!open && !initialAccount) {
+    return (
+      <div className="add-account">
+        <ActionMessage state={state} />
+        <button className="quiet-button" type="button" onClick={() => setOpen(true)}>
+          + Adicionar outra rede
+        </button>
+      </div>
+    );
+  }
+
   return (
-    <form action={action} className="editor-form">
+    <form action={action} className="editor-form" key={formKey}>
       {initialAccount && (
         <input type="hidden" name="accountId" value={initialAccount.id} />
       )}

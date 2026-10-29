@@ -13,7 +13,16 @@ import {
   type InternalRole,
 } from "@/lib/labels";
 import styles from "./internal.module.css";
-import { PageHeader, Stats } from "./ui";
+import { Notice, PageHeader, Stats } from "./ui";
+
+// Confirmação mostrada depois de uma decisão final (a ficha pode sair da fila
+// de quem decidiu, por isso a pessoa volta para esta lista).
+const decisionNotices: Record<string, string> = {
+  approved: "Decisão registrada: cadastro aprovado. O criador já foi avisado.",
+  rejected: "Decisão registrada: cadastro não aprovado. O criador recebeu a justificativa.",
+  changes_requested:
+    "Decisão registrada: correções solicitadas. O criador recebeu o que precisa ajustar.",
+};
 
 export const metadata: Metadata = { title: "Visão geral da operação" };
 
@@ -70,6 +79,7 @@ export default async function InternalDashboard({
   const { supabase, user, roleKeys, rolesError } = await requireUserWithRoles();
   const params = await searchParams;
   const search = stringParam(params.q)?.trim().slice(0, 80) ?? "";
+  const decisionNotice = decisionNotices[stringParam(params.decisao) ?? ""] ?? null;
   const rawStatus = stringParam(params.status) ?? "all";
   const selectedStatus = creatorStatusKeys.includes(rawStatus as CreatorStatus)
     ? (rawStatus as CreatorStatus)
@@ -350,6 +360,11 @@ export default async function InternalDashboard({
     >
       <section className={styles.main}>
         <PageHeader title={heading.title} description={heading.description} />
+        {decisionNotice && (
+          <Notice tone="success" role="status">
+            {decisionNotice}
+          </Notice>
+        )}
 
         {primaryRole === "admin" && (
           <>

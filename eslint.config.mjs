@@ -21,5 +21,10 @@ export default defineConfig([
     "next-env.d.ts",
     ".claude/**",
     "graphify-out/**",
+    // Gerados pelo servidor de testes e pelos relatórios do Playwright.
+    ".next-test/**",
+    "playwright-report/**",
+    "playwright-report-flows/**",
+    "test-results/**",
   ]),
 ]);

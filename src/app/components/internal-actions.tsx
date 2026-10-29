@@ -43,7 +43,15 @@ function Submit({
   );
 }
 
-export function RecruiterControls({ creatorId }: { creatorId: string }) {
+// O bloco continua na tela depois do encaminhamento (a situação muda e o
+// botão some), para a confirmação aparecer em vez de o bloco sumir.
+export function RecruiterControls({
+  creatorId,
+  canForward,
+}: {
+  creatorId: string;
+  canForward: boolean;
+}) {
   const [noteState, noteAction, notePending] = useActionState(
     recordContactEventAction,
     emptyState,
@@ -69,7 +77,16 @@ export function RecruiterControls({ creatorId }: { creatorId: string }) {
       <form action={forwardAction} className="internal-inline-form">
         <input type="hidden" name="targetCreator" value={creatorId} />
         <Feedback state={forwardState} />
-        <Submit pending={forwardPending}>Encaminhar para validação</Submit>
+        {canForward ? (
+          <Submit pending={forwardPending}>Encaminhar para validação</Submit>
+        ) : (
+          !forwardState.success && (
+            <p className="field-hint">
+              O encaminhamento para validação fica disponível enquanto o
+              cadastro aguarda análise.
+            </p>
+          )
+        )}
       </form>
     </section>
   );
@@ -209,7 +226,15 @@ const decisionConfirmations: Record<string, string> = {
   changes_requested: "Pedir correções? O motivo vai para o criador.",
 };
 
-export function FinalDecisionForm({ creatorId }: { creatorId: string }) {
+// Continua na tela depois da decisão (a situação muda e o formulário fecha),
+// para a confirmação aparecer em vez de a seção sumir.
+export function FinalDecisionForm({
+  creatorId,
+  open,
+}: {
+  creatorId: string;
+  open: boolean;
+}) {
   const [state, action, pending] = useActionState(
     recordFinalDecisionAction,
     emptyState,
@@ -220,6 +245,17 @@ export function FinalDecisionForm({ creatorId }: { creatorId: string }) {
   useEffect(() => {
     if (state.message) setConfirming(null);
   }, [state]);
+
+  if (!open) {
+    return state.message ? (
+      <Feedback state={state} />
+    ) : (
+      <p className="field-hint">
+        A decisão final fica disponível quando o cadastro está aguardando
+        análise, em análise ou com correção solicitada.
+      </p>
+    );
+  }
 
   return (
     <form
