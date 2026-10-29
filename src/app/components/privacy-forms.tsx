@@ -8,6 +8,7 @@ import {
   resolveDataRequestAction,
   updateAccountSettingsAction,
 } from "@/app/actions/privacy";
+import { FormFeedback } from "@/app/components/form-feedback";
 import type { FormState } from "@/lib/validation/auth";
 import {
   dataRequestKindLabels,
@@ -16,18 +17,7 @@ import {
 
 const initialState: FormState = { message: "", success: false };
 
-function ActionMessage({ state }: { state: FormState }) {
-  if (!state.message) return null;
-  return (
-    <p
-      className={state.success ? "form-message success" : "form-message error"}
-      role="status"
-      aria-live="polite"
-    >
-      {state.message}
-    </p>
-  );
-}
+const ActionMessage = FormFeedback;
 
 export function DataRequestForm() {
   const [state, action, pending] = useActionState(

@@ -1020,6 +1020,13 @@ button.signup-showcase-toggle:focus-visible {
   border-color: #a64337;
   background: #f6e9e5;
 }
+/* Campo apontado pela mensagem de erro (FormFeedback). */
+input[aria-invalid="true"],
+select[aria-invalid="true"],
+textarea[aria-invalid="true"] {
+  border-color: #a64337 !important;
+  box-shadow: 0 0 0 1px #a64337;
+}
 .auth-links {
   display: flex;
   justify-content: space-between;

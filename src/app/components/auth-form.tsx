@@ -1,13 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { useActionState, useState } from "react";
+import { startTransition, useActionState, useState } from "react";
 import {
   loginAction,
   passwordUpdateAction,
   recoveryAction,
   signupAction,
 } from "@/app/actions/auth";
+import { FormFeedback } from "@/app/components/form-feedback";
 import type { FormState } from "@/lib/validation/auth";
 
 type AuthMode = "login" | "signup" | "recovery" | "reset";
@@ -144,6 +145,15 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
   return (
     <form
       action={formAction}
+      // Envio pelo onSubmit: o React só limpa o formulário quando o envio vem
+      // do atributo action. Assim, se o servidor recusar (senha errada, senhas
+      // diferentes), o que a pessoa digitou continua nos campos. Sem
+      // JavaScript, o action acima envia normalmente.
+      onSubmit={(event) => {
+        event.preventDefault();
+        const data = new FormData(event.currentTarget);
+        startTransition(() => formAction(data));
+      }}
       className={mode === "signup" ? "auth-form signup-auth-form" : "auth-form"}
     >
       <div className="auth-heading">
@@ -218,17 +228,7 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
         </>
       )}
 
-      {state.message && (
-        <p
-          className={
-            state.success ? "form-message success" : "form-message error"
-          }
-          role="status"
-          aria-live="polite"
-        >
-          {state.message}
-        </p>
-      )}
+      <FormFeedback state={state} />
 
       <button
         className="button button-dark submit-button"

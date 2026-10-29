@@ -16,6 +16,7 @@ import {
   passwordUpdateSchema,
   recoverySchema,
   signupSchema,
+  validationFailure,
   type FormState,
 } from "@/lib/validation/auth";
 
@@ -86,10 +87,7 @@ export async function signupAction(
   });
 
   if (!parsed.success) {
-    return {
-      message: parsed.error.issues[0]?.message ?? invalidForm.message,
-      success: false,
-    };
+    return validationFailure(parsed.error, invalidForm.message);
   }
   const phone = parsed.data.phone ? normalizePhone(parsed.data.phone) : null;
   if (parsed.data.phone && !phone) {
@@ -260,10 +258,7 @@ export async function passwordUpdateAction(
     passwordConfirmation: formData.get("passwordConfirmation"),
   });
   if (!parsed.success) {
-    return {
-      message: parsed.error.issues[0]?.message ?? invalidForm.message,
-      success: false,
-    };
+    return validationFailure(parsed.error, invalidForm.message);
   }
   if (!isSupabaseConfigured()) return setupMessage;
 

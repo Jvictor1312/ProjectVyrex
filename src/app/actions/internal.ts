@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 import { requireSession } from "@/lib/auth";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
-import type { FormState } from "@/lib/validation/auth";
+import { validationFailure, type FormState } from "@/lib/validation/auth";
 
 const creatorIdSchema = z.object({ targetCreator: z.uuid() });
 const reasonSchema = z.string().trim().min(1).max(2000);
@@ -24,10 +24,11 @@ const denied: FormState = {
   success: false,
 };
 
-function invalid(message?: string): FormState {
+function invalid(message?: string, field?: string): FormState {
   return {
     message: message ?? "Confira os dados e tente novamente.",
     success: false,
+    ...(field ? { field } : {}),
   };
 }
 
@@ -71,7 +72,7 @@ export async function recordContactEventAction(
       summary: formData.get("summary"),
       visibleToCreator: formData.get("visibleToCreator") === "on",
     });
-  if (!parsed.success) return invalid(parsed.error.issues[0]?.message);
+  if (!parsed.success) return validationFailure(parsed.error, invalid().message);
 
   const { supabase } = await requireSession();
   const { error } = await supabase.rpc("record_contact_event", {
@@ -98,7 +99,7 @@ export async function sendCreatorMessageAction(
       targetCreator: formData.get("targetCreator"),
       body: formData.get("body"),
     });
-  if (!parsed.success) return invalid(parsed.error.issues[0]?.message);
+  if (!parsed.success) return validationFailure(parsed.error, invalid().message);
 
   const { supabase } = await requireSession();
   const { error } = await supabase.rpc("write_staff_message", {
@@ -123,7 +124,7 @@ export async function requestCorrectionsAction(
       targetCreator: formData.get("targetCreator"),
       reason: formData.get("reason"),
     });
-  if (!parsed.success) return invalid(parsed.error.issues[0]?.message);
+  if (!parsed.success) return validationFailure(parsed.error, invalid().message);
 
   const { supabase } = await requireSession();
   const { error } = await supabase.rpc("request_creator_corrections", {
@@ -150,9 +151,9 @@ export async function reviewStoryEvidenceAction(
       decision: formData.get("decision"),
       reason: formData.get("reason") ?? "",
     });
-  if (!parsed.success) return invalid(parsed.error.issues[0]?.message);
+  if (!parsed.success) return validationFailure(parsed.error, invalid().message);
   if (parsed.data.decision !== "approved" && !parsed.data.reason) {
-    return invalid("Informe o motivo para rejeitar ou solicitar correção.");
+    return invalid("Informe o motivo para rejeitar ou solicitar correção.", "reason");
   }
 
   const { supabase } = await requireSession();
@@ -188,9 +189,9 @@ export async function reviewSocialAccountAction(
       decision: formData.get("decision"),
       reason: formData.get("reason") ?? "",
     });
-  if (!parsed.success) return invalid(parsed.error.issues[0]?.message);
+  if (!parsed.success) return validationFailure(parsed.error, invalid().message);
   if (parsed.data.decision === "rejected" && !parsed.data.reason) {
-    return invalid("Informe o motivo para rejeitar a rede social.");
+    return invalid("Informe o motivo para rejeitar a rede social.", "reason");
   }
 
   const { supabase } = await requireSession();
@@ -226,7 +227,7 @@ export async function recordFinalDecisionAction(
       decision: formData.get("decision"),
       reason: formData.get("reason"),
     });
-  if (!parsed.success) return invalid(parsed.error.issues[0]?.message);
+  if (!parsed.success) return validationFailure(parsed.error, invalid().message);
 
   const { supabase } = await requireSession();
   const { error } = await supabase.rpc("record_review_decision", {
@@ -257,7 +258,7 @@ export async function assignCreatorResponsiblesAction(
       recruiterId: formData.get("recruiterId") || null,
       relationshipManagerId: formData.get("relationshipManagerId") || null,
     });
-  if (!parsed.success) return invalid(parsed.error.issues[0]?.message);
+  if (!parsed.success) return validationFailure(parsed.error, invalid().message);
 
   const { supabase } = await requireSession();
   const { error } = await supabase.rpc("assign_creator_responsibles", {
@@ -293,7 +294,7 @@ export async function inviteInternalUserAction(
       email: formData.get("email"),
       role: formData.get("role"),
     });
-  if (!parsed.success) return invalid(parsed.error.issues[0]?.message);
+  if (!parsed.success) return validationFailure(parsed.error, invalid().message);
 
   const { supabase } = await requireSession();
   const { data: allowed, error: permissionError } = await supabase.rpc(
@@ -417,7 +418,7 @@ export async function manageInternalRoleAction(
       role: formData.get("role"),
       enabled: formData.get("enabled") === "true",
     });
-  if (!parsed.success) return invalid(parsed.error.issues[0]?.message);
+  if (!parsed.success) return validationFailure(parsed.error, invalid().message);
 
   const { supabase } = await requireSession();
   const { error } = await supabase.rpc("set_user_role", {
@@ -449,9 +450,9 @@ export async function setInternalUserActiveAction(
       enabled,
       reason: formData.get("reason") ?? "",
     });
-  if (!parsed.success) return invalid(parsed.error.issues[0]?.message);
+  if (!parsed.success) return validationFailure(parsed.error, invalid().message);
   if (!parsed.data.enabled && !parsed.data.reason) {
-    return invalid("Informe o motivo para desativar a conta.");
+    return invalid("Informe o motivo para desativar a conta.", "reason");
   }
 
   const { supabase } = await requireSession();
@@ -487,7 +488,7 @@ export async function updateEligibilitySettingsAction(
       maxStoryAgeDays:
         rawMaxAge === "" || rawMaxAge === null ? null : Number(rawMaxAge),
     });
-  if (!parsed.success) return invalid(parsed.error.issues[0]?.message);
+  if (!parsed.success) return validationFailure(parsed.error, invalid().message);
 
   const { supabase } = await requireSession();
   const { error } = await supabase.rpc("update_eligibility_settings", {

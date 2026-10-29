@@ -47,4 +47,19 @@ export const passwordUpdateSchema = z
 export type FormState = {
   message: string;
   success: boolean;
+  // Nome do campo (atributo name) com problema. A tela marca esse campo como
+  // inválido, liga-o à mensagem e leva o foco até ele (FieldErrorLink).
+  field?: string;
 };
+
+// Resposta padrão quando o Zod recusa o formulário: a mensagem do primeiro
+// problema e o campo a que ela se refere.
+export function validationFailure(error: z.ZodError, fallback: string): FormState {
+  const issue = error.issues[0];
+  const field = issue?.path[0];
+  return {
+    message: issue?.message ?? fallback,
+    success: false,
+    ...(typeof field === "string" ? { field } : {}),
+  };
+}

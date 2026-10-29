@@ -11,23 +11,13 @@ import {
   reviewStoryEvidenceAction,
   sendCreatorMessageAction,
 } from "@/app/actions/internal";
+import { FormFeedback } from "@/app/components/form-feedback";
 import type { FormState } from "@/lib/validation/auth";
 import styles from "@/app/interno/internal-detail.module.css";
 
 const emptyState: FormState = { message: "", success: false };
 
-function Feedback({ state }: { state: FormState }) {
-  if (!state.message) return null;
-  return (
-    <p
-      className={state.success ? "form-message success" : "form-message error"}
-      role="status"
-      aria-live="polite"
-    >
-      {state.message}
-    </p>
-  );
-}
+const Feedback = FormFeedback;
 
 function Submit({
   pending,

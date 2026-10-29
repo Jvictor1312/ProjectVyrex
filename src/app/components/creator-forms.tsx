@@ -9,22 +9,12 @@ import {
   withdrawCreatorApplicationAction,
 } from "@/app/actions/creator";
 import { categoriesList, socialPlatforms } from "@/lib/validation/creator";
+import { FormFeedback } from "@/app/components/form-feedback";
 import type { FormState } from "@/lib/validation/auth";
 import { categoryLabels, platformLabels } from "@/lib/labels";
 
 const initialState: FormState = { message: "", success: false };
-function ActionMessage({ state }: { state: FormState }) {
-  if (!state.message) return null;
-  return (
-    <p
-      className={state.success ? "form-message success" : "form-message error"}
-      role="status"
-      aria-live="polite"
-    >
-      {state.message}
-    </p>
-  );
-}
+const ActionMessage = FormFeedback;
 
 export function CreatorWizard({
   steps,

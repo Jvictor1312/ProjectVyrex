@@ -10,7 +10,7 @@ import {
   maximumEvidenceBytes,
   normalizeEvidenceImage,
 } from "@/lib/evidence/normalize";
-import type { FormState } from "@/lib/validation/auth";
+import { validationFailure, type FormState } from "@/lib/validation/auth";
 import {
   creatorProfileDraftSchema,
   evidenceMetadataSchema,
@@ -33,10 +33,7 @@ export async function saveCreatorProfileAction(
     categories: formData.getAll("categories"),
   });
   if (!parsed.success)
-    return {
-      message: parsed.error.issues[0]?.message ?? errorState.message,
-      success: false,
-    };
+    return validationFailure(parsed.error, errorState.message);
 
   const { supabase, user } = await requireSession();
   const { data, error } = await supabase
@@ -78,10 +75,7 @@ export async function saveSocialAccountAction(
     followersReported: followers,
   });
   if (!parsed.success)
-    return {
-      message: parsed.error.issues[0]?.message ?? errorState.message,
-      success: false,
-    };
+    return validationFailure(parsed.error, errorState.message);
 
   const { supabase, user } = await requireSession();
   const account = {

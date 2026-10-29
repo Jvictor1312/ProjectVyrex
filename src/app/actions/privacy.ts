@@ -10,7 +10,7 @@ import {
   dataRequestSchema,
   resolveDataRequestSchema,
 } from "@/lib/validation/privacy";
-import { passwordUpdateSchema, type FormState } from "@/lib/validation/auth";
+import { passwordUpdateSchema, validationFailure, type FormState } from "@/lib/validation/auth";
 
 export async function createDataRequestAction(
   _state: FormState,
@@ -97,10 +97,7 @@ export async function updateAccountSettingsAction(
     phone: formData.get("phone") || undefined,
   });
   if (!parsed.success) {
-    return {
-      message: parsed.error.issues[0]?.message ?? "Confira os campos.",
-      success: false,
-    };
+    return validationFailure(parsed.error, "Confira os campos.");
   }
   const phone = parsed.data.phone ? normalizePhone(parsed.data.phone) : null;
   if (parsed.data.phone && !phone) {
@@ -160,12 +157,10 @@ export async function changePasswordAction(
     passwordConfirmation: formData.get("passwordConfirmation"),
   });
   if (!parsed.success) {
-    return {
-      message:
-        parsed.error.issues[0]?.message ??
-        "Mínimo de 11 caracteres, com maiúscula, minúscula, número e símbolo.",
-      success: false,
-    };
+    return validationFailure(
+      parsed.error,
+      "Mínimo de 11 caracteres, com maiúscula, minúscula, número e símbolo.",
+    );
   }
 
   const currentPassword = formData.get("currentPassword");
