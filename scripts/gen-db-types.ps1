@@ -1,4 +1,4 @@
-# Regera src/lib/supabase/database.types.ts a partir do banco (só leitura).
+﻿# Regera src/lib/supabase/database.types.ts a partir do banco (só leitura).
 # Rode depois de aplicar uma migration. Usa o token salvo na variável do
 # Windows SUPABASE_ACCESS_TOKEN (nunca escrito em arquivo).
 param([string]$ProjectRef = "zofxrohoilwjtzbcruse")
