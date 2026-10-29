@@ -130,31 +130,25 @@ export default async function InternalDashboard({
     .replace(/\s+/g, " ")
     .trim();
 
-  // Pré-consultas só quando há busca ou filtro de responsável.
-  const assignmentIds = async (table: "recruiter_assignments" | "relationship_assignments") => {
-    const column = table === "recruiter_assignments" ? "recruiter_id" : "manager_id";
-    let query = supabase.from(table).select("creator_id").is("ended_at", null);
-    if (responsible !== "none") query = query.eq(column, responsible);
-    const { data } = await query;
-    return (data ?? []).map((row) => row.creator_id as string);
-  };
-  const [nameMatches, assigned] = await Promise.all([
-    safeSearch
-      ? supabase.from("profiles").select("id").like("full_name_search", `%${safeSearch}%`).limit(200)
-      : Promise.resolve({ data: [] as { id: string }[] }),
-    responsible
-      ? Promise.all([
-          assignmentIds("recruiter_assignments"),
-          assignmentIds("relationship_assignments"),
-        ]).then(([a, b]) => [...new Set([...a, ...b])])
-      : Promise.resolve(null),
-  ]);
+  // Pré-consulta só quando há busca: quem tem o nome do cadastro parecido.
+  const nameMatches = safeSearch
+    ? await supabase.from("profiles").select("id").like("full_name_search", `%${safeSearch}%`).limit(200)
+    : { data: [] as { id: string }[] };
 
+  // A lista sai de creator_queue (migration 202610290003), que aplica o
+  // filtro "Responsável" dentro do banco; sem filtro, devolve todos os
+  // cadastros que a pessoa pode ver (a RLS vale do mesmo jeito).
   let creatorsQuery = supabase
-    .from("creator_profiles")
+    .rpc(
+      "creator_queue",
+      {
+        responsible: responsible && responsible !== "none" ? responsible : undefined,
+        unassigned: responsible === "none",
+      },
+      { count: "exact", get: true },
+    )
     .select(
       "user_id, public_name, status, submitted_at, updated_at, account:profiles!creator_profiles_user_id_fkey(full_name)",
-      { count: "exact" },
     )
     .in("status", statuses);
   if (safeSearch) {
@@ -163,17 +157,6 @@ export default async function InternalDashboard({
     creatorsQuery = creatorsQuery.or(
       [`public_name_search.like.%${safeSearch}%`, ...(ids.length ? [`user_id.in.(${ids.join(",")})`] : [])].join(","),
     );
-  }
-  if (assigned) {
-    if (responsible === "none") {
-      if (assigned.length) creatorsQuery = creatorsQuery.not("user_id", "in", `(${assigned.join(",")})`);
-    } else {
-      // Sem nenhum cadastro atribuído, a lista fica vazia de propósito.
-      creatorsQuery = creatorsQuery.in(
-        "user_id",
-        assigned.length ? assigned : ["00000000-0000-0000-0000-000000000000"],
-      );
-    }
   }
   if (period) {
     const since = new Date(Date.now() - periodOptions[period] * 86_400_000).toISOString();

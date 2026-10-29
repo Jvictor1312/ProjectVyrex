@@ -1,6 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { loggedFetch } from "@/lib/log";
+import type { Database } from "./database.types";
 
 export function isSupabaseConfigured() {
   return Boolean(
@@ -20,7 +21,7 @@ export async function createSupabaseServerClient() {
     );
   }
 
-  return createServerClient(supabaseUrl, supabaseAnonKey, {
+  return createServerClient<Database>(supabaseUrl, supabaseAnonKey, {
     // Recusas e falhas do banco ficam registradas no log do servidor.
     global: { fetch: loggedFetch },
     cookies: {

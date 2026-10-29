@@ -166,7 +166,7 @@ export async function reviewStoryEvidenceAction(
   const { error } = await supabase.rpc("review_story_evidence", {
     evidence_id: parsed.data.evidenceId,
     decision: parsed.data.decision,
-    reason: parsed.data.reason || null,
+    reason: parsed.data.reason || undefined,
   });
   if (error) return denied;
   refreshCreator(evidence.creator_id);
@@ -204,7 +204,7 @@ export async function reviewSocialAccountAction(
   const { error } = await supabase.rpc("review_social_account", {
     target_account: parsed.data.accountId,
     decision: parsed.data.decision,
-    reason: parsed.data.reason || null,
+    reason: parsed.data.reason || undefined,
   });
   if (error) return denied;
   refreshCreator(account.creator_id);
@@ -262,8 +262,10 @@ export async function assignCreatorResponsiblesAction(
   const { supabase } = await requireSession();
   const { error } = await supabase.rpc("assign_creator_responsibles", {
     target_creator: parsed.data.targetCreator,
-    new_recruiter: parsed.data.recruiterId,
-    new_manager: parsed.data.relationshipManagerId,
+    // null = "sem responsável" (o banco aceita); o gerador de tipos não marca
+    // como anulável um parâmetro sem valor padrão.
+    new_recruiter: parsed.data.recruiterId as string,
+    new_manager: parsed.data.relationshipManagerId as string,
   });
   if (error) return denied;
   refreshCreator(parsed.data.targetCreator);
@@ -456,7 +458,7 @@ export async function setInternalUserActiveAction(
   const { error } = await supabase.rpc("set_user_active", {
     target_user: parsed.data.targetUser,
     enabled: parsed.data.enabled,
-    reason: parsed.data.reason || null,
+    reason: parsed.data.reason || undefined,
   });
   if (error) return teamRuleError(error.message) ?? denied;
   revalidatePath("/interno/equipe");
@@ -492,7 +494,8 @@ export async function updateEligibilitySettingsAction(
     new_minimum_followers: parsed.data.minimumFollowers,
     new_required_evidence: parsed.data.requiredEvidence,
     new_minimum_views: parsed.data.minimumViews,
-    new_max_story_age_days: parsed.data.maxStoryAgeDays,
+    // Omitido vale o padrão do banco (null = sem idade máxima), igual a enviar null.
+    new_max_story_age_days: parsed.data.maxStoryAgeDays ?? undefined,
   });
   if (error) return denied;
   revalidatePath("/interno/configuracoes");

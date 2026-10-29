@@ -30,7 +30,7 @@ export async function createDataRequestAction(
   const { supabase } = await requireSession();
   const { error } = await supabase.rpc("create_data_request", {
     request_kind: parsed.data.kind,
-    request_details: parsed.data.details ?? null,
+    request_details: parsed.data.details ?? undefined,
   });
 
   if (error) {
@@ -68,7 +68,7 @@ export async function resolveDataRequestAction(
   const { error } = await supabase.rpc("resolve_data_request", {
     request_id: parsed.data.requestId,
     new_status: parsed.data.status,
-    note: parsed.data.note ?? null,
+    note: parsed.data.note ?? undefined,
   });
 
   if (error) {

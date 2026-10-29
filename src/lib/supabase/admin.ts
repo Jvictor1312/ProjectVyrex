@@ -1,6 +1,7 @@
 import "server-only";
 import { createClient } from "@supabase/supabase-js";
 import { loggedFetch } from "@/lib/log";
+import type { Database } from "./database.types";
 
 export function createSupabaseAdminClient() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -8,7 +9,7 @@ export function createSupabaseAdminClient() {
 
   if (!supabaseUrl || !serviceRoleKey) return null;
 
-  return createClient(supabaseUrl, serviceRoleKey, {
+  return createClient<Database>(supabaseUrl, serviceRoleKey, {
     global: { fetch: loggedFetch },
     auth: {
       autoRefreshToken: false,

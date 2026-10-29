@@ -86,8 +86,17 @@ test("3. administrador atribui recrutador e gestora", async ({ browser }) => {
 
   await page.getByLabel("Recrutador").selectOption({ label: "Rui Recrutador (teste)" });
   await page.getByLabel("Gestor de relacionamento").selectOption({ label: "Gabi Gestora (teste)" });
+  const recruiterId = await page.getByLabel("Recrutador").inputValue();
   await page.getByRole("button", { name: "Salvar responsáveis" }).click();
   await expect(page.getByText("Responsáveis atualizados.")).toBeVisible();
+
+  // Filtro "Responsável" do painel (feito no banco): aparece para o
+  // recrutador atribuído e some em "Sem responsável".
+  const search = `q=${encodeURIComponent(`FLUXO ACAO ${stamp}`)}`;
+  await page.goto(`/interno?${search}&resp=${recruiterId}`);
+  await expect(page.getByText(creator.publicName)).toBeVisible();
+  await page.goto(`/interno?${search}&resp=none`);
+  await expect(page.getByText(creator.publicName)).toHaveCount(0);
   await context.close();
 });
 

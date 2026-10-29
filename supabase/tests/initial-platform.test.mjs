@@ -159,6 +159,12 @@ before(async () => {
       "utf8",
     ),
   );
+  await database.exec(
+    await readFile(
+      new URL("../migrations/202610290003_creator_queue_filter.sql", import.meta.url),
+      "utf8",
+    ),
+  );
   await database.query(
     "insert into auth.users (id, raw_user_meta_data) values ($1, '{}'::jsonb), ($2, '{}'::jsonb), ($3, '{}'::jsonb)",
     [creatorOne, creatorTwo, creatorThree],
@@ -1136,6 +1142,62 @@ test("dashboard report sums assignments in the database and respects access rule
     database
       .exec("set role anon")
       .then(() => database.query("select public.internal_dashboard_report()"))
+      .finally(() => database.exec("reset role")),
+    /permission denied/i,
+  );
+});
+
+// Filtro "Responsável" do painel (202610290003).
+test("creator queue filters by current responsible inside the database and respects access", async () => {
+  const ids = (rows) => rows.map((row) => row.user_id).sort();
+  const queue = async (userId, sql, params = []) =>
+    ids((await asUser(userId, () => database.query(sql, params))).rows);
+  // Resultado esperado calculado direto nas tabelas (sem RLS).
+  const expected = async (sql, params = []) => ids((await database.query(sql, params)).rows);
+
+  const allVisible = await expected("select user_id from public.creator_profiles");
+  assert.deepEqual(
+    await queue(administrator, "select user_id from public.creator_queue()"),
+    allVisible,
+  );
+
+  for (const person of [assignedRecruiter, relationshipManager]) {
+    const mine = await expected(
+      `select c.user_id from public.creator_profiles c
+       where exists (select 1 from public.recruiter_assignments a
+                     where a.creator_id = c.user_id and a.ended_at is null and a.recruiter_id = $1)
+          or exists (select 1 from public.relationship_assignments a
+                     where a.creator_id = c.user_id and a.ended_at is null and a.manager_id = $1)`,
+      [person],
+    );
+    assert.ok(mine.length > 0);
+    assert.deepEqual(
+      await queue(administrator, "select user_id from public.creator_queue($1)", [person]),
+      mine,
+    );
+  }
+
+  const unassigned = await queue(administrator, "select user_id from public.creator_queue(null, true)");
+  const anyAssigned = await expected(
+    `select creator_id as user_id from public.recruiter_assignments where ended_at is null
+     union select creator_id from public.relationship_assignments where ended_at is null`,
+  );
+  assert.ok(unassigned.length > 0);
+  assert.ok(unassigned.every((id) => !anyAssigned.includes(id)));
+  assert.equal(unassigned.length + anyAssigned.length, allVisible.length);
+
+  // A RLS continua valendo: o criador só recebe o próprio cadastro, e o
+  // recrutador sem atribuições não recebe nada pelo filtro.
+  assert.deepEqual(await queue(creatorTwo, "select user_id from public.creator_queue()"), [creatorTwo]);
+  assert.deepEqual(
+    await queue(unassignedRecruiter, "select user_id from public.creator_queue($1)", [assignedRecruiter]),
+    [],
+  );
+
+  await assert.rejects(
+    database
+      .exec("set role anon")
+      .then(() => database.query("select * from public.creator_queue()"))
       .finally(() => database.exec("reset role")),
     /permission denied/i,
   );
