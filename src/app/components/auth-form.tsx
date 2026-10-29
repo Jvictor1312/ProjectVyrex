@@ -5,13 +5,12 @@ import { startTransition, useActionState, useState } from "react";
 import {
   loginAction,
   passwordUpdateAction,
-  recoveryAction,
   signupAction,
 } from "@/app/actions/auth";
 import { FormFeedback } from "@/app/components/form-feedback";
 import type { FormState } from "@/lib/validation/auth";
 
-type AuthMode = "login" | "signup" | "recovery" | "reset";
+type AuthMode = "login" | "signup" | "reset";
 
 const initialState: FormState = { message: "", success: false };
 const passwordRequirements =
@@ -118,11 +117,6 @@ const content: Record<
     description: "Crie sua conta gratuita. Depois, você completa o perfil, informa sua rede social e envia 3 prints de Stories para a análise da equipe.",
     submit: "Criar minha conta",
   },
-  recovery: {
-    title: "Recupere seu acesso.",
-    description: "Enviaremos as instruções para o e-mail informado.",
-    submit: "Enviar instruções",
-  },
   reset: {
     title: "Escolha uma nova senha.",
     description: passwordRequirements,
@@ -136,9 +130,7 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
       ? loginAction
       : mode === "signup"
         ? signupAction
-        : mode === "reset"
-          ? passwordUpdateAction
-          : recoveryAction;
+        : passwordUpdateAction;
   const [state, formAction, pending] = useActionState(action, initialState);
   const copy = content[mode];
 
@@ -181,7 +173,7 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
         </label>
       )}
 
-      {mode !== "recovery" && mode !== "reset" && (
+      {mode !== "reset" && (
         <PasswordField
           name="password"
           label="Senha"
@@ -249,7 +241,6 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
               Ainda não tem conta? <Link href="/cadastro">Criar conta</Link>
             </span>
           )}
-          {mode === "recovery" && <Link href="/login">Voltar para entrar</Link>}
           {mode === "reset" && (
             <Link href="/recuperar-senha">Solicitar outro link</Link>
           )}

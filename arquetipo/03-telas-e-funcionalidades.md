@@ -10,7 +10,7 @@ As 31 rotas do site, agrupadas por quem acessa. Todas têm versão para celular 
 | `/cadastro` | Criar conta: nome, e-mail, celular (opcional), senha forte com "mostrar/ocultar", aceite dos termos. Painel à esquerda (recolhível): esfera com o logo e "Assistir vídeo" (play sempre visível), anel pulsando e uma pequena esfera em órbita, a frase "Criadores e marcas, na mesma órbita." e a instrução "Toque na esfera e conheça a Vyrex em vídeo". A esfera abre o vídeo de apresentação; sem vídeo cadastrado, a janela avisa que ele virá em breve. Se o servidor recusar o formulário, o que foi digitado continua nos campos e o campo com problema fica destacado. |
 | `/cadastro/confirmacao` | "Confira seu e-mail", com orientação sobre a caixa de spam. |
 | `/login` | Entrar. Leva ao painel certo: equipe → `/interno`, criador → `/dashboard`. |
-| `/recuperar-senha` | Pede e-mail **ou CPF**. A resposta é sempre a mesma, exista ou não a conta. |
+| `/recuperar-senha` | Pede e-mail **ou CPF**. A resposta é sempre a mesma, exista ou não a conta. Depois do envio: aviso para olhar o Spam (remetente e assunto), botão "Reenviar em m:ss" liberado a cada 3 minutos e até 3 envios por hora para o mesmo e-mail ou CPF; no fim, o botão some e a tela explica quando tentar de novo. O servidor aplica os mesmos limites (`src/lib/recovery-limits.ts`). |
 | `/redefinir-senha` | Nova senha (chega pelo link do e-mail). |
 | `/termos`, `/privacidade` | Rascunhos jurídicos (marcados como "documento preliminar"). |
 | `/acesso-negado` | Página 403 (sem permissão). |

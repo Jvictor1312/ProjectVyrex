@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 import { fetchActiveRoleKeys } from "@/lib/auth";
 import { rateLimit, tooManyAttempts } from "@/lib/rate-limit";
+import { recoveryCooldownSeconds, recoveryMaxSends } from "@/lib/recovery-limits";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { invalidPhoneMessage, normalizePhone } from "@/lib/validation/phone";
 import { isValidCpf, looksLikeEmail, normalizeCpf } from "@/lib/validation/cpf";
@@ -198,26 +199,42 @@ export async function recoveryOptionsAction(
 }
 
 const neutralSent = {
-  email:
-    "Se houver uma conta com esse e-mail, enviamos as instruções de recuperação. Confira também o spam.",
-  cpf: "Se houver uma conta ativa com esse CPF, enviamos as instruções para o e-mail cadastrado nela. Confira também o spam.",
+  email: "Se houver uma conta com esse e-mail, enviamos as instruções de recuperação.",
+  cpf: "Se houver uma conta ativa com esse CPF, enviamos as instruções para o e-mail cadastrado nela.",
 };
+
+export type RecoverySendState =
+  | { status: "idle" }
+  | { status: "sent"; message: string }
+  | { status: "wait"; message: string }
+  | { status: "limit"; message: string }
+  | { status: "error"; message: string };
 
 // Passo 2: envia o link. A resposta é a mesma exista ou não a conta, e leva
 // pelo menos o mesmo tempo nos dois casos (o tempo de resposta também não
-// pode denunciar a conta).
+// pode denunciar a conta). Os limites contam o que foi digitado, não a conta.
 export async function recoveryAction(
-  _previousState: FormState,
+  _previousState: RecoverySendState,
   formData: FormData,
-): Promise<FormState> {
-  if (!isSupabaseConfigured()) return setupMessage;
+): Promise<RecoverySendState> {
+  if (!isSupabaseConfigured()) return { status: "error", message: setupMessage.message };
   const minimumTime = new Promise((resolve) => setTimeout(resolve, 1200));
   const kind = formData.get("kind") === "cpf" ? "cpf" : "email";
   const identifier = String(formData.get("identifier") ?? "").trim();
+  const limitKey = `${kind}:${identifier}`;
 
-  // Limite por e-mail ou CPF informado, antes de consultar qualquer conta.
-  if (!(await rateLimit("recovery-send", 3, 3600, `${kind}:${identifier}`)).allowed) {
-    return tooManyAttempts;
+  // Limites antes de consultar qualquer conta.
+  if (!(await rateLimit("recovery-cooldown", 1, recoveryCooldownSeconds, limitKey)).allowed) {
+    return {
+      status: "wait",
+      message: "Já enviamos há pouco. Aguarde alguns minutos antes de pedir outro e-mail.",
+    };
+  }
+  if (!(await rateLimit("recovery-send", recoveryMaxSends, 3600, limitKey)).allowed) {
+    return {
+      status: "limit",
+      message: `Você já pediu o e-mail ${recoveryMaxSends} vezes. Ele pode demorar alguns minutos para chegar.`,
+    };
   }
 
   // O e-mail é sempre resolvido aqui no servidor (o navegador nunca recebe o
@@ -225,18 +242,18 @@ export async function recoveryAction(
   let email: string | null = null;
   if (kind === "cpf") {
     const cpf = normalizeCpf(identifier);
-    if (!isValidCpf(cpf)) return invalidForm;
+    if (!isValidCpf(cpf)) return { status: "error", message: invalidForm.message };
     const found = await emailForCpf(cpf);
     if (found === "unavailable") {
       return {
+        status: "error",
         message: "A recuperação por CPF está indisponível no momento. Use o e-mail da conta.",
-        success: false,
       };
     }
     email = found;
   } else {
     const parsed = recoverySchema.safeParse({ email: identifier });
-    if (!parsed.success) return invalidForm;
+    if (!parsed.success) return { status: "error", message: invalidForm.message };
     email = parsed.data.email;
   }
 
@@ -247,7 +264,7 @@ export async function recoveryAction(
     });
   }
   await minimumTime;
-  return { message: neutralSent[kind], success: true };
+  return { status: "sent", message: neutralSent[kind] };
 }
 export async function passwordUpdateAction(
   _previousState: FormState,

@@ -2173,6 +2173,38 @@ textarea[aria-invalid="true"] {
   cursor: not-allowed;
   opacity: 0.55;
 }
+/* Recuperação de senha: aviso do spam e limite de envios. */
+.recovery-help {
+  display: grid;
+  gap: 4px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: #edeeec;
+  font-size: 14px;
+  line-height: 1.5;
+}
+.recovery-help p {
+  margin: 0;
+  color: var(--muted);
+}
+.recovery-help b {
+  color: var(--ink);
+}
+.recovery-remaining,
+.recovery-limit {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.5;
+}
+.recovery-remaining {
+  text-align: center;
+}
+.recovery-limit {
+  padding: 14px 16px;
+  border: 1px solid #c9d0c8;
+  border-radius: 14px;
+}
 .link-button {
   padding: 0;
   border: 0;
