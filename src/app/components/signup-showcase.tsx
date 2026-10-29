@@ -121,16 +121,14 @@ function SignupShowcase({
             >
               <VyrexLogo className="signup-orb-word" decorative />
               <span className="signup-orb-cta">
-                {videoUrl && (
-                  <span className="signup-orb-play" aria-hidden="true">
-                    <svg viewBox="0 0 12 12" focusable="false">
-                      <path d="M4 2.6v6.8L9.4 6z" />
-                    </svg>
-                  </span>
-                )}
-                <span className="signup-orb-prompt">
-                  {videoUrl ? "Assistir vídeo" : "Conheça a Vyrex"}
+                {/* O play aparece sempre (decisão do dono). Sem vídeo
+                    cadastrado, a janela avisa que ele virá em breve. */}
+                <span className="signup-orb-play" aria-hidden="true">
+                  <svg viewBox="0 0 12 12" focusable="false">
+                    <path d="M4 2.6v6.8L9.4 6z" />
+                  </svg>
                 </span>
+                <span className="signup-orb-prompt">Assistir vídeo</span>
               </span>
             </button>
           </div>
@@ -139,9 +137,7 @@ function SignupShowcase({
               Criadores e marcas, na mesma órbita.
             </p>
             <p className="signup-showcase-instruction">
-              {videoUrl
-                ? "Toque na esfera e conheça a Vyrex em vídeo."
-                : "Apresente seu trabalho para a nossa equipe."}
+              Toque na esfera e conheça a Vyrex em vídeo.
             </p>
           </div>
         </div>
