@@ -1,5 +1,7 @@
 # Arquitetura da Vyrex
 
+> **Atualização de 2026-10-29:** a versão atual e conferida deste assunto está em [arquetipo/](../arquetipo/README.md). Este documento é mantido como histórico e pode estar desatualizado.
+
 ## Visão geral
 
 Aplicação Next.js (App Router) + Supabase (Auth, PostgreSQL, Storage). A regra de negócio e a autorização ficam no banco (RLS + funções RPC `security definer`); o servidor Next.js valida entradas com Zod, exige sessão e chama o banco com a sessão do usuário. O navegador nunca recebe a chave `service_role`.

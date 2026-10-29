@@ -1,5 +1,7 @@
 # Segurança
 
+> **Atualização de 2026-10-29:** a versão atual e conferida deste assunto está em [arquetipo/](../arquetipo/README.md). Este documento é mantido como histórico e pode estar desatualizado.
+
 ## Princípios aplicados
 
 - **Autorização no banco.** RLS em todas as tabelas privadas; mutações sensíveis (decisões, atribuições, papéis, critérios, privacidade) somente por RPCs `security definer` com `search_path` fixo e checagem de permissão. O cliente recebe `grant select` e, em poucas colunas, `update`/`insert`.

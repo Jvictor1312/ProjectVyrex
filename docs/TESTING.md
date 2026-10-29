@@ -1,5 +1,7 @@
 # Testes
 
+> **Atualização de 2026-10-29:** a versão atual e conferida deste assunto está em [arquetipo/](../arquetipo/README.md). Este documento é mantido como histórico e pode estar desatualizado.
+
 ## Como executar (na máquina de desenvolvimento)
 
 ```powershell

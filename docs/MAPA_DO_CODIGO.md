@@ -1,5 +1,7 @@
 # Vyrex — mapa do código
 
+> **Atualização de 2026-10-29:** a versão atual e conferida deste assunto está em [arquetipo/](../arquetipo/README.md). Este documento é mantido como histórico e pode estar desatualizado.
+
 Leitura geral da estrutura do código, escrita para dar contexto a uma IA (ou a uma pessoa nova) antes de mexer no projeto. Reflete o código em **2026-10-28** (commit `d87f200`). Tudo aqui foi conferido lendo os arquivos; onde a documentação antiga diverge do código, isso está apontado na seção 14.
 
 Ordem de leitura sugerida: este arquivo → `CLAUDE.md` (regras do dono) → `docs/PASSAGEM.md` (onde o trabalho parou) → `docs/TASKS.md` (pendências).

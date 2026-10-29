@@ -63,7 +63,7 @@ Removidas por não servirem a este projeto: `hyperframes` (vídeo), `frontend-de
 ## Supabase
 
 - Projeto na nuvem `zofxrohoilwjtzbcruse` (nome "Vyrex", região us-east-1). Chaves em `.env.local`: pública (formato antigo `eyJ`) e `SUPABASE_SERVICE_ROLE_KEY` com a chave secreta nova (`sb_secret_`), usada só no servidor (e-mails da equipe, convites, recuperação por CPF).
-- Todas as migrations de `supabase/migrations/` (até `202610280008_user_id_for_email.sql`) estão aplicadas no banco (pelo SQL Editor ou pela Management API; não existe a tabela `supabase_migrations.schema_migrations`). Novas migrations devem ser aditivas e não destrutivas; aplique-as pela Management API (`POST /v1/projects/{ref}/database/query`) e inclua-as nos testes PGlite.
+- Todas as migrations de `supabase/migrations/` (até `202610290002_shared_rate_limit.sql`) estão aplicadas no banco (pelo SQL Editor ou pela Management API; não existe a tabela `supabase_migrations.schema_migrations`). Novas migrations devem ser aditivas e não destrutivas; aplique-as pela Management API (`POST /v1/projects/{ref}/database/query`) e inclua-as nos testes PGlite.
 - Critérios atuais no banco: 0 seguidores mínimos, 1.000 visualizações por evidência e **3 evidências obrigatórias** (posições 1 a 3; a 4ª e a 5ª são opcionais). As diretrizes citam 3.000/2.000 e 5 evidências: estão desatualizadas.
 - E-mails do Supabase: no plano gratuito sem SMTP próprio os textos não podem ser alterados. Os modelos em português estão em `supabase/templates/`; aplique-os quando o usuário configurar o SMTP.
 - Contas de teste: `jvictorbviana+user@gmail.com` (criador) e `jvictorbviana+adm@gmail.com` (admin). O Claude pode entrar nelas (veja "Testar telas com login").
@@ -71,6 +71,7 @@ Removidas por não servirem a este projeto: `hyperframes` (vídeo), `frontend-de
 
 ## Documentação
 
+- `arquetipo/`: retrato completo e conferido do sistema (o que existe, como funciona, testes, acessibilidade, segurança e avaliação da arquitetura). Atualize o capítulo afetado quando mudar algo estrutural.
 - `docs/TASKS.md`: tarefas e progresso (atualize após cada conjunto de alterações).
 - `docs/ARCHITECTURE.md`, `docs/DECISIONS.md`, `docs/SECURITY.md`, `docs/TESTING.md`.
 - `README.md`: instalação e configuração.

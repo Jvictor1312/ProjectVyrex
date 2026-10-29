@@ -1,11 +1,12 @@
 # Vyrex - acompanhamento de tarefas
 
-Atualizado em: 2026-10-28. Reescrito para mostrar só o estado atual e as pendências reais; o registro detalhado das sessões anteriores está no histórico do git (`git log -- docs/TASKS.md`).
+Atualizado em: 2026-10-29. Reescrito para mostrar só o estado atual e as pendências reais; o registro detalhado das sessões anteriores está no histórico do git (`git log -- docs/TASKS.md`).
 
 ## Estado atual (verificado)
 
+- **Retrato completo do sistema:** `arquetipo/README.md` (atualizado em 2026-10-29).
 - **Passagem para outro colaborador:** comece por `docs/PASSAGEM.md` (onde paramos, o que fica fora do git e próximas tarefas).
-- **Ambiente:** Supabase na nuvem (`zofxrohoilwjtzbcruse`) com as 13 migrations aplicadas (até `202610280008`); `.env.local` com URL, chave pública (formato antigo `eyJ`) e chave de serviço nova (`sb_secret_`). Servidor local em `localhost:3000`. Projeto de testes `ukwnnrrqmrvfwtbjjrbi` com servidor em `localhost:3001`.
+- **Ambiente:** Supabase na nuvem (`zofxrohoilwjtzbcruse`) com as 15 migrations aplicadas (até `202610290002`; conferido em 2026-10-29 no real e no de testes); `.env.local` com URL, chave pública (formato antigo `eyJ`) e chave de serviço nova (`sb_secret_`). Servidor local em `localhost:3000`. Projeto de testes `ukwnnrrqmrvfwtbjjrbi` com servidor em `localhost:3001`.
 - **Verificações:** `npm run typecheck`, `npm run lint`, `npm test` (54/54, PGlite), `npm run test:e2e` (55 aprovados, 3 pulados de propósito), `npm run test:flows` (10/10) e `npm run build` passam.
 - **Área do criador (`/dashboard`):** visão geral, meu cadastro (wizard, perfil com salvamento automático, redes, evidências, revisão e envio), mensagens e configurações (dados, senha, privacidade). Menu no topo. Evidências: vários prints de uma vez, dados por Story, um botão salva todos; os que falham ficam marcados ("Não foi salvo") e o botão vira "Tentar enviar de novo".
 - **Área interna (`/interno`):** visão geral adaptada a cada função (indicadores sem as contas da equipe; busca por nome público ou do cadastro; filtros por situação, responsável e período), ficha do criador (conferência de redes e evidências, decisão, responsáveis, histórico), gestão de colaboradores (convite, funções, desativação com confirmação, histórico), configurações (critérios e vídeo) e pedidos de privacidade.
@@ -15,6 +16,14 @@ Atualizado em: 2026-10-28. Reescrito para mostrar só o estado atual e as pendê
 
 ## Pendências
 
+### Feito em 2026-10-29 (arquétipo, acessibilidade e avaliação da arquitetura)
+- [x] **Arquétipo do sistema** em `arquetipo/` (8 capítulos): o que foi feito, telas, como funciona, testes, acessibilidade, segurança e avaliação da arquitetura. Documentos antigos de `docs/` ganharam um aviso apontando para ele.
+- [x] **Auditoria de acessibilidade** em 16 telas × 2 larguras, com correções (commit `a3757ed`): "Pular para o conteúdo"; campos da ficha do criador com moldura; "Abrir ficha" com 44px no celular.
+- [x] Verificações: typecheck, lint, `npm test` 54/54, build, `test:e2e` 55 + 3 pulados, `test:flows` 10/10.
+- [ ] **Arquitetura, alta prioridade** (detalhes em `arquetipo/08-avaliacao-da-arquitetura.md`): A1 registro de erros no servidor; A2 CI no GitHub (typecheck, lint, test, build); A3 cópia de segurança do banco (decisão do dono); A4 confirmar o limite de tamanho da hospedagem para prints de 8 MB.
+- [ ] **Arquitetura, média:** M1 tipos gerados do banco; M2 `layout.tsx` nas áreas logadas; M3 filtro "Responsável" filtrando no banco; M4 custo do nonce (páginas montadas a cada visita); M5 `@axe-core/playwright` nos testes e erros ligados aos campos; M6 controle das migrations aplicadas.
+- [ ] **Arquitetura, limpeza:** B1 código sem uso (`InfoHelp`, `maskPhone`, `seed:local-users`); B2 textos de auditoria que faltam; B3 decidir sobre o Tailwind e dividir o `globals.css`; B4 situação `suspended`; B5 reescrever os documentos antigos.
+
 ### Feito em 2026-10-29 (histórico, evidências repetidas, visual e desempenho)
 - [x] **Histórico da Visão geral recolhido** (`<details>` nativo, com contagem de registros); mostra até 15 registros.
 - [x] **Evidências "repetidas" no histórico:** cada conferência de evidência é um registro próprio, mas as telas não liam qual Story era (`review_history.evidence_id`) e mostravam linhas idênticas. Visão geral e ficha da equipe agora mostram "Evidência aprovada · Story N" (`src/lib/history.ts`). Teste PGlite e unitário novos. Nenhum dado alterado.
@@ -22,7 +31,7 @@ Atualizado em: 2026-10-28. Reescrito para mostrar só o estado atual e as pendê
 - [x] **Desempenho:** conexões com o Supabase mantidas abertas por até 60 s (`src/instrumentation.ts`, dependência `undici`). Medido no site: consulta após 6 s parado caiu de mediana 329 ms (até 552) para 204 ms (até 212).
 - [x] `npm run test:e2e` rodado em 2026-10-29 com Chrome e credenciais: 55 aprovados, 3 pulados de propósito.
 - [ ] Rodar `npm run test:flows` (servidor de testes na 3001). O passo 8 do fluxo foi atualizado para abrir o histórico recolhido.
-- [ ] Risco anotado: o painel `/interno` busca todas as redes sociais e atribuições sem limite; com muitos cadastros, isso vai pesar.
+- [x] Risco anotado: o painel `/interno` buscava todas as redes e atribuições. O resumo passou a ser somado no banco (`202610290001`); sobra o filtro "Responsável" (item M3 acima).
 
 ### Feito em 2026-10-28 (sessão e CPF)
 - [x] **Continuar logado:** a página inicial reconhece quem já entrou ("Ir para o meu painel"); `/login` e `/cadastro` levam direto ao painel; o `proxy` renova a sessão também em `/`, `/login` e `/cadastro`.
