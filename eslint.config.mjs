@@ -23,6 +23,7 @@ export default defineConfig([
     "graphify-out/**",
     // Gerados pelo servidor de testes e pelos relatórios do Playwright.
     ".next-test/**",
+    ".next-prod/**",
     "playwright-report/**",
     "playwright-report-flows/**",
     "test-results/**",

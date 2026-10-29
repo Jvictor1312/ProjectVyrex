@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Figtree, Gelasio } from "next/font/google";
+import { connection } from "next/server";
 import "./globals.css";
 
 // Fontes servidas pelo próprio site (aparecem iguais em qualquer aparelho).
@@ -47,9 +48,13 @@ export const viewport: Viewport = {
   themeColor: "#f5f5f3",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
+  // Cada página é montada na hora do pedido: os scripts precisam do nonce
+  // sorteado para aquele pedido (src/proxy.ts). Página pronta de antemão
+  // teria scripts sem nonce, bloqueados pela política de conteúdo.
+  await connection();
   return (
     <html
       lang="pt-BR"

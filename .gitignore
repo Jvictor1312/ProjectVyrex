@@ -169,3 +169,4 @@ vite.config.ts.timestamp-*
 /test-results/
 /.next-test/
 /playwright-report-flows/
+/.next-prod/

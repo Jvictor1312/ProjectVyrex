@@ -50,9 +50,10 @@ test.describe("proteção das áreas com login", () => {
     });
   }
 
-  test("link de retorno não leva para outro site", async ({ page }) => {
+  test("link de retorno não leva para outro site", async ({ page, baseURL }) => {
     await page.goto("/auth/callback?next=//exemplo-externo.test");
-    await expect(page).toHaveURL(/localhost:3000\/login/);
+    await expect(page).toHaveURL(/\/login/);
+    expect(new URL(page.url()).origin).toBe(new URL(baseURL!).origin);
   });
 });
 

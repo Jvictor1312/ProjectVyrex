@@ -6,7 +6,7 @@ Atualizado em: 2026-10-28. Reescrito para mostrar só o estado atual e as pendê
 
 - **Passagem para outro colaborador:** comece por `docs/PASSAGEM.md` (onde paramos, o que fica fora do git e próximas tarefas).
 - **Ambiente:** Supabase na nuvem (`zofxrohoilwjtzbcruse`) com as 13 migrations aplicadas (até `202610280008`); `.env.local` com URL, chave pública (formato antigo `eyJ`) e chave de serviço nova (`sb_secret_`). Servidor local em `localhost:3000`. Projeto de testes `ukwnnrrqmrvfwtbjjrbi` com servidor em `localhost:3001`.
-- **Verificações:** `npm run typecheck`, `npm run lint`, `npm test` (47/47, PGlite), `npm run test:e2e` (55 aprovados, 3 pulados de propósito), `npm run test:flows` (10/10) e `npm run build` passam.
+- **Verificações:** `npm run typecheck`, `npm run lint`, `npm test` (54/54, PGlite), `npm run test:e2e` (55 aprovados, 3 pulados de propósito), `npm run test:flows` (10/10) e `npm run build` passam.
 - **Área do criador (`/dashboard`):** visão geral, meu cadastro (wizard, perfil com salvamento automático, redes, evidências, revisão e envio), mensagens e configurações (dados, senha, privacidade). Menu no topo. Evidências: vários prints de uma vez, dados por Story, um botão salva todos; os que falham ficam marcados ("Não foi salvo") e o botão vira "Tentar enviar de novo".
 - **Área interna (`/interno`):** visão geral adaptada a cada função (indicadores sem as contas da equipe; busca por nome público ou do cadastro; filtros por situação, responsável e período), ficha do criador (conferência de redes e evidências, decisão, responsáveis, histórico), gestão de colaboradores (convite, funções, desativação com confirmação, histórico), configurações (critérios e vídeo) e pedidos de privacidade.
 - **Padrões:** vocabulário único em `src/lib/labels.ts`; componentes da área interna em `src/app/interno/ui.tsx`; escala visual (título 24–32px, seção 16–20px, texto 14px, campos e botões 38–40px).
@@ -20,7 +20,8 @@ Atualizado em: 2026-10-28. Reescrito para mostrar só o estado atual e as pendê
 - [x] **Evidências "repetidas" no histórico:** cada conferência de evidência é um registro próprio, mas as telas não liam qual Story era (`review_history.evidence_id`) e mostravam linhas idênticas. Visão geral e ficha da equipe agora mostram "Evidência aprovada · Story N" (`src/lib/history.ts`). Teste PGlite e unitário novos. Nenhum dado alterado.
 - [x] **Meu cadastro e Mensagens com visual refinado.** Apresentação separada em `CreatorProfileView` e `CreatorMessages`, usadas pela tela real e pelas prévias (nova: `/preview/criador/mensagens`, `?vazio=1` para o estado vazio).
 - [x] **Desempenho:** conexões com o Supabase mantidas abertas por até 60 s (`src/instrumentation.ts`, dependência `undici`). Medido no site: consulta após 6 s parado caiu de mediana 329 ms (até 552) para 204 ms (até 212).
-- [ ] Rodar `npm run test:e2e` e `npm run test:flows` numa máquina com Chrome e credenciais (aqui não há Chrome instalado nem as variáveis `VYREX_TEST_*`). O passo 8 do fluxo foi atualizado para abrir o histórico recolhido.
+- [x] `npm run test:e2e` rodado em 2026-10-29 com Chrome e credenciais: 55 aprovados, 3 pulados de propósito.
+- [ ] Rodar `npm run test:flows` (servidor de testes na 3001). O passo 8 do fluxo foi atualizado para abrir o histórico recolhido.
 - [ ] Risco anotado: o painel `/interno` busca todas as redes sociais e atribuições sem limite; com muitos cadastros, isso vai pesar.
 
 ### Feito em 2026-10-28 (sessão e CPF)
@@ -47,7 +48,8 @@ Atualizado em: 2026-10-28. Reescrito para mostrar só o estado atual e as pendê
 - [x] **Situações:** Enviado para análise, Correções solicitadas, Não aprovado, Cadastro suspenso (vocabulário único em `src/lib/labels.ts`; a ficha da equipe deixou de ter uma lista própria).
 - [x] **Busca e compartilhamento:** título e descrição reais, Open Graph, `robots.txt` e `X-Robots-Tag: noindex` nas áreas com login, prévias e retornos de autenticação.
 - [x] **Confirmações que sumiam:** rede social salva, encaminhamento e decisão final (depois da decisão, a equipe volta à lista com aviso).
-- [ ] **Segurança, próximo passo antes de publicar:** CSP com *nonce* (tirar `'unsafe-inline'`) e limite de tentativas compartilhado entre instâncias (hoje em memória).
+- [x] **Limite de tentativas compartilhado** entre instâncias (no banco). Feito em 2026-10-29.
+- [x] **CSP com *nonce*** (2026-10-29): `src/lib/security/csp.ts` monta a política e `src/proxy.ts` sorteia um nonce por página; o layout usa `connection()` para montar as páginas na hora. Scripts sem nonce e HTML injetado com `onerror` são bloqueados (conferido no build de produção em `localhost:3002`); estilos seguem com `'unsafe-inline'` (o React grava `style=`). Build de teste: `$env:NEXT_DIST_DIR=".next-prod"; npm run build`.
 - [ ] **Revisão jurídica** dos termos e da política (o texto não foi alterado no conteúdo).
 
 ### Decisões do usuário

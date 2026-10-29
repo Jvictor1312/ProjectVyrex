@@ -1,11 +1,41 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { contentSecurityPolicy, createNonce } from "@/lib/security/csp";
+
+// Telas que dependem da sessão: o proxy renova o login antes delas.
+function needsSession(pathname: string) {
+  return (
+    pathname === "/" ||
+    pathname === "/login" ||
+    pathname === "/cadastro" ||
+    pathname === "/redefinir-senha" ||
+    pathname === "/dashboard" ||
+    pathname.startsWith("/dashboard/") ||
+    pathname === "/interno" ||
+    pathname.startsWith("/interno/") ||
+    pathname.startsWith("/auth/")
+  );
+}
+
+// Toda página recebe uma política de conteúdo com nonce novo. O Next lê o
+// nonce do cabeçalho da requisição e o aplica nos próprios scripts.
+export async function proxy(request: NextRequest) {
+  const policy = contentSecurityPolicy(
+    createNonce(),
+    process.env.NODE_ENV === "development",
+  );
+  request.headers.set("Content-Security-Policy", policy);
+  const response = await sessionProxy(request);
+  response.headers.set("Content-Security-Policy", policy);
+  return response;
+}
 
 // Renova a sessão do Supabase antes das telas com login. Sem isso, o token
 // vencido seria renovado dentro das páginas, que não conseguem gravar o cookie
 // novo, e a rotação de tokens poderia derrubar a sessão.
-export async function proxy(request: NextRequest) {
+async function sessionProxy(request: NextRequest) {
   let response = NextResponse.next({ request });
+  if (!needsSession(request.nextUrl.pathname)) return response;
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
   if (!supabaseUrl || !supabaseAnonKey) return response;
@@ -55,15 +85,9 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  // A página inicial, o login e o cadastro também passam por aqui, para a
-  // sessão continuar ativa e quem já entrou não precisar entrar de novo.
+  // Todas as páginas (para a política de conteúdo), menos os arquivos
+  // estáticos: scripts do Next, imagens, vídeos e ícones não precisam dela.
   matcher: [
-    "/",
-    "/login",
-    "/cadastro",
-    "/dashboard/:path*",
-    "/interno/:path*",
-    "/redefinir-senha",
-    "/auth/:path*",
+    "/((?!_next/static|_next/image|favicon\\.ico|.*\\.(?:png|jpe?g|gif|svg|webp|avif|ico|mp4|webm|txt|xml|woff2?)$).*)",
   ],
 };
