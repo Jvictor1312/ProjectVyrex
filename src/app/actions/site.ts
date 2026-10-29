@@ -1,8 +1,8 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { requireSession } from "@/lib/auth";
-import { siteMediaBucket } from "@/lib/site-media";
+import { presentationVideoTag, siteMediaBucket } from "@/lib/site-media";
 import type { FormState } from "@/lib/validation/auth";
 
 const videoPathPattern = /^presentation\/[0-9a-f-]{36}\.(mp4|webm)$/;
@@ -51,6 +51,7 @@ export async function savePresentationVideoAction(
   if (previous && previous !== path) {
     await supabase.storage.from(siteMediaBucket).remove([previous]);
   }
+  revalidateTag(presentationVideoTag, { expire: 0 });
   revalidatePath("/cadastro");
   revalidatePath("/login");
   revalidatePath("/interno/configuracoes");
@@ -74,6 +75,7 @@ export async function removePresentationVideoAction(): Promise<FormState> {
     return { message: "Não foi possível remover o vídeo.", success: false };
   }
   await supabase.storage.from(siteMediaBucket).remove([path]);
+  revalidateTag(presentationVideoTag, { expire: 0 });
   revalidatePath("/cadastro");
   revalidatePath("/login");
   revalidatePath("/interno/configuracoes");

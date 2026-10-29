@@ -5,9 +5,8 @@ import { getPresentationVideoUrl } from "@/lib/site-media";
 
 export const metadata: Metadata = { title: "Criar conta" };
 
-// Página gerada com antecedência; atualizada a cada 5 minutos ou quando um
-// administrador troca o vídeo (revalidatePath em actions/site.ts).
-export const revalidate = 300;
+// A página é montada a cada visita (o nonce da política de conteúdo exige);
+// o endereço do vídeo vem de um cache de 5 min (lib/site-media.ts).
 
 export default async function SignupPage() {
   const videoUrl = await getPresentationVideoUrl();
