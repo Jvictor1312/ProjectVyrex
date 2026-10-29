@@ -6,7 +6,7 @@ Linha do tempo tirada do histórico do git (97 commits). O detalhe de cada mudan
 
 - Esquema do banco completo (migration `202610140001`): contas, funções e permissões, cadastro do criador, redes, evidências, responsáveis, histórico, mensagens, avisos, critérios, auditoria e o bucket privado dos prints.
 - Pedidos de privacidade (LGPD), edição de rede que zera a verificação, bloqueio de envio sem nome público e os critérios novos (0 seguidores e 1.000 visualizações).
-- Relatório de QA inicial (`QA_REPORT.txt`, 14/10).
+- Relatório de QA inicial (hoje em `docs/historico/QA_REPORT_2026-10-14.txt`).
 
 ## 27/10 — organização e primeira rodada de correções
 
@@ -41,3 +41,16 @@ Linha do tempo tirada do histórico do git (97 commits). O detalhe de cada mudan
 - **Política de conteúdo com nonce** (commit `0dbcc96`): o navegador só roda scripts que o próprio site marcou naquela visita. HTML injetado com código é bloqueado (conferido no build de produção).
 - **Acessibilidade** (commit `a3757ed`): link "Pular para o conteúdo"; campos da ficha do criador com moldura e altura adequada; "Abrir ficha" com toque de 44px no celular.
 - Este arquétipo.
+
+## 29/10 (tarde) — itens da avaliação da arquitetura
+
+- **Registro de erros** (`8db6761`): toda recusa ou falha do banco e todo erro não tratado vira uma linha no log do servidor, sem dados pessoais.
+- **CI no GitHub** (`ad29604`): tipos, lint, testes, build e `npm audit` a cada envio.
+- **Limpeza** (`58d7b62`): textos de auditoria que faltavam; `InfoHelp` e `maskPhone` removidos.
+- **Tipos gerados do banco e filtro "Responsável" no banco** (`c05b098`, migration `202610290003`).
+- **Registro das migrations aplicadas** (`eef2672`): tabela `supabase_migrations.schema_migrations` nos dois bancos e `scripts/migrations.ps1`.
+- **Acessibilidade** (`0e82088`): erro ligado ao campo (marcado, descrito e com foco); login e cadastro não apagam o que foi digitado; auditoria axe (WCAG 2.2 AA) em 15 telas dentro dos testes.
+- **Layout da área do criador** (`9edd260`): o menu fica na tela ao trocar de página.
+- **Cache do vídeo do cadastro** (`155ebf4`).
+- **Cópia de segurança** (`adefbcf`): `scripts/backup-db.ps1` exporta os dados (só leitura); primeira cópia do banco real feita em 29/10.
+- **Documentação** reescrita: `docs/ARCHITECTURE.md`, `SECURITY.md`, `TESTING.md`, `DECISIONS.md` (20 decisões).

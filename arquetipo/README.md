@@ -22,8 +22,8 @@ Tudo aqui foi conferido no código, no banco e nas telas nesta data. Quando algu
 - **O que é:** site onde criadores de conteúdo se cadastram e mostram o alcance dos seus Stories. A equipe da Vyrex confere, conversa com o criador e aprova ou não.
 - **Quem usa:** criadores e uma equipe com quatro funções (administrador, recrutador, gestor de relacionamento e analista de validação).
 - **Como é feito:** Next.js 16 (site) + Supabase (login, banco de dados e arquivos). As regras de quem pode o quê ficam **dentro do banco**, então nem uma chamada feita "por fora" do site consegue burlá-las.
-- **Estado:** funcional e testado. Hoje passaram 54 testes de regras e banco, 55 testes de navegador e 10 de 10 etapas do fluxo completo. **Ainda não foi publicado.** Faltam SMTP próprio (e-mails em português), a revisão jurídica dos termos e a troca das chaves.
-- **Arquitetura:** sólida no que importa (segurança, regras no banco, testes). Os pontos a melhorar são de organização e de operação, não de base. Detalhes no arquivo 8.
+- **Estado:** funcional e testado. Hoje passaram 61 testes de regras e banco, 85 testes de navegador (incluindo a auditoria de acessibilidade em 15 telas) e 10 de 10 etapas do fluxo completo; o GitHub repete as verificações a cada envio. **Ainda não foi publicado.** Faltam SMTP próprio (e-mails em português), a revisão jurídica dos termos e a troca das chaves.
+- **Arquitetura:** sólida no que importa (segurança, regras no banco, testes). Dos 15 itens da avaliação, 13 foram resolvidos ou decididos em 29/10; os 2 restantes (limite de envio da hospedagem e regra de suspensão) dependem de decisões do dono. Detalhes no arquivo 8.
 
 ## Mapa de outros documentos
 

@@ -9,7 +9,7 @@ Meta: **WCAG 2.2, nível AA**, com regras extras de celular definidas pelo dono 
 | Idioma | `<html lang="pt-BR">` |
 | Um título principal por tela | conferido nas 16 telas auditadas |
 | Rótulos nos campos | todos os campos visíveis têm `<label>` (51 no código) |
-| Mensagens lidas pelo leitor de tela | 43 avisos com `role="status"` ou `role="alert"` (salvo, erro, enviando) |
+| Mensagens lidas pelo leitor de tela | avisos com `role="status"` ou `role="alert"` (salvo, erro, enviando); erro de validação ligado ao campo |
 | Página atual no menu | `aria-current` no menu do criador e no da equipe |
 | Foco visível no teclado | contorno em 44 pontos do CSS; conferido com Tab em todas as telas |
 | **Pular para o conteúdo** | primeiro item do Tab na home, na área do criador e na área da equipe (novo, 29/10) |
@@ -43,16 +43,23 @@ Itens conferidos: idioma, título principal, saltos na ordem dos títulos, regi�
 - As caixas de marcar com 16–22px têm o texto ao lado clicável, então a área de toque real é maior.
 - Links dentro de frases ("Esqueci minha senha") ficam na exceção de texto corrido da WCAG 2.5.8.
 
+### Encontrado e corrigido na segunda rodada (commit `0e82088`)
+
+| Problema | Correção |
+| --- | --- |
+| Erros de formulário não ficavam ligados ao campo | O servidor informa o campo (`validationFailure`); `FormFeedback` marca-o com `aria-invalid`, liga-o à mensagem (`aria-describedby`), leva o foco até ele e mostra a borda de erro. Conferido no cadastro com senhas diferentes. |
+| Login e cadastro apagavam tudo o que foi digitado quando o servidor recusava | Envio pelo `onSubmit` (o React só limpa quando o envio vem do `action`). |
+| Textos com 9–11px nas páginas públicas ("© 2026 Vyrex", "Conheça a empresa", "DOCUMENTO PRELIMINAR" e outros do mesmo CSS) | Todos com 12px no mínimo, também no computador. |
+| A auditoria não era repetível | `tests/e2e/accessibility.spec.ts`: axe-core (WCAG 2.2 AA) em 15 telas, computador e celular, a cada `npm run test:e2e`. Resultado: nenhum problema sério ou crítico. |
+
 ### Ainda pendente
 
 | Item | Impacto | Sugestão |
 | --- | --- | --- |
-| Erros de formulário não ficam ligados ao campo (`aria-describedby` e `aria-invalid` só existem no campo de senha) | médio: o leitor de tela anuncia o erro, mas não diz em qual campo está | ligar cada mensagem de campo ao seu `input` |
-| Três textos com menos de 12px no computador: "© 2026 Vyrex", "Conheça a empresa" e "DOCUMENTO PRELIMINAR" | baixo | subir para 12px |
 | Telas de login, cadastro e recuperação não têm link de pular | baixo: o menu dessas telas é só o logo | opcional |
 | Teste com leitor de tela real (NVDA no Windows, VoiceOver no iPhone) | não feito | uma rodada manual antes de publicar |
 | Modo escuro só na área da equipe; o site não segue o tema do sistema (`prefers-color-scheme`) | preferência, não exigência | decisão de produto |
 
 ## Como repetir a auditoria
 
-O roteiro usado hoje ficou fora do projeto, na pasta temporária da sessão. Para tornar a auditoria permanente, a recomendação (capítulo 8) é acrescentar o `@axe-core/playwright` aos testes de navegador. Assim, cada `npm run test:e2e` também confere a acessibilidade.
+`npm run test:e2e` já inclui a auditoria axe. O resultado detalhado de cada tela (inclusive os problemas menores) fica anexado ao relatório em `playwright-report/index.html`.

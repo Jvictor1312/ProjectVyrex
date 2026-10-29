@@ -52,12 +52,12 @@ Uma pessoa pode ter mais de uma função. **Toda conta nova nasce como criador**
 
 | Item | Quantidade |
 | --- | --- |
-| Commits | 97 |
+| Commits | 110 |
 | Linhas de código em `src/` (TS, TSX) | ~9.800 |
-| Linhas de SQL nas migrations | ~2.150 (15 migrations) |
+| Linhas de SQL nas migrations | ~2.200 (16 migrations) |
 | Rotas (telas e endereços) | 31 |
 | Tabelas no banco | 21 |
-| Testes automáticos | 54 (regras e banco) + 28 de navegador × 2 aparelhos + 10 etapas de fluxo |
+| Testes automáticos | 61 (regras, banco e registro) + 43 de navegador × 2 aparelhos (15 telas com auditoria de acessibilidade) + 10 etapas de fluxo |
 
 ## Ambientes
 

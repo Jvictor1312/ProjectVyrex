@@ -15,6 +15,7 @@ Next.js no servidor
    ├─ Páginas (Server Components): leem o banco COM A SESSÃO DE QUEM ESTÁ LOGADO
    ├─ Server Actions (src/app/actions/*.ts): Zod → confere a sessão → chama o banco
    ├─ src/lib/: regras compartilhadas (rótulos, histórico, busca, validação, segurança)
+   ├─ src/lib/log.ts: registra toda recusa/falha do banco e todo erro não tratado
    └─ src/lib/supabase/admin.ts: chave de serviço, só no servidor, em 4 usos pontuais
    ▼
 Supabase
@@ -39,7 +40,9 @@ Supabase
 
 `formulário → Zod (formato) → requireSession() → RPC ou update com o próprio id → revalidatePath → mensagem em português`
 
-- Erros do banco nunca chegam crus ao usuário: viram uma mensagem neutra.
+- Erros do banco nunca chegam crus ao usuário: viram uma mensagem neutra. **O detalhe fica no log do servidor** (`src/lib/log.ts`): o `fetch` dos clientes Supabase registra toda resposta de erro (aviso para recusa prevista, erro para falha), e `onRequestError` (`src/instrumentation.ts`) registra exceções não tratadas. Sem dados pessoais.
+- Em erro de validação, o servidor devolve também **o campo** (`validationFailure`); na tela, `FormFeedback` marca o campo como inválido, liga-o à mensagem e leva o foco até ele.
+- Login, cadastro e senha enviam pelo `onSubmit`, para o React não apagar o que foi digitado quando o servidor recusa.
 - Mudanças de **situação do cadastro, funções, responsáveis e critérios** só acontecem por **RPC** (função no banco), que confere a permissão, trava a linha e grava histórico, auditoria e aviso **na mesma transação**.
 
 ## 4.4 Login e conta
@@ -89,7 +92,11 @@ incomplete ──enviar──► submitted ──encaminhar (recrutador)──�
 
 **Para aprovar**, o banco exige: as 3 evidências obrigatórias aprovadas, cada uma com as visualizações mínimas, e a rede verificada.
 
-**Migrations (15):** de `202610140001_initial_platform.sql` até `202610290002_shared_rate_limit.sql`. Todas são aditivas e estão aplicadas no projeto real e no de testes. Quando uma função aparece em mais de uma migration, vale a última.
+**Migrations (16):** de `202610140001_initial_platform.sql` até `202610290003_creator_queue_filter.sql`. Todas são aditivas, estão aplicadas no projeto real e no de testes e ficam **registradas** em `supabase_migrations.schema_migrations`. `scripts\migrations.ps1 -Banco testes|real [-Aplicar]` mostra o que falta e aplica (a migration e o registro na mesma transação). Depois, `scripts\gen-db-types.ps1` regera os tipos (`src/lib/supabase/database.types.ts`), que o TypeScript usa para conferir cada consulta. Quando uma função aparece em mais de uma migration, vale a última.
+
+**Lista do painel da equipe:** sai da RPC `creator_queue(responsible, unassigned)` (security invoker, a RLS vale). O filtro "Responsável" é aplicado dentro do banco; situação, busca, período, ordem e paginação vêm por cima.
+
+**Cópia de segurança:** `scripts\backup-db.ps1` exporta os dados de todas as tabelas (só leitura) para `backups\` (fora do git).
 
 ## 4.6 O caminho de um print até o banco
 
@@ -105,7 +112,7 @@ incomplete ──enviar──► submitted ──encaminhar (recrutador)──�
 | Pasta | Conteúdo |
 | --- | --- |
 | `src/app/(auth)`, `(legal)` | login, cadastro, recuperação; termos e privacidade |
-| `src/app/dashboard` | área do criador (cada página usa `CreatorShell`) |
+| `src/app/dashboard` | área do criador (`layout.tsx` monta `CreatorShell` uma vez; o menu fica na tela entre as páginas) |
 | `src/app/interno` | área da equipe (cada página usa `InternalShell`; peças visuais em `ui.tsx`) |
 | `src/app/actions` | Server Actions: `auth`, `creator`, `internal`, `privacy`, `site` |
 | `src/app/components` | formulários e peças interativas |
@@ -113,4 +120,5 @@ incomplete ──enviar──► submitted ──encaminhar (recrutador)──�
 | `src/lib` | `auth`, `labels` (vocabulário único), `history`, `audit-*`, `search`, `rate-limit`, `security/` (CSP, redirecionamento), `validation/` (Zod, CPF, telefone), `evidence/` (imagem), `supabase/` (clientes) |
 | `supabase/` | migrations, testes PGlite, modelos de e-mail |
 | `tests/` | unitários, `e2e/` (banco real, só leitura), `e2e-flows/` (banco de testes) |
-| `scripts/` | servidor de testes, e2e, seed das contas de teste, gravar credenciais |
+| `scripts/` | servidor de testes, e2e, seed das contas de teste, gravar credenciais, migrations, tipos do banco, cópia de segurança |
+| `.github/workflows/` | CI: verificações a cada envio |

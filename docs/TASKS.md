@@ -20,9 +20,10 @@ Atualizado em: 2026-10-29. Reescrito para mostrar só o estado atual e as pendê
 - [x] **Arquétipo do sistema** em `arquetipo/` (8 capítulos): o que foi feito, telas, como funciona, testes, acessibilidade, segurança e avaliação da arquitetura. Documentos antigos de `docs/` ganharam um aviso apontando para ele.
 - [x] **Auditoria de acessibilidade** em 16 telas × 2 larguras, com correções (commit `a3757ed`): "Pular para o conteúdo"; campos da ficha do criador com moldura; "Abrir ficha" com 44px no celular.
 - [x] Verificações: typecheck, lint, `npm test` 54/54, build, `test:e2e` 55 + 3 pulados, `test:flows` 10/10.
-- [ ] **Arquitetura, alta prioridade** (detalhes em `arquetipo/08-avaliacao-da-arquitetura.md`): A1 registro de erros no servidor; A2 CI no GitHub (typecheck, lint, test, build); A3 cópia de segurança do banco (decisão do dono); A4 confirmar o limite de tamanho da hospedagem para prints de 8 MB.
-- [ ] **Arquitetura, média:** M1 tipos gerados do banco; M2 `layout.tsx` nas áreas logadas; M3 filtro "Responsável" filtrando no banco; M4 custo do nonce (páginas montadas a cada visita); M5 `@axe-core/playwright` nos testes e erros ligados aos campos; M6 controle das migrations aplicadas.
-- [ ] **Arquitetura, limpeza:** B1 código sem uso (`InfoHelp`, `maskPhone`, `seed:local-users`); B2 textos de auditoria que faltam; B3 decidir sobre o Tailwind e dividir o `globals.css`; B4 situação `suspended`; B5 reescrever os documentos antigos.
+- [x] **Itens da avaliação da arquitetura (segunda rodada, 29/10):** registro de erros, CI no GitHub, tipos gerados do banco, filtro "Responsável" no banco (migration `202610290003`), registro das migrations aplicadas, axe nos testes e erros ligados aos campos, layout da área do criador, cache do vídeo, limpeza de código, textos de auditoria, documentos reescritos, script e primeira cópia de segurança, textos públicos com 12px. Situação item a item em `arquetipo/08-avaliacao-da-arquitetura.md`.
+- [x] Login, cadastro e senha não apagam mais o que foi digitado quando o servidor recusa (era o comportamento padrão do React 19).
+- [ ] **Decisões do dono:** onde guardar as cópias de segurança e com que frequência (e se os prints do Storage entram); hospedagem (limite de envio por requisição, ex.: 4,5 MB na Vercel, contra prints de até 8 MB); regra da situação `suspended`; serviço de alertas para o log (ex.: Sentry).
+- [x] Verificações em 29/10 (fim): `npm test` 61/61, `test:e2e` 85 + 3 pulados (com axe), `test:flows` 10/10, CI aprovado.
 
 ### Feito em 2026-10-29 (histórico, evidências repetidas, visual e desempenho)
 - [x] **Histórico da Visão geral recolhido** (`<details>` nativo, com contagem de registros); mostra até 15 registros.

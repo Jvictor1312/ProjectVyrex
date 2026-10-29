@@ -1,6 +1,15 @@
 # Vyrex — mapa do código
 
-> **Atualização de 2026-10-29:** a versão atual e conferida deste assunto está em [arquetipo/](../arquetipo/README.md). Este documento é mantido como histórico e pode estar desatualizado.
+> **Mudanças de 2026-10-29** (o resto do mapa continua valendo; visão geral atualizada em [arquetipo/](../arquetipo/README.md)):
+> - `src/proxy.ts` roda em **todas** as páginas: sorteia o nonce da política de conteúdo (`src/lib/security/csp.ts`) e só renova a sessão nas telas com login. A CSP saiu do `next.config.ts` e não tem mais `'unsafe-inline'` em scripts. O layout raiz chama `connection()`.
+> - Limite de tentativas no banco (`consume_rate_limit`, migration `202610290002`), com a memória como reserva.
+> - Registro de erros: `src/lib/log.ts` (fetch dos clientes Supabase) e `onRequestError` em `src/instrumentation.ts`.
+> - Tipos gerados: `src/lib/supabase/database.types.ts` (`scripts/gen-db-types.ps1`).
+> - Painel `/interno` lista pela RPC `creator_queue` (filtro "Responsável" no banco, migration `202610290003`). São 16 migrations, registradas em `supabase_migrations.schema_migrations` (`scripts/migrations.ps1`).
+> - `src/app/dashboard/layout.tsx`: a moldura do criador saiu das páginas.
+> - Formulários: `validationFailure` (servidor) + `FormFeedback` (tela) marcam o campo com erro; login e cadastro não apagam o que foi digitado.
+> - Removidos: `components/info-help.tsx` e `maskPhone`. Novo: `components/skip-link.tsx`.
+> - Seção 14: os itens de documentação, `InfoHelp`, `maskPhone`, textos de auditoria, limite em memória, CSP e busca com acento estão resolvidos.
 
 Leitura geral da estrutura do código, escrita para dar contexto a uma IA (ou a uma pessoa nova) antes de mexer no projeto. Reflete o código em **2026-10-28** (commit `d87f200`). Tudo aqui foi conferido lendo os arquivos; onde a documentação antiga diverge do código, isso está apontado na seção 14.
 

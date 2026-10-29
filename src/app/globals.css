@@ -101,11 +101,11 @@ input {
   flex-wrap: wrap;
   border-bottom: 1px solid var(--line);
   color: #535b56;
-  font-size: 10px;
+  font-size: 12px;
 }
 .preview-strip span {
   color: var(--muted);
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 800;
   letter-spacing: 1px;
 }
@@ -170,7 +170,7 @@ button:focus-visible {
   gap: 9px;
   margin: 0 0 25px;
   color: var(--muted);
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 800;
   letter-spacing: 1.7px;
 }
@@ -216,7 +216,7 @@ h1 em {
 .hero-note {
   margin: 19px 0 0;
   color: var(--muted);
-  font-size: 11px;
+  font-size: 12px;
 }
 .hero-art {
   min-height: 430px;
@@ -270,7 +270,7 @@ h1 em {
 .art-index {
   position: absolute;
   color: var(--muted);
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: 1.2px;
 }
@@ -310,7 +310,7 @@ h1 em {
 }
 .principle-number {
   color: var(--green);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 800;
 }
 .principle h3 {
@@ -385,7 +385,7 @@ h1 em {
 }
 .public-note {
   margin: 14px 0 0;
-  font-size: 11px;
+  font-size: 12px;
 }
 .faq-list details {
   border-top: 1px solid var(--line);
@@ -419,7 +419,7 @@ h1 em {
 .site-footer p,
 .site-footer > span {
   color: var(--muted);
-  font-size: 10px;
+  font-size: 12px;
 }
 .auth-page {
   min-height: 100svh;
@@ -503,7 +503,7 @@ h1 em {
 .signup-showcase-kicker {
   margin: 0;
   color: #aeb5b0;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 700;
 }
 .signup-orb {
@@ -549,7 +549,7 @@ h1 em {
 }
 .signup-orb-prompt {
   color: #5c625e;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
 }
 .signup-showcase-instruction {
@@ -566,7 +566,7 @@ h1 em {
   justify-content: space-between;
   gap: 14px;
   color: #aeb5b0;
-  font-size: 10px;
+  font-size: 12px;
 }
 /* Botão único na base da barra: recolhe a barra aberta e abre a recolhida. */
 .signup-showcase-toggle {
@@ -1606,7 +1606,7 @@ textarea[aria-invalid="true"] {
     font-size: 12px;
   }
   .signup-showcase-bottom {
-    font-size: 9px;
+    font-size: 12px;
   }
   .signup-form-panel {
     min-height: auto;
@@ -1637,7 +1637,7 @@ textarea[aria-invalid="true"] {
     font-size: 12px;
   }
   .signup-showcase-bottom {
-    font-size: 9px;
+    font-size: 12px;
   }
   .signup-form-panel {
     min-height: auto;
@@ -1742,7 +1742,7 @@ textarea[aria-invalid="true"] {
     gap: 10px;
   }
   .topnav .button {
-    font-size: 11px;
+    font-size: 12px;
   }
   .topnav > a:nth-child(2) {
     display: none;

@@ -27,6 +27,11 @@ Estado em 29/10/2026. Este capítulo substitui a primeira parte de `docs/SECURIT
 - Prints em bucket **privado**, com até 8 MB e só imagem; cada um é **refeito em WebP no servidor**, o que remove metadados e conteúdo escondido. A pasta é a do próprio usuário, com cota de 10 envios a cada 10 min. A equipe vê por links assinados de 10 min.
 - Vídeo de apresentação em bucket público, mas só quem configura os critérios envia ou remove.
 
+### Monitoramento e cópias
+- **Registro de erros** (`src/lib/log.ts`): toda recusa ou falha do banco, do Storage e do Auth, e todo erro não tratado, vira uma linha JSON no log do servidor. O registro não guarda formulários, detalhes do banco (que podem trazer valores), parâmetros de endereço nem o id do usuário nos caminhos do Storage.
+- **Cópia de segurança dos dados** (`scripts/backup-db.ps1`, só leitura): um JSON por tabela, mais as contas (sem senhas) e a lista de arquivos, em `backups\` (fora do git). Primeira cópia do banco real feita em 29/10. Os arquivos do Storage (prints e vídeo) **não** entram nessa cópia.
+- **CI** com `npm audit` a cada envio.
+
 ### Dados e segredos
 - Nenhum `.env*` no git (exceto `.env.example`). As senhas das contas de teste ficam em variáveis do Windows e nunca entram em arquivo.
 - CPF em tabela própria, que só o dono lê; nem a equipe vê.
@@ -45,6 +50,8 @@ Estado em 29/10/2026. Este capítulo substitui a primeira parte de `docs/SECURIT
 | Revisão jurídica dos termos e da política | LGPD | jurídico |
 | Exportação e exclusão de dados por pedido de privacidade | hoje o site registra o pedido; a execução é manual | decisão operacional e jurídica |
 | Apagar as contas `+adm` e `+user` | são de teste | fim do projeto |
+| Guardar as cópias de segurança fora deste computador e decidir a frequência (e se os prints do Storage também entram) | a cópia local some junto com o computador | dono |
+| Ligar o log do servidor a um serviço de alertas (ex.: Sentry) | hoje os registros só aparecem no log da hospedagem | conta no serviço |
 
 ## Riscos aceitos (pedidos do produto)
 

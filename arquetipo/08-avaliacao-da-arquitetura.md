@@ -11,7 +11,29 @@ O que falta **não é de base**. São três grupos:
 2. **Organização:** documentos antigos desatualizados, código sem uso e o CSS concentrado num arquivo grande.
 3. **Preparação para crescer:** tipos do banco gerados automaticamente, o filtro por responsável e o limite de tamanho de envio na hospedagem.
 
-## Avaliação por área
+## Situação dos itens (atualizado em 29/10, depois da segunda rodada)
+
+| Item | Situação | Onde |
+| --- | --- | --- |
+| A1 Registro de erros | **feito** | `src/lib/log.ts`, `src/instrumentation.ts` (falta ligar a um serviço de alertas: depende de conta) |
+| A2 CI no GitHub | **feito** | `.github/workflows/verificacoes.yml` |
+| A3 Cópia de segurança | **ferramenta pronta, primeira cópia feita** | `scripts/backup-db.ps1` (onde guardar e com que frequência: decisão do dono) |
+| A4 Limite de tamanho na hospedagem | **depende da escolha da hospedagem** | ver texto abaixo |
+| M1 Tipos gerados do banco | **feito** | `src/lib/supabase/database.types.ts`, `scripts/gen-db-types.ps1` |
+| M2 Layouts nas áreas logadas | **feito na área do criador**; equipe mantida por página (decisão 18 em `docs/DECISIONS.md`) | `src/app/dashboard/layout.tsx` |
+| M3 Filtro "Responsável" no banco | **feito** | migration `202610290003`, `creator_queue` |
+| M4 Custo do nonce | **feito** (vídeo do cadastro em cache) | `src/lib/site-media.ts` |
+| M5 Acessibilidade nos testes e erros ligados aos campos | **feito** | `tests/e2e/accessibility.spec.ts`, `FormFeedback` |
+| M6 Controle das migrations | **feito** | `supabase_migrations.schema_migrations`, `scripts/migrations.ps1` |
+| B1 Código sem uso | **feito** (`seed:local-users` mantido: tem teste e está no README) | |
+| B2 Textos de auditoria | **feito** | `src/lib/audit-labels.ts` |
+| B3 Tailwind e `globals.css` | **decidido: manter o Tailwind** como reset base (decisão 19); dividir o `globals.css` fica para quando cada tela for mexida | |
+| B4 Situação `suspended` | **depende do produto**: suspender cadastro é uma regra nova (quem pode, com que motivo, o que o criador vê) | |
+| B5 Documentos antigos | **feito** | `docs/ARCHITECTURE.md`, `SECURITY.md`, `TESTING.md`, `DECISIONS.md` reescritos; `QA_REPORT.txt` em `docs/historico/` |
+
+Com isso, as áreas "Operação" e "Testes" sobem de nível: há registro de erros, CI, cópia de segurança e auditoria de acessibilidade automática. A tabela abaixo é a avaliação original, mantida para referência.
+
+## Avaliação por área (original, antes da segunda rodada)
 
 | Área | Situação | Comentário |
 | --- | --- | --- |
@@ -91,7 +113,7 @@ Atualizar ou marcar como históricos:
 | `docs/SECURITY.md` (primeira parte) | diz que não há limite de tentativas nem cabeçalhos; cita `getUser()` e links de 60 s |
 | `docs/TESTING.md` | diz que não há Playwright e que os testes "não foram executados" |
 | `docs/DECISIONS.md` nº 3 | critérios antigos (3.000 / 5 / 2.000) |
-| `QA_REPORT.txt` (raiz) | relatório de 14/10, anterior a quase tudo |
+| `QA_REPORT.txt` (raiz; movido para `docs/historico/`) | relatório de 14/10, anterior a quase tudo |
 | `docs/MAPA_DO_CODIGO.md` | ainda cita o limite em memória e a CSP com `'unsafe-inline'` (mudados em 29/10) |
 
 ## O que NÃO precisa mudar

@@ -6,24 +6,28 @@
 | --- | --- | --- |
 | Tipos | `npm run typecheck` | sem erros |
 | Padrões de código | `npm run lint` | sem erros |
-| Regras e banco | `npm test` | **54 de 54** |
+| Regras, banco e registro de erros | `npm test` | **61 de 61** |
 | Build de produção | `$env:NEXT_DIST_DIR=".next-prod"; npm run build` | concluído (31 rotas) |
-| Navegador, banco real, só leitura | `npm run test:e2e` | **55 aprovados**, 3 pulados de propósito |
-| Fluxo completo, banco de testes | `npm run test:flows` | **10 de 10** |
+| Navegador, banco real, só leitura | `npm run test:e2e` | **85 aprovados**, 3 pulados de propósito |
+| Acessibilidade (axe, WCAG 2.2 AA) em 15 telas × 2 aparelhos | dentro do `test:e2e` | nenhum problema sério ou crítico |
+| Fluxo completo, banco de testes | `npm run test:flows` | **10 de 10** (com a etapa nova do filtro "Responsável") |
+| CI no GitHub | a cada envio | aprovado |
 | Proteção de scripts no build de produção | manual, no Chrome (`localhost:3002`) | scripts do site rodam; HTML injetado com código é bloqueado |
-| Acessibilidade em 16 telas × 2 larguras | auditoria automática (ver capítulo 6) | sem problemas de contraste, títulos, imagens ou rolagem lateral |
 
 ## As quatro camadas
 
-### 1. Regras e banco — `npm test` (54 testes, ~5 s)
+### 1. Regras e banco — `npm test` (61 testes, ~6 s)
 
 Roda com o executor de testes do próprio Node, sem internet.
 
-- **`supabase/tests/initial-platform.test.mjs` (34):** aplica **todas** as migrations num Postgres que roda na memória (PGlite), com imitações de `auth` e `storage`. Testa como cada função age: o criador só vê o que é dele; o recrutador encaminha mas não decide; não dá para aprovar sem as evidências; não dá para tirar o último administrador; desativação; cota de upload; CPF; desfazer envio; busca sem acento; limite de tentativas.
+- **`tests/log.test.mjs` (6):** o registro de erros anota recusas e falhas, não registra senha errada nem dados pessoais (detalhes do banco, parâmetros do endereço, id do usuário no Storage) e devolve a resposta intacta.
+- **`supabase/tests/initial-platform.test.mjs` (35):** inclui o filtro "Responsável" (`creator_queue`). aplica **todas** as migrations num Postgres que roda na memória (PGlite), com imitações de `auth` e `storage`. Testa como cada função age: o criador só vê o que é dele; o recrutador encaminha mas não decide; não dá para aprovar sem as evidências; não dá para tirar o último administrador; desativação; cota de upload; CPF; desfazer envio; busca sem acento; limite de tentativas.
 - **`supabase/tests/data-requests.test.mjs` (4):** pedidos de privacidade (duplicidade, isolamento, só o admin resolve, justificativa obrigatória).
 - **`tests/validation.test.mjs` (16):** validação dos formulários, senha forte, CPF, destino do login por função, redirecionamento seguro, normalização de imagem, agrupamento do histórico, texto de busca.
 
-### 2. Navegador no banco real — `npm run test:e2e` (28 testes × computador e celular)
+### 2. Navegador no banco real — `npm run test:e2e` (43 testes × computador e celular)
+
+- `accessibility.spec.ts` (15): auditoria **axe-core** com as regras WCAG 2.0, 2.1 e 2.2 (A e AA) nas telas públicas, do criador e da equipe. Falha em problema sério ou crítico; os menores vão anexados ao relatório (`playwright-report/`).
 
 Playwright no Chrome instalado, nos projetos "computador" e "celular" (Pixel 7). **Só lê**: nunca salva nada no banco real.
 
@@ -38,7 +42,7 @@ Sobe o servidor `localhost:3001` ligado ao projeto **Vyrex Testes** e se recusa 
 
 1. O servidor está no banco de testes.
 2. Criador novo preenche perfil, rede e evidências e envia.
-3. Administrador atribui recrutador e gestora.
+3. Administrador atribui recrutador e gestora; o filtro "Responsável" mostra o criador para o recrutador e o esconde em "Sem responsável".
 4. Outro criador não consegue abrir a ficha.
 5. Recrutador encaminha e não vê a decisão final.
 6. Gestora manda mensagem.
@@ -67,14 +71,14 @@ git checkout -- next-env.d.ts tsconfig.json   # desfaz o que os servidores de te
 1. Escreva a migration nova (só aditiva).
 2. Inclua-a no `before()` de `supabase/tests/initial-platform.test.mjs` e escreva o teste.
 3. `npm test`.
-4. Aplique no projeto de **testes** e rode `npm run test:flows`.
-5. Só então aplique no real (Management API).
+4. `scripts\migrations.ps1 -Banco testes -Aplicar` e `npm run test:flows`.
+5. Só então `scripts\migrations.ps1 -Banco real -Aplicar` e `scripts\gen-db-types.ps1`.
 
 ## O que ainda não é testado automaticamente
 
 - **Componentes React isolados:** a cobertura vem dos testes de navegador.
 - **E-mails de verdade** (confirmação e recuperação): dependem de SMTP próprio.
 - **Celular de verdade** (iPhone e Android): só o simulado do Chrome.
-- **Carga:** comportamento com milhares de cadastros. O resumo do painel já é somado no banco, mas o filtro "Responsável" de `/interno` ainda busca todos os ids atribuídos e os coloca na própria consulta, o que cresce com a base.
+- **Carga:** comportamento com milhares de cadastros (o painel já soma e filtra no banco, mas não houve teste de volume).
 - **Acessibilidade com leitor de tela real** (NVDA, VoiceOver).
-- **CI:** os testes rodam só nesta máquina; o GitHub não os roda a cada envio.
+- **Testes de navegador no CI:** precisam das contas de teste, por isso rodam só nesta máquina. O CI roda tipos, lint, `npm test`, build e audit.
