@@ -15,6 +15,14 @@ Atualizado em: 2026-10-28. Reescrito para mostrar só o estado atual e as pendê
 
 ## Pendências
 
+### Feito em 2026-10-29 (histórico, evidências repetidas, visual e desempenho)
+- [x] **Histórico da Visão geral recolhido** (`<details>` nativo, com contagem de registros); mostra até 15 registros.
+- [x] **Evidências "repetidas" no histórico:** cada conferência de evidência é um registro próprio, mas as telas não liam qual Story era (`review_history.evidence_id`) e mostravam linhas idênticas. Visão geral e ficha da equipe agora mostram "Evidência aprovada · Story N" (`src/lib/history.ts`). Teste PGlite e unitário novos. Nenhum dado alterado.
+- [x] **Meu cadastro e Mensagens com visual refinado.** Apresentação separada em `CreatorProfileView` e `CreatorMessages`, usadas pela tela real e pelas prévias (nova: `/preview/criador/mensagens`, `?vazio=1` para o estado vazio).
+- [x] **Desempenho:** conexões com o Supabase mantidas abertas por até 60 s (`src/instrumentation.ts`, dependência `undici`). Medido no site: consulta após 6 s parado caiu de mediana 329 ms (até 552) para 204 ms (até 212).
+- [ ] Rodar `npm run test:e2e` e `npm run test:flows` numa máquina com Chrome e credenciais (aqui não há Chrome instalado nem as variáveis `VYREX_TEST_*`). O passo 8 do fluxo foi atualizado para abrir o histórico recolhido.
+- [ ] Risco anotado: o painel `/interno` busca todas as redes sociais e atribuições sem limite; com muitos cadastros, isso vai pesar.
+
 ### Feito em 2026-10-28 (sessão e CPF)
 - [x] **Continuar logado:** a página inicial reconhece quem já entrou ("Ir para o meu painel"); `/login` e `/cadastro` levam direto ao painel; o `proxy` renova a sessão também em `/`, `/login` e `/cadastro`.
 - [x] **CPF opcional** em Configurações (tabela `user_documents`, só o próprio usuário lê; dígitos e duplicidade conferidos no banco). **Recuperação por CPF ou e-mail:** com CPF, a tela mostra o e-mail mascarado e envia as instruções para ele; o e-mail completo nunca vai ao navegador. Migration `202610280007` aplicada; 5 testes novos.
