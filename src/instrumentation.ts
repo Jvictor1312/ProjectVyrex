@@ -1,3 +1,13 @@
+import type { Instrumentation } from "next";
+import { logServerError } from "@/lib/log";
+
+// Erros não tratados em páginas, Server Actions, rotas e no proxy. A página
+// de erro mostra só uma mensagem neutra; o detalhe fica aqui, no log. O
+// endereço vai sem os parâmetros (podem trazer termos de busca ou códigos).
+export const onRequestError: Instrumentation.onRequestError = (error, request, context) => {
+  logServerError(`${context.routeType} ${request.method} ${request.path.split("?")[0]}`, error);
+};
+
 // Roda uma vez quando o servidor do Next inicia.
 //
 // Conexões com o Supabase: o fetch do Node fecha uma conexão parada depois de

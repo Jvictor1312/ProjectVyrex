@@ -12,7 +12,7 @@
     "start": "next start",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
-    "test": "node --experimental-strip-types --test supabase/tests/initial-platform.test.mjs supabase/tests/data-requests.test.mjs tests/validation.test.mjs",
+    "test": "node --experimental-strip-types --test supabase/tests/initial-platform.test.mjs supabase/tests/data-requests.test.mjs tests/validation.test.mjs tests/log.test.mjs",
     "test:e2e": "powershell -ExecutionPolicy Bypass -File scripts/e2e.ps1",
     "test:flows": "playwright test -c playwright.flows.config.ts",
     "seed:test": "node scripts/seed-test-project.mjs",

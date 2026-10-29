@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { randomUUID } from "node:crypto";
 import { z } from "zod";
 import { requireSession } from "@/lib/auth";
+import { logServerError } from "@/lib/log";
 import {
   maximumEvidenceBytes,
   normalizeEvidenceImage,
@@ -232,7 +233,10 @@ export async function uploadStoryEvidenceAction(
       message: `Evidência ${parsed.data.position} salva.`,
       success: true,
     };
-  } catch {
+  } catch (error) {
+    // Quase sempre é um arquivo que não é imagem de verdade (aviso), mas
+    // também pega falhas de rede no envio.
+    logServerError("uploadStoryEvidenceAction", error, "aviso");
     return {
       message:
         "Não foi possível ler essa imagem. Tente enviar outro arquivo válido.",
