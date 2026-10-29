@@ -27,7 +27,7 @@ Atualizado em: 2026-10-29. Reescrito para mostrar só o estado atual e as pendê
 - [x] **SMTP próprio** (2026-10-29): Gmail da Vyrex configurado pelo dono; modelos em português aplicados pela Management API (assuntos "Confirme seu e-mail na Vyrex" e "Recupere sua senha da Vyrex"). E-mail de teste chegou (caiu no spam). Modelos refeitos no mesmo dia: faixa preta com "VYREX", texto explicando o pedido, link de reserva e rodapé.
 - [x] **Logo oficial nos e-mails** (migration `202610290005`, aplicada no de testes, fluxos 11/11, e no real): PNG branco gerado do SVG, no bucket público `email-assets`; texto "VYREX" como reserva quando o programa bloqueia imagens (o Gmail bloqueia no spam).
 - [ ] **E-mails no spam:** a causa principal é o remetente Gmail gratuito, sem reputação, com links para `supabase.co` e "Site URL" ainda em `localhost:3000`. Solução definitiva: domínio próprio + Resend com SPF, DKIM e DMARC (guia, parte A2-Resend) e "Site URL" do endereço real quando o site for publicado.
-- [ ] **Troca das chaves (dono):** passo a passo em `docs/GUIA_SMTP_E_CHAVES.md`, parte B; as chaves são gravadas por `scripts/trocar-chaves.ps1` (às escondidas). Depois o Claude confere o site.
+- **Troca das chaves: não será feita (decisão do dono, 2026-10-29).** O guia (`docs/GUIA_SMTP_E_CHAVES.md`, parte B) e o script `scripts/trocar-chaves.ps1` continuam disponíveis caso ele mude de ideia. Não tratar como pendência.
 - [x] **Vídeo de apresentação da Vyrex enviado pelo dono** (conferido em 2026-10-29: 1920×1080, 61 s, 10,5 MB).
 - [x] **Suspender e reativar cadastros** (migration `202610290004`, aplicada no de testes e no real): só administrador, só aprovados, motivo obrigatório, aviso ao criador, histórico e auditoria. Seção na ficha do criador; teste PGlite e etapa 9 do fluxo completo.
 - [ ] **Decisões do dono:** onde guardar as cópias de segurança e com que frequência (e se os prints do Storage entram); hospedagem (limite de envio por requisição, ex.: 4,5 MB na Vercel, contra prints de até 8 MB); regra da situação `suspended`; serviço de alertas para o log (ex.: Sentry).
@@ -83,7 +83,7 @@ Atualizado em: 2026-10-29. Reescrito para mostrar só o estado atual e as pendê
 - [ ] **SMS** (recuperação por celular): exige provedor (Twilio, MessageBird ou Vonage).
 - [ ] **Termos e política de privacidade:** rascunhos; precisam de revisão jurídica.
 - [ ] **Publicação:** só com autorização. Antes: configurar as variáveis de ambiente na hospedagem, Site URL e callbacks do Auth.
-- [ ] **Segurança das chaves (fim do projeto, decisão do usuário):** a chave secreta e a `service_role` antiga foram coladas na conversa em 2026-10-28. Trocar a secreta; migrar a chave pública para `sb_publishable_` e então desativar as chaves antigas (JWT). O token de acesso (`sbp_`) também foi colado na conversa: apagar e gerar outro em supabase.com/dashboard/account/tokens.
+- **Segurança das chaves: o dono decidiu não trocar (2026-10-29).** Registro histórico: a chave secreta e a `service_role` antiga foram coladas na conversa em 2026-10-28. Trocar a secreta; migrar a chave pública para `sb_publishable_` e então desativar as chaves antigas (JWT). O token de acesso (`sbp_`) também foi colado na conversa: apagar e gerar outro em supabase.com/dashboard/account/tokens.
 
 ### Técnicas (podem ser feitas sem o usuário)
 - [x] **Testes automáticos de navegador** (Playwright, `npm run test:e2e`): públicas, proteção de rotas, recuperação neutra, área do criador e da equipe só leitura, em computador e celular. Liberado pelo usuário em 2026-10-28.
