@@ -7,7 +7,7 @@ As 31 rotas do site, agrupadas por quem acessa. Todas têm versão para celular 
 | Endereço | O que tem |
 | --- | --- |
 | `/` | Página inicial: título, órbitas animadas (param para quem pede menos movimento), "Como funciona" em 4 etapas, dúvidas frequentes, contato para marcas. Quem já entrou vê "Ir para o meu painel". |
-| `/cadastro` | Criar conta: nome, e-mail, celular (opcional), senha forte com "mostrar/ocultar", aceite dos termos, vídeo de apresentação. |
+| `/cadastro` | Criar conta: nome, e-mail, celular (opcional), senha forte com "mostrar/ocultar", aceite dos termos. Painel à esquerda (recolhível): esfera com o logo e "Assistir vídeo" (play sempre visível), anel pulsando e uma pequena esfera em órbita, a frase "Criadores e marcas, na mesma órbita." e a instrução "Toque na esfera e conheça a Vyrex em vídeo". A esfera abre o vídeo de apresentação; sem vídeo cadastrado, a janela avisa que ele virá em breve. Se o servidor recusar o formulário, o que foi digitado continua nos campos e o campo com problema fica destacado. |
 | `/cadastro/confirmacao` | "Confira seu e-mail", com orientação sobre a caixa de spam. |
 | `/login` | Entrar. Leva ao painel certo: equipe → `/interno`, criador → `/dashboard`. |
 | `/recuperar-senha` | Pede e-mail **ou CPF**. A resposta é sempre a mesma, exista ou não a conta. |
@@ -41,7 +41,7 @@ Menu lateral (no celular, abas no topo): **Operação** (Visão geral) e, só pa
 | `/interno` | toda a equipe | Painel que muda conforme a função. Administrador: indicadores (cadastrados, enviados, em análise, com correção, aprovados, tempo médio), carteira por responsável e redes declaradas. Todos: lista de cadastros com busca sem acento, filtros por situação, responsável e período, e 25 por página. O analista vê só a fila de análise, do mais antigo para o mais novo. |
 | `/interno/[id]` | quem tem acesso àquele criador | **Ficha do criador:** dados, redes, prints em tamanho real, histórico, mensagens e contatos. Os controles aparecem conforme a função: triagem e encaminhamento (recrutador); contato, mensagem e pedido de correção (gestor); conferência de cada print e da rede e decisão final (analista); troca de responsáveis (administrador). |
 | `/interno/equipe` | administrador | Colaboradores: lista com e-mail e último acesso, convite (ou função adicionada a uma conta que já existe), funções, ativar e desativar com motivo, e histórico agrupado. |
-| `/interno/configuracoes` | administrador | Critérios de aprovação, com histórico, e o vídeo de apresentação, com barra de progresso no envio. |
+| `/interno/configuracoes` | administrador | Critérios de aprovação, com histórico, e o vídeo de apresentação, com barra de progresso no envio. O envio recusa vídeos abaixo de HD (1280×720) e explica o motivo. |
 | `/interno/privacidade` | administrador | Pedidos de privacidade dos titulares, para registrar a resolução. |
 
 ## Prévias (só em desenvolvimento, sem login)

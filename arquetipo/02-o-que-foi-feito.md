@@ -54,3 +54,8 @@ Linha do tempo tirada do histórico do git (97 commits). O detalhe de cada mudan
 - **Cache do vídeo do cadastro** (`155ebf4`).
 - **Cópia de segurança** (`adefbcf`): `scripts/backup-db.ps1` exporta os dados (só leitura); primeira cópia do banco real feita em 29/10.
 - **Documentação** reescrita: `docs/ARCHITECTURE.md`, `SECURITY.md`, `TESTING.md`, `DECISIONS.md` (20 decisões).
+
+## 29/10 (noite) — tela de cadastro
+
+- **Esfera mais clara e marcante** (`f6177ef`, `d274147`, `49d7634`): play em contorno fino com "Assistir vídeo" (sempre visível), anel pulsando, pequena esfera em órbita e a frase "Criadores e marcas, na mesma órbita.".
+- **Vídeo:** o arquivo cadastrado era um desenho da Disney em 320×240, a causa da baixa resolução. Foi tirado da tela a pedido do dono (o arquivo continua no Storage). O envio passou a exigir HD.
