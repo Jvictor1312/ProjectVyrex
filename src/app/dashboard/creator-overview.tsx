@@ -2,6 +2,7 @@ import Link from "next/link";
 import { WithdrawApplicationButton } from "@/app/components/creator-forms";
 import { historyEntryLabel } from "@/lib/history";
 import {
+  creatorStatusDescriptions,
   creatorStatusLabel,
   creatorStatusTone,
   evidenceStatusLabels,
@@ -73,9 +74,10 @@ export function nextStepFor(
       };
     case "submitted":
     case "under_review":
+      // "Enviado" e "Em análise" têm explicações diferentes (aguardando x já em conferência).
       return {
         title: "Seu cadastro está em análise",
-        text: "A equipe está conferindo seus dados e evidências. Você recebe um aviso aqui quando houver novidade.",
+        text: `${creatorStatusDescriptions[status]} Você recebe um aviso aqui quando houver novidade.`,
         href: "/dashboard/mensagens",
         cta: "Ver mensagens",
       };
@@ -90,7 +92,7 @@ export function nextStepFor(
     case "suspended":
       return {
         title: "Veja a resposta da equipe",
-        text: "A equipe explicou o motivo na página Mensagens.",
+        text: creatorStatusDescriptions[status],
         href: "/dashboard/mensagens",
         cta: "Ver mensagens",
       };
