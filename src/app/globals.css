@@ -544,13 +544,24 @@ h1 em {
   outline-offset: 18px;
 }
 .signup-orb-word {
-  width: 84px;
+  width: 112px;
   height: auto;
 }
+/* Linha discreta abaixo do logo: play em contorno fino + texto pequeno. */
+.signup-orb-cta {
+  display: inline-flex;
+  white-space: nowrap;
+  align-items: center;
+  gap: 7px;
+  margin-top: 4px;
+  padding-top: 10px;
+  border-top: 1px solid #10121124;
+}
 .signup-orb-prompt {
-  color: #101211;
-  font-size: 13px;
-  font-weight: 700;
+  color: #3d433f;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
 }
 /* Palco da esfera: anel pulsando + órbita com uma pequena esfera. */
 .signup-orb-stage {
@@ -606,21 +617,24 @@ h1 em {
     transform: rotate(360deg);
   }
 }
-/* Botão de play dentro da esfera: deixa claro que ali tem um vídeo. */
+/* Play pequeno, em contorno fino; preenche ao passar o mouse. */
 .signup-orb-play {
   display: grid;
-  width: 46px;
-  height: 46px;
-  place-items: center;
-  border-radius: 50%;
-  background: #101211;
-  color: #fff;
-  transition: transform 180ms ease-out;
-}
-.signup-orb-play svg {
   width: 20px;
   height: 20px;
-  margin-left: 3px;
+  place-items: center;
+  border: 1px solid #101211;
+  border-radius: 50%;
+  color: #101211;
+  transition:
+    background 180ms ease-out,
+    color 180ms ease-out,
+    transform 180ms ease-out;
+}
+.signup-orb-play svg {
+  width: 9px;
+  height: 9px;
+  margin-left: 1px;
   fill: currentColor;
 }
 .signup-orb:hover,
@@ -631,7 +645,9 @@ h1 em {
 }
 .signup-orb:hover .signup-orb-play,
 .signup-orb:focus-visible .signup-orb-play {
-  transform: scale(1.12);
+  background: #101211;
+  color: #fff;
+  transform: scale(1.1);
 }
 .signup-showcase-copy {
   display: grid;
@@ -1703,11 +1719,7 @@ textarea[aria-invalid="true"] {
     width: 158px;
   }
   .signup-orb-word {
-    width: 72px;
-  }
-  .signup-orb-play {
-    width: 40px;
-    height: 40px;
+    width: 92px;
   }
   .signup-showcase-tagline {
     font-size: 24px;
@@ -1751,11 +1763,7 @@ textarea[aria-invalid="true"] {
     width: 158px;
   }
   .signup-orb-word {
-    width: 72px;
-  }
-  .signup-orb-play {
-    width: 40px;
-    height: 40px;
+    width: 92px;
   }
   .signup-showcase-tagline {
     font-size: 24px;

@@ -120,15 +120,17 @@ function SignupShowcase({
               onClick={() => setDialogOpen(true)}
             >
               <VyrexLogo className="signup-orb-word" decorative />
-              {videoUrl && (
-                <span className="signup-orb-play" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" focusable="false">
-                    <path d="M8 5.5v13l11-6.5z" />
-                  </svg>
+              <span className="signup-orb-cta">
+                {videoUrl && (
+                  <span className="signup-orb-play" aria-hidden="true">
+                    <svg viewBox="0 0 12 12" focusable="false">
+                      <path d="M4 2.6v6.8L9.4 6z" />
+                    </svg>
+                  </span>
+                )}
+                <span className="signup-orb-prompt">
+                  {videoUrl ? "Assistir vídeo" : "Conheça a Vyrex"}
                 </span>
-              )}
-              <span className="signup-orb-prompt">
-                {videoUrl ? "Assistir apresentação" : "Conheça a Vyrex"}
               </span>
             </button>
           </div>
