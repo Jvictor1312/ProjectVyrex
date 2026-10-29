@@ -166,3 +166,23 @@ test("8. criador vê a aprovação, a mensagem e o histórico", async ({ page })
     await expect(history.getByText(`Evidência aprovada · Story ${position}`)).toBeVisible();
   }
 });
+
+test("9. administrador suspende, o criador vê o aviso, e o cadastro é reativado", async ({ browser, page }) => {
+  const { context, page: admin } = await loginAs(browser, "ADMIN", /\/interno/);
+  await admin.goto(`/interno/${creatorId}`);
+  await admin.getByLabel("Motivo da suspensão").fill("Suspensão de teste automático.");
+  await admin.getByRole("button", { name: "Suspender cadastro" }).click();
+  await admin.getByRole("button", { name: "Confirmar" }).click();
+  await expect(admin.getByText("Cadastro suspenso. O criador recebeu um aviso com o motivo.")).toBeVisible();
+
+  await login(page, creator.email, creator.password, /\/dashboard/);
+  await expect(page.getByText("Cadastro suspenso").first()).toBeVisible();
+  await expect(page.getByText("Suspensão de teste automático.").first()).toBeVisible();
+
+  await admin.reload();
+  await admin.getByLabel("Motivo da reativação").fill("Reativação de teste automático.");
+  await admin.getByRole("button", { name: "Reativar cadastro" }).click();
+  await admin.getByRole("button", { name: "Confirmar" }).click();
+  await expect(admin.getByText("Cadastro reativado. O criador recebeu um aviso com o motivo.")).toBeVisible();
+  await context.close();
+});

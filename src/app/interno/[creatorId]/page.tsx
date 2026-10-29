@@ -6,6 +6,7 @@ import {
   AssignmentForm,
   EvidenceReviewForm,
   FinalDecisionForm,
+  SuspensionForm,
   RecruiterControls,
   RelationshipControls,
   SocialAccountReviewForm,
@@ -394,6 +395,15 @@ export default async function CreatorInternalDetail({
           <section className={styles.section}>
             <h2>Decisão final</h2>
             <FinalDecisionForm creatorId={creatorId} open={canDecideNow} />
+          </section>
+        )}
+        {isAdmin && ["approved", "suspended"].includes(creator.status) && (
+          <section className={styles.section}>
+            <h2>{creator.status === "suspended" ? "Reativar cadastro" : "Suspender cadastro"}</h2>
+            <SuspensionForm
+              creatorId={creatorId}
+              suspended={creator.status === "suspended"}
+            />
           </section>
         )}
         {assignmentProps && (

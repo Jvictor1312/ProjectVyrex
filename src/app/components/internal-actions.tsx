@@ -10,6 +10,7 @@ import {
   reviewSocialAccountAction,
   reviewStoryEvidenceAction,
   sendCreatorMessageAction,
+  setCreatorSuspensionAction,
 } from "@/app/actions/internal";
 import { FormFeedback } from "@/app/components/form-feedback";
 import type { FormState } from "@/lib/validation/auth";
@@ -302,6 +303,73 @@ export function FinalDecisionForm({
           }}
         >
           Registrar decisão
+        </button>
+      )}
+    </form>
+  );
+}
+
+// Suspender um cadastro aprovado ou reativar um suspenso (só administrador).
+export function SuspensionForm({
+  creatorId,
+  suspended,
+}: {
+  creatorId: string;
+  suspended: boolean;
+}) {
+  const [state, action, pending] = useActionState(setCreatorSuspensionAction, emptyState);
+  const [confirming, setConfirming] = useState(false);
+  useEffect(() => {
+    if (state.success) setConfirming(false);
+  }, [state]);
+
+  return (
+    <form
+      action={action}
+      className={`internal-action-form ${styles.actionForm} ${styles.criticalAction}`}
+    >
+      <input type="hidden" name="targetCreator" value={creatorId} />
+      <input type="hidden" name="suspend" value={suspended ? "false" : "true"} />
+      <p className="field-hint">
+        {suspended
+          ? "O cadastro está suspenso. Reativar devolve o criador à base de aprovados."
+          : "Suspender tira o criador da base de aprovados sem apagar nada. Ele recebe um aviso com o motivo e pode ser reativado depois."}
+      </p>
+      <label className="field">
+        <span>{suspended ? "Motivo da reativação" : "Motivo da suspensão"}</span>
+        <textarea name="reason" rows={3} maxLength={2000} required />
+      </label>
+      <Feedback state={state} />
+      {confirming ? (
+        <div className={styles.confirmBox} role="alertdialog" aria-live="polite">
+          <p>
+            {suspended
+              ? "Reativar o cadastro? O criador volta a constar como aprovado."
+              : "Suspender o cadastro? O criador deixa de constar como aprovado até ser reativado."}
+          </p>
+          <div>
+            <button className="button button-dark" type="submit" disabled={pending}>
+              {pending ? "Salvando…" : "Confirmar"}
+            </button>
+            <button
+              className="quiet-button"
+              type="button"
+              disabled={pending}
+              onClick={() => setConfirming(false)}
+            >
+              Cancelar
+            </button>
+          </div>
+        </div>
+      ) : (
+        <button
+          className="button button-dark"
+          type="button"
+          onClick={(event) => {
+            if (event.currentTarget.form?.reportValidity()) setConfirming(true);
+          }}
+        >
+          {suspended ? "Reativar cadastro" : "Suspender cadastro"}
         </button>
       )}
     </form>

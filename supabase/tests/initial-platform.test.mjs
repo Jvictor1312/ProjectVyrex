@@ -165,6 +165,12 @@ before(async () => {
       "utf8",
     ),
   );
+  await database.exec(
+    await readFile(
+      new URL("../migrations/202610290004_creator_suspension.sql", import.meta.url),
+      "utf8",
+    ),
+  );
   await database.query(
     "insert into auth.users (id, raw_user_meta_data) values ($1, '{}'::jsonb), ($2, '{}'::jsonb), ($3, '{}'::jsonb)",
     [creatorOne, creatorTwo, creatorThree],
@@ -1201,6 +1207,58 @@ test("creator queue filters by current responsible inside the database and respe
       .finally(() => database.exec("reset role")),
     /permission denied/i,
   );
+});
+
+// Suspender e reativar (202610290004).
+test("only administrators suspend approved creators, with reason, history, notice and audit", async () => {
+  const status = async () =>
+    (await database.query("select status from public.creator_profiles where user_id = $1", [creatorThree]))
+      .rows[0].status;
+  const call = (userId, suspend, reason) =>
+    asUser(userId, () =>
+      database.query("select public.set_creator_suspension($1, $2, $3)", [creatorThree, suspend, reason]),
+    );
+
+  // Só cadastro aprovado pode ser suspenso.
+  await database.query("update public.creator_profiles set status = 'submitted' where user_id = $1", [creatorThree]);
+  await assert.rejects(call(administrator, true, "Teste"), /only approved/);
+  await database.query("update public.creator_profiles set status = 'approved' where user_id = $1", [creatorThree]);
+
+  // Outras funções e o próprio criador não suspendem; motivo é obrigatório.
+  await assert.rejects(call(validator, true, "Teste"), /not authorized/);
+  await assert.rejects(call(creatorThree, true, "Teste"), /not authorized/);
+  await assert.rejects(call(administrator, true, "   "), /reason is required/);
+  assert.equal(await status(), "approved");
+
+  await call(administrator, true, "Conteúdo fora das regras da agência.");
+  assert.equal(await status(), "suspended");
+  // Não suspende duas vezes nem reativa quem não está suspenso.
+  await assert.rejects(call(administrator, true, "De novo"), /only approved/);
+
+  const notice = await asUser(creatorThree, () =>
+    database.query(
+      "select title, body from public.notifications where user_id = $1 order by created_at desc limit 1",
+      [creatorThree],
+    ),
+  );
+  assert.deepEqual(notice.rows[0], { title: "Cadastro suspenso", body: "Conteúdo fora das regras da agência." });
+
+  await call(administrator, false, "Situação resolvida.");
+  assert.equal(await status(), "approved");
+
+  const history = await database.query(
+    "select action, outcome from public.review_history where creator_id = $1 and action in ('suspended', 'reinstated') order by created_at",
+    [creatorThree],
+  );
+  assert.deepEqual(history.rows, [
+    { action: "suspended", outcome: "suspended" },
+    { action: "reinstated", outcome: "approved" },
+  ]);
+  const audit = await database.query(
+    "select action from public.audit_logs where entity_id = $1 and action in ('creator.suspended', 'creator.reinstated') order by created_at",
+    [creatorThree],
+  );
+  assert.deepEqual(audit.rows.map((row) => row.action), ["creator.suspended", "creator.reinstated"]);
 });
 
 // Limite de tentativas compartilhado (202610290002).

@@ -243,6 +243,42 @@ export async function recordFinalDecisionAction(
   redirect(`/interno?decisao=${parsed.data.decision}`);
 }
 
+// Suspender (aprovado → suspenso) ou reativar (suspenso → aprovado). A regra
+// e a permissão ficam no banco (set_creator_suspension, migration 202610290004).
+export async function setCreatorSuspensionAction(
+  _state: FormState,
+  formData: FormData,
+): Promise<FormState> {
+  const parsed = z
+    .object({
+      targetCreator: z.uuid(),
+      suspend: z.enum(["true", "false"]),
+      reason: z.string().trim().min(1, "Informe o motivo.").max(2000),
+    })
+    .safeParse({
+      targetCreator: formData.get("targetCreator"),
+      suspend: formData.get("suspend"),
+      reason: formData.get("reason") ?? "",
+    });
+  if (!parsed.success) return validationFailure(parsed.error, invalid().message);
+
+  const suspend = parsed.data.suspend === "true";
+  const { supabase } = await requireSession();
+  const { error } = await supabase.rpc("set_creator_suspension", {
+    target_creator: parsed.data.targetCreator,
+    suspend,
+    reason: parsed.data.reason,
+  });
+  if (error) return denied;
+  refreshCreator(parsed.data.targetCreator);
+  return {
+    message: suspend
+      ? "Cadastro suspenso. O criador recebeu um aviso com o motivo."
+      : "Cadastro reativado. O criador recebeu um aviso com o motivo.",
+    success: true,
+  };
+}
+
 export async function assignCreatorResponsiblesAction(
   _state: FormState,
   formData: FormData,

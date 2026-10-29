@@ -1,5 +1,5 @@
 // Gerado a partir do banco real (zofxrohoilwjtzbcruse) pela Management API.
-// NÃ£o edite Ã  mÃ£o: depois de aplicar uma migration, rode
+// Não edite à mão: depois de aplicar uma migration, rode
 //   powershell -ExecutionPolicy Bypass -File scripts\gen-db-types.ps1
 
 export type Json =
@@ -994,6 +994,10 @@ export type Database = {
         Returns: undefined
       }
       search_text: { Args: { value: string }; Returns: string }
+      set_creator_suspension: {
+        Args: { reason: string; suspend: boolean; target_creator: string }
+        Returns: undefined
+      }
       set_own_cpf: { Args: { new_cpf: string }; Returns: undefined }
       set_user_active: {
         Args: { enabled: boolean; reason?: string; target_user: string }

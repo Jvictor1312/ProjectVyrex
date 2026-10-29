@@ -88,11 +88,11 @@ incomplete ──enviar──► submitted ──encaminhar (recrutador)──�
                                approved | rejected
 ```
 
-`suspended` existe nos rótulos e no esquema, mas nenhuma função coloca um cadastro nessa situação ainda.
+**Suspender e reativar** (`set_creator_suspension`, migration `202610290004`): só o administrador (permissão `creators.suspend`), só de `approved` para `suspended` e de volta para `approved`, com motivo obrigatório, aviso ao criador, histórico e auditoria.
 
 **Para aprovar**, o banco exige: as 3 evidências obrigatórias aprovadas, cada uma com as visualizações mínimas, e a rede verificada.
 
-**Migrations (16):** de `202610140001_initial_platform.sql` até `202610290003_creator_queue_filter.sql`. Todas são aditivas, estão aplicadas no projeto real e no de testes e ficam **registradas** em `supabase_migrations.schema_migrations`. `scripts\migrations.ps1 -Banco testes|real [-Aplicar]` mostra o que falta e aplica (a migration e o registro na mesma transação). Depois, `scripts\gen-db-types.ps1` regera os tipos (`src/lib/supabase/database.types.ts`), que o TypeScript usa para conferir cada consulta. Quando uma função aparece em mais de uma migration, vale a última.
+**Migrations (17):** de `202610140001_initial_platform.sql` até `202610290004_creator_suspension.sql`. Todas são aditivas, estão aplicadas no projeto real e no de testes e ficam **registradas** em `supabase_migrations.schema_migrations`. `scripts\migrations.ps1 -Banco testes|real [-Aplicar]` mostra o que falta e aplica (a migration e o registro na mesma transação). Depois, `scripts\gen-db-types.ps1` regera os tipos (`src/lib/supabase/database.types.ts`), que o TypeScript usa para conferir cada consulta. Quando uma função aparece em mais de uma migration, vale a última.
 
 **Lista do painel da equipe:** sai da RPC `creator_queue(responsible, unassigned)` (security invoker, a RLS vale). O filtro "Responsável" é aplicado dentro do banco; situação, busca, período, ordem e paginação vêm por cima.
 

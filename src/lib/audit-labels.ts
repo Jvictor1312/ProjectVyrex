@@ -9,6 +9,8 @@ const actionLabels: Record<string, string> = {
   "user.cpf.changed": "CPF da conta alterado",
   "creator.evidence.reviewed": "Evidência analisada",
   "creator.decision.recorded": "Decisão final registrada",
+  "creator.suspended": "Cadastro suspenso",
+  "creator.reinstated": "Cadastro reativado",
   "creator.responsibles.changed": "Responsáveis alterados",
   "creator.message.sent": "Mensagem enviada ao criador",
   "creator.corrections.requested": "Correção solicitada",

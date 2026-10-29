@@ -28,7 +28,7 @@ O que falta **não é de base**. São três grupos:
 | B1 Código sem uso | **feito** (`seed:local-users` mantido: tem teste e está no README) | |
 | B2 Textos de auditoria | **feito** | `src/lib/audit-labels.ts` |
 | B3 Tailwind e `globals.css` | **decidido: manter o Tailwind** como reset base (decisão 19); dividir o `globals.css` fica para quando cada tela for mexida | |
-| B4 Situação `suspended` | **depende do produto**: suspender cadastro é uma regra nova (quem pode, com que motivo, o que o criador vê) | |
+| B4 Situação `suspended` | **feito** (só administrador, só aprovados, motivo obrigatório, aviso ao criador, reativação) | migration `202610290004`, ficha do criador |
 | B5 Documentos antigos | **feito** | `docs/ARCHITECTURE.md`, `SECURITY.md`, `TESTING.md`, `DECISIONS.md` reescritos; `QA_REPORT.txt` em `docs/historico/` |
 
 Com isso, as áreas "Operação" e "Testes" sobem de nível: há registro de erros, CI, cópia de segurança e auditoria de acessibilidade automática. A tabela abaixo é a avaliação original, mantida para referência.
