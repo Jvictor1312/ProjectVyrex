@@ -16,6 +16,13 @@ Atualizado em: 2026-10-29. Reescrito para mostrar só o estado atual e as pendê
 
 ## Pendências
 
+### Feito em 2026-10-31 (verificação das métricas do Instagram)
+- [x] **Dois métodos opcionais** em Meu cadastro > Redes sociais e na ficha da equipe: conexão oficial pela API da Meta (token cifrado, renovação, reconexão, avisos da Meta) e gravação de tela (MP4/MOV, 10 s a 3 min, até 50 MB, bucket privado, aprovação pela validação). Detalhes, viabilidade e passo a passo da Meta em `docs/INSTAGRAM.md`.
+- [x] Verificações: typecheck, lint, `npm test` 79/79, build. Telas conferidas no navegador (Chromium do Playwright, janela visível) em 1440 e 390 px pela prévia `/preview/criador/cadastro?verificacao=conectado|vazio|indisponivel`, sem erros no console. `test:e2e` e `test:flows` não rodados (sem Chrome nem credenciais nesta máquina).
+- [ ] **Aplicar a migration `202610310001`** (testes → fluxos → real → `gen-db-types.ps1`). Só com autorização do dono; os tipos foram acrescentados à mão em `database.types.ts`.
+- [ ] **Criar o app na Meta** e as variáveis `INSTAGRAM_*` (passo a passo em `docs/INSTAGRAM.md`, seção 3). App Review e verificação da empresa para abrir a todos os criadores.
+- [ ] O servidor de `localhost:3000` ficou com erro 500 depois do rebase (guardou em cache o `package.json` no meio da resolução de conflito). O arquivo está correto: basta reiniciar a tarefa "Vyrex: servidor local" no VS Code.
+
 ### Feito em 2026-10-29 (arquétipo, acessibilidade e avaliação da arquitetura)
 - [x] **Arquétipo do sistema** em `arquetipo/` (8 capítulos): o que foi feito, telas, como funciona, testes, acessibilidade, segurança e avaliação da arquitetura. Documentos antigos de `docs/` ganharam um aviso apontando para ele.
 - [x] **Auditoria de acessibilidade** em 16 telas × 2 larguras, com correções (commit `a3757ed`): "Pular para o conteúdo"; campos da ficha do criador com moldura; "Abrir ficha" com 44px no celular.
