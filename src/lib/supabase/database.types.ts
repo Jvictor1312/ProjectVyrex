@@ -1,6 +1,9 @@
 // Gerado a partir do banco real (zofxrohoilwjtzbcruse) pela Management API.
 // Não edite à mão: depois de aplicar uma migration, rode
 //   powershell -ExecutionPolicy Bypass -File scripts\gen-db-types.ps1
+// ATENÇÃO: os tipos da migration 202610310001 (Instagram e gravação de tela)
+// foram acrescentados à mão porque ela ainda não foi aplicada no banco real.
+// Ao aplicá-la, rode o script acima e esta nota some.
 
 export type Json =
   | string
@@ -285,6 +288,150 @@ export type Database = {
           },
         ]
       }
+      instagram_connections: {
+        Row: {
+          account_type: string | null
+          app_scoped_id: string | null
+          connected_at: string
+          creator_id: string
+          granted_scopes: string[]
+          instagram_user_id: string
+          last_sync_error: string | null
+          last_synced_at: string | null
+          status: string
+          status_reason: string | null
+          token_expires_at: string | null
+          updated_at: string
+          username: string
+        }
+        Insert: {
+          account_type?: string | null
+          app_scoped_id?: string | null
+          connected_at?: string
+          creator_id: string
+          granted_scopes?: string[]
+          instagram_user_id: string
+          last_sync_error?: string | null
+          last_synced_at?: string | null
+          status?: string
+          status_reason?: string | null
+          token_expires_at?: string | null
+          updated_at?: string
+          username: string
+        }
+        Update: {
+          account_type?: string | null
+          app_scoped_id?: string | null
+          connected_at?: string
+          creator_id?: string
+          granted_scopes?: string[]
+          instagram_user_id?: string
+          last_sync_error?: string | null
+          last_synced_at?: string | null
+          status?: string
+          status_reason?: string | null
+          token_expires_at?: string | null
+          updated_at?: string
+          username?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "instagram_connections_creator_id_fkey"
+            columns: ["creator_id"]
+            isOneToOne: true
+            referencedRelation: "creator_profiles"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
+      instagram_metric_snapshots: {
+        Row: {
+          account_reach: number | null
+          account_views: number | null
+          creator_id: string
+          fetched_at: string
+          followers_count: number | null
+          id: string
+          insights_since: string | null
+          insights_until: string | null
+          instagram_user_id: string
+          media_count: number | null
+          stories: Json
+          unavailable: Json
+          username: string
+        }
+        Insert: {
+          account_reach?: number | null
+          account_views?: number | null
+          creator_id: string
+          fetched_at?: string
+          followers_count?: number | null
+          id?: string
+          insights_since?: string | null
+          insights_until?: string | null
+          instagram_user_id: string
+          media_count?: number | null
+          stories?: Json
+          unavailable?: Json
+          username: string
+        }
+        Update: {
+          account_reach?: number | null
+          account_views?: number | null
+          creator_id?: string
+          fetched_at?: string
+          followers_count?: number | null
+          id?: string
+          insights_since?: string | null
+          insights_until?: string | null
+          instagram_user_id?: string
+          media_count?: number | null
+          stories?: Json
+          unavailable?: Json
+          username?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "instagram_metric_snapshots_creator_id_fkey"
+            columns: ["creator_id"]
+            isOneToOne: false
+            referencedRelation: "creator_profiles"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
+      instagram_tokens: {
+        Row: {
+          access_token_ciphertext: string | null
+          creator_id: string
+          expires_at: string | null
+          issued_at: string | null
+          updated_at: string
+        }
+        Insert: {
+          access_token_ciphertext?: string | null
+          creator_id: string
+          expires_at?: string | null
+          issued_at?: string | null
+          updated_at?: string
+        }
+        Update: {
+          access_token_ciphertext?: string | null
+          creator_id?: string
+          expires_at?: string | null
+          issued_at?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "instagram_tokens_creator_id_fkey"
+            columns: ["creator_id"]
+            isOneToOne: true
+            referencedRelation: "instagram_connections"
+            referencedColumns: ["creator_id"]
+          },
+        ]
+      }
       metric_evidence: {
         Row: {
           content_type: string
@@ -367,6 +514,66 @@ export type Database = {
             columns: ["social_account_id"]
             isOneToOne: false
             referencedRelation: "social_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      metric_recordings: {
+        Row: {
+          content_type: string
+          created_at: string
+          creator_id: string
+          duration_seconds: number
+          id: string
+          review_reason: string | null
+          review_status: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          size_bytes: number
+          storage_path: string
+          updated_at: string
+        }
+        Insert: {
+          content_type: string
+          created_at?: string
+          creator_id: string
+          duration_seconds: number
+          id?: string
+          review_reason?: string | null
+          review_status?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          size_bytes: number
+          storage_path: string
+          updated_at?: string
+        }
+        Update: {
+          content_type?: string
+          created_at?: string
+          creator_id?: string
+          duration_seconds?: number
+          id?: string
+          review_reason?: string | null
+          review_status?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          size_bytes?: number
+          storage_path?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "metric_recordings_creator_id_fkey"
+            columns: ["creator_id"]
+            isOneToOne: true
+            referencedRelation: "creator_profiles"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "metric_recordings_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -985,6 +1192,10 @@ export type Database = {
         Args: { new_status: string; note?: string; request_id: string }
         Returns: undefined
       }
+      review_metric_recording: {
+        Args: { decision: string; reason: string; target_recording: string }
+        Returns: undefined
+      }
       review_social_account: {
         Args: { decision: string; reason?: string; target_account: string }
         Returns: undefined
@@ -992,6 +1203,15 @@ export type Database = {
       review_story_evidence: {
         Args: { decision: string; evidence_id: string; reason?: string }
         Returns: undefined
+      }
+      save_own_metric_recording: {
+        Args: {
+          recording_content_type: string
+          recording_duration: number
+          recording_path: string
+          recording_size: number
+        }
+        Returns: string
       }
       search_text: { Args: { value: string }; Returns: string }
       set_creator_suspension: {

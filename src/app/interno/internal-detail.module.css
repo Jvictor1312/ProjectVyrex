@@ -265,3 +265,12 @@
     min-height: 44px;
   }
 }
+
+/* Gravação de tela das métricas (vertical, como no celular). */
+.recordingVideo {
+  display: block;
+  width: 100%;
+  max-width: 360px;
+  max-height: 640px;
+  background: #000;
+}

@@ -11,6 +11,20 @@ import {
   RelationshipControls,
   SocialAccountReviewForm,
 } from "@/app/components/internal-actions";
+import { InstagramMetricsSummary } from "@/app/components/instagram-metrics-summary";
+import {
+  InstagramRefreshButton,
+  RecordingReviewForm,
+} from "@/app/components/metric-verification";
+import {
+  connectionStatusLabels,
+  formatDuration,
+  recordingStatusLabels,
+  recordingStatusTones,
+  syncErrorLabels,
+  verificationSourceLabels,
+} from "@/lib/instagram/labels";
+import { loadMetricVerification } from "@/lib/instagram/view-data";
 import { InternalShell } from "../internal-shell";
 import { fetchActiveRoleKeys, requireUserFast } from "@/lib/auth";
 import {
@@ -43,6 +57,8 @@ const historyLabels: Record<string, string> = {
   evidence_changes_requested: "Correção de evidência solicitada",
   social_account_verified: "Rede social verificada",
   social_account_rejected: "Rede social precisa de ajuste",
+  recording_approved: "Gravação de tela aprovada",
+  recording_rejected: "Gravação de tela recusada",
   approved: "Cadastro aprovado",
   rejected: "Cadastro não aprovado",
   changes_requested: "Correções solicitadas",
@@ -83,6 +99,7 @@ export default async function CreatorInternalDetail({
     staffResult,
     recruiterAssignment,
     managerAssignment,
+    verification,
   ] = await Promise.all([
     fetchActiveRoleKeys(supabase, user.id),
     activeCheck,
@@ -146,6 +163,7 @@ export default async function CreatorInternalDetail({
       .eq("creator_id", creatorId)
       .is("ended_at", null)
       .maybeSingle(),
+    loadMetricVerification(supabase, creatorId),
   ]);
   await ensureActive(activeResult);
   if (rolesResult.error) notFound();
@@ -322,6 +340,97 @@ export default async function CreatorInternalDetail({
                 </article>
               );
             })
+          )}
+        </section>
+
+        <section className={styles.section}>
+          <h2>Verificação das métricas</h2>
+          <p>
+            Origem de cada número: {verificationSourceLabels.api.toLowerCase()},{" "}
+            {verificationSourceLabels.manual.toLowerCase()} ou visto na gravação de
+            tela. A verificação é opcional para o criador.
+          </p>
+          {verification.loadError && (
+            <Notice tone="warning">Parte da verificação não pôde ser carregada.</Notice>
+          )}
+          <h3>API do Instagram</h3>
+          {verification.connection ? (
+            <>
+              <p>
+                <Badge
+                  tone={verification.connection.status === "active" ? "success" : "warning"}
+                >
+                  {connectionStatusLabels[verification.connection.status] ??
+                    verification.connection.status}
+                </Badge>{" "}
+                @{verification.connection.username} · conectado em{" "}
+                {new Date(verification.connection.connectedAt).toLocaleDateString("pt-BR")}
+                {verification.connection.lastSyncError &&
+                  ` · ${syncErrorLabels[verification.connection.lastSyncError] ?? syncErrorLabels.error}`}
+              </p>
+              {verification.snapshot ? (
+                <InstagramMetricsSummary
+                  snapshot={verification.snapshot}
+                  accountType={verification.connection.accountType}
+                  declaredHandle={
+                    accounts.find((account) => account.platform === "instagram")?.handle ?? null
+                  }
+                  declaredFollowers={
+                    accounts.find((account) => account.platform === "instagram")
+                      ?.followers_reported ?? null
+                  }
+                />
+              ) : (
+                <p>Nenhuma consulta de métricas registrada.</p>
+              )}
+              {canValidate && verification.connection.status === "active" && (
+                <InstagramRefreshButton creatorId={creatorId} />
+              )}
+            </>
+          ) : (
+            <p>O criador não conectou o Instagram pela API.</p>
+          )}
+
+          <h3>Gravação de tela</h3>
+          {verification.recording ? (
+            <div>
+              {verification.recording.url ? (
+                <video
+                  src={verification.recording.url}
+                  controls
+                  preload="metadata"
+                  playsInline
+                  className={styles.recordingVideo}
+                />
+              ) : (
+                <p>Vídeo indisponível no momento.</p>
+              )}
+              <p>
+                <Badge tone={recordingStatusTones[verification.recording.status] ?? "neutral"}>
+                  {recordingStatusLabels[verification.recording.status] ??
+                    verification.recording.status}
+                </Badge>{" "}
+                {formatDuration(verification.recording.durationSeconds)} ·{" "}
+                {(verification.recording.sizeBytes / (1024 * 1024)).toLocaleString("pt-BR", {
+                  maximumFractionDigits: 1,
+                })}{" "}
+                MB · enviada em{" "}
+                {new Date(verification.recording.createdAt).toLocaleString("pt-BR")}
+              </p>
+              {verification.recording.reason && (
+                <Notice tone={recordingStatusTones[verification.recording.status] ?? "neutral"}>
+                  {verification.recording.reason}
+                </Notice>
+              )}
+              {canReviewNow && (
+                <RecordingReviewForm
+                  recordingId={verification.recording.id}
+                  creatorId={creatorId}
+                />
+              )}
+            </div>
+          ) : (
+            <p>Nenhuma gravação de tela enviada.</p>
           )}
         </section>
 

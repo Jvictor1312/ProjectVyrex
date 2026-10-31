@@ -21,6 +21,8 @@ const historyLabels: Record<string, string> = {
   evidence_changes_requested: "Correção pedida em uma evidência",
   social_account_verified: "Rede social conferida",
   social_account_rejected: "Rede social precisa de ajuste",
+  recording_approved: "Gravação de tela aprovada",
+  recording_rejected: "Gravação de tela recusada",
   approved: "Cadastro aprovado",
   rejected: "Cadastro não aprovado",
   changes_requested: "Correção solicitada",

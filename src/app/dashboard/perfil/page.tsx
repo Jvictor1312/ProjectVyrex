@@ -5,6 +5,9 @@ import {
   defaultRequiredEvidence,
   evidenceStatusLabels,
 } from "@/lib/labels";
+import { CreatorMetricVerification } from "@/app/components/metric-verification";
+import { isInstagramConfigured } from "@/lib/instagram/service";
+import { loadMetricVerification } from "@/lib/instagram/view-data";
 import { CreatorProfileView } from "./creator-profile-view";
 
 export const metadata: Metadata = { title: "Meu cadastro" };
@@ -16,13 +19,19 @@ const evidenceStatus: Record<string, string> = {
   pending: "Enviada",
 };
 
-export default async function CreatorProfilePage() {
+export default async function CreatorProfilePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ instagram?: string }>;
+}) {
+  const { instagram: instagramNotice } = await searchParams;
   const { supabase, user, activeCheck, ensureActive } = await requireUserFast();
   const [
     profileResult,
     accountsResult,
     evidenceResult,
     settingsResult,
+    verification,
     activeResult,
   ] = await Promise.all([
     supabase
@@ -53,6 +62,7 @@ export default async function CreatorProfilePage() {
       )
       .eq("singleton", true)
       .maybeSingle(),
+    loadMetricVerification(supabase, user.id),
     activeCheck,
   ]);
   await ensureActive(activeResult);
@@ -61,6 +71,7 @@ export default async function CreatorProfilePage() {
   const accounts = accountsResult.data ?? [];
   const evidence = evidenceResult.data ?? [];
   const settings = settingsResult.data;
+  const instagramAccount = accounts.find((account) => account.platform === "instagram");
   const evidenceSlots = new Map(evidence.map((item) => [item.position, item]));
   const signedUrls = evidence.length
     ? await supabase.storage.from("story-evidence").createSignedUrls(
@@ -155,6 +166,18 @@ export default async function CreatorProfilePage() {
           categories: profile?.categories ?? [],
         }}
         accounts={accounts}
+        initialStep={instagramNotice ? "redes" : undefined}
+        metricVerification={
+          <CreatorMetricVerification
+            configured={isInstagramConfigured()}
+            data={verification}
+            canEdit={canEdit}
+            userId={user.id}
+            declaredHandle={instagramAccount?.handle ?? null}
+            declaredFollowers={instagramAccount?.followers_reported ?? null}
+            notice={instagramNotice}
+          />
+        }
         evidenceSlots={[1, 2, 3, 4, 5].map((position) => {
           const item = evidenceSlots.get(position);
           return {

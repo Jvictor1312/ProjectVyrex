@@ -1,0 +1,238 @@
+/* Verificação de métricas do Instagram: mesmo visual preto e branco da área
+   do criador (variáveis de globals.css) e da área da equipe (as variáveis do
+   tema interno, quando existirem, têm prioridade). */
+
+.block {
+  margin-top: 28px;
+  padding-top: 22px;
+  border-top: 1px solid var(--line, #dcdddb);
+}
+.block h3 {
+  margin: 0 0 8px;
+  font-size: 17px;
+}
+.options {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: 16px;
+}
+.option {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 10px;
+  padding: 18px;
+  border: 1px solid var(--line, #dcdddb);
+  background: var(--surface, #fff);
+}
+.option h4 {
+  margin: 0;
+  font-size: 15px;
+}
+.hint {
+  margin: 0;
+  color: var(--muted, #5f6461);
+  font-size: 13px;
+  line-height: 1.6;
+}
+.status {
+  margin: 0;
+  font-size: 14px;
+}
+.warning {
+  margin: 0;
+  padding: 10px 12px;
+  border-left: 3px solid currentColor;
+  background: var(--paper, #f5f5f3);
+  font-size: 13px;
+  line-height: 1.5;
+}
+.unavailable {
+  margin: 0;
+  color: var(--muted, #5f6461);
+  font-size: 13px;
+}
+.unavailable small {
+  display: block;
+  margin-top: 3px;
+  font-size: 12px;
+  line-height: 1.4;
+}
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+.inline {
+  display: grid;
+  gap: 8px;
+}
+.confirm {
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid var(--line, #dcdddb);
+}
+.confirm p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+}
+.steps {
+  margin: 0;
+  padding-left: 20px;
+  list-style: decimal;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.summary {
+  display: grid;
+  gap: 12px;
+  margin-top: 6px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line, #dcdddb);
+}
+.source {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  color: var(--muted, #5f6461);
+  font-size: 13px;
+}
+.apiBadge {
+  padding: 3px 8px;
+  background: var(--ink, #101313);
+  color: var(--paper, #f5f5f3);
+  font-size: 12px;
+  font-weight: 700;
+}
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin: 0;
+}
+.metrics > div {
+  min-width: 0;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--line, #dcdddb);
+}
+.metrics dt {
+  color: var(--muted, #5f6461);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+.metrics dd {
+  margin: 5px 0 0;
+  overflow-wrap: anywhere;
+}
+.metrics dd strong {
+  font-size: 20px;
+}
+.declared {
+  color: var(--muted, #5f6461);
+  font-size: 12px;
+}
+.subheading {
+  margin: 4px 0 0;
+  font-size: 13px;
+}
+.stories {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.stories li {
+  display: grid;
+  gap: 2px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--line, #dcdddb);
+  font-size: 13px;
+}
+.stories a {
+  text-decoration: underline;
+}
+
+.recording {
+  display: grid;
+  gap: 8px;
+}
+.video {
+  width: 100%;
+  max-height: 420px;
+  background: #000;
+}
+.upload {
+  display: grid;
+  gap: 10px;
+  justify-items: start;
+}
+.fileInput {
+  display: none;
+}
+.progress {
+  display: grid;
+  width: 100%;
+  gap: 6px;
+  font-size: 13px;
+}
+.progress progress {
+  width: 100%;
+}
+
+.reviewForm {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+.reviewForm select,
+.reviewForm input,
+.reviewForm button {
+  min-height: 38px;
+  padding: 0 10px;
+  border: 1px solid var(--line, #dcdddb);
+  background: var(--surface, #fff);
+  color: inherit;
+  font: inherit;
+  font-size: 14px;
+}
+.reviewForm input {
+  flex: 1 1 200px;
+}
+.reviewForm button {
+  background: var(--text, var(--ink, #101313));
+  color: var(--bg, var(--paper, #f5f5f3));
+  font-weight: 700;
+  cursor: pointer;
+}
+
+@media (max-width: 760px) {
+  .options,
+  .metrics {
+    grid-template-columns: 1fr;
+  }
+  .option {
+    padding: 14px;
+  }
+  .reviewForm select,
+  .reviewForm input,
+  .reviewForm button {
+    width: 100%;
+    min-height: 44px;
+    font-size: 16px;
+  }
+  .actions :global(.button),
+  .actions :global(.quiet-button),
+  .upload :global(.button) {
+    min-height: 44px;
+  }
+}

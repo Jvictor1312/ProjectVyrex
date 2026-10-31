@@ -19,6 +19,7 @@ const ActionMessage = FormFeedback;
 export function CreatorWizard({
   steps,
   children,
+  initialPanelId,
 }: {
   steps: {
     title: string;
@@ -27,10 +28,13 @@ export function CreatorWizard({
     panelId: string;
   }[];
   children: ReactNode;
+  // Etapa a abrir primeiro (ex.: ao voltar da conexão com o Instagram).
+  initialPanelId?: string;
 }) {
   const firstIncomplete = steps.findIndex((step) => !step.complete);
+  const requested = steps.findIndex((step) => step.panelId === initialPanelId);
   const [activeStep, setActiveStep] = useState(
-    firstIncomplete < 0 ? 0 : firstIncomplete,
+    requested >= 0 ? requested : firstIncomplete < 0 ? 0 : firstIncomplete,
   );
   const wizardRef = useRef<HTMLDivElement>(null);
   const changedByUser = useRef(false);

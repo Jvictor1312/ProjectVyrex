@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import Link from "next/link";
 import {
   CreatorWizard,
@@ -41,6 +42,10 @@ export type CreatorProfileViewProps = {
     followers_reported: number;
     verification_status: string;
   }[];
+  // Verificação das métricas do Instagram (API ou gravação de tela).
+  metricVerification?: ReactNode;
+  // Etapa do assistente a abrir primeiro (id do painel, ex.: "redes").
+  initialStep?: string;
   evidenceSlots: EvidenceSlot[];
   evidenceCount: number;
   evidenceComplete: boolean;
@@ -59,6 +64,8 @@ export function CreatorProfileView({
   decisionReason,
   profile,
   accounts,
+  metricVerification,
+  initialStep,
   evidenceSlots,
   evidenceCount,
   evidenceComplete,
@@ -78,6 +85,7 @@ export function CreatorProfileView({
       )}
 
       <CreatorWizard
+        initialPanelId={initialStep}
         steps={[
           {
             title: "Perfil",
@@ -171,6 +179,7 @@ export function CreatorProfileView({
           {canEdit && (
             <SocialAccountForm startCollapsed={accounts.length > 0} />
           )}
+          {metricVerification}
         </section>
 
         <section className="profile-section" id="evidencias" data-wizard-step="2">
