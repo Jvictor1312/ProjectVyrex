@@ -109,13 +109,13 @@ Os testes usam PostgreSQL embutido PGlite para executar a migration, com substit
 
 As permissões são verificadas novamente em RPCs do PostgreSQL e políticas RLS; esconder um botão não é considerado autorização. Contas desativadas perdem o acesso mesmo que mantenham um token de sessão. As decisões são registradas em histórico/auditoria e não podem ser alteradas por gravações diretas do cliente.
 
-## Critérios iniciais de análise
+## Critérios de análise
 
-- Pelo menos 3.000 seguidores informados em uma rede; a equipe ainda precisa verificar a contagem.
-- Exatamente cinco evidências de Stories, identificadas da mais recente (posição 1) para a mais antiga (posição 5).
-- Pelo menos 2.000 visualizações informadas por evidência; as imagens não são consideradas comprovação automática.
+- Não existe número mínimo de seguidores. A equipe confere a rede social informada.
+- No mínimo 3 e no máximo 5 evidências de Stories, identificadas da mais recente (posição 1) para a mais antiga. As posições 1 a 3 são obrigatórias; a 4 e a 5 são opcionais.
+- Pelo menos 1.000 visualizações em cada Story enviado como evidência, individualmente (as visualizações não são somadas). As imagens não são consideradas comprovação automática.
 - Por padrão, todas as evidências devem ter até sete dias. Um administrador pode alterar ou remover esse limite na configuração.
-- A aprovação exige rede social verificada e análise manual aprovada para todas as cinco evidências.
+- A aprovação exige rede social verificada e análise manual aprovada para as evidências obrigatórias.
 
 Estes critérios significam elegibilidade para futuras oportunidades, não promessa de campanha, contratação ou remuneração.
 

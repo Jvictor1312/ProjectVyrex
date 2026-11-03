@@ -194,7 +194,7 @@ Todas as migrations estão em `supabase/migrations/` e foram aplicadas no projet
 | `202610150001_data_requests.sql` | pedidos de privacidade (`data_requests`) + permissão `privacy.requests.manage` |
 | `202610150002_social_account_updates.sql` | editar a rede social zera a verificação (gatilho) e é auditado |
 | `202610150003_submission_profile_name.sql` | gatilho: não envia sem nome público |
-| `202610150004_creator_growth_criteria.sql` | critérios 3.000/2.000 → **0 seguidores / 1.000 visualizações** |
+| `202610150004_creator_growth_criteria.sql` | critérios passam a **0 seguidores / 1.000 visualizações por evidência** |
 | `202610280001_presentation_video.sql` | `site_settings` + bucket público `site-media` (vídeo da tela de cadastro) |
 | `202610280002_three_required_evidence.sql` | **3 evidências obrigatórias** (posições 1–3; 4 e 5 opcionais); nova versão de `submit_creator_application` e `update_eligibility_settings` |
 | `202610280003_signup_phone_and_recovery_options.sql` | telefone do cadastro vai para `profiles`; cria `recovery_phone_hint` |
@@ -433,9 +433,7 @@ Nada aqui foi alterado; são observações para quem for mexer.
 **Documentação desatualizada em relação ao código**
 - `docs/SECURITY.md`, primeira parte: diz que `requireUser()` usa `auth.getUser()` (hoje é `getClaims()`), que não há limite de tentativas e que os cabeçalhos de segurança não estão configurados. Os três já existem; a seção "Revisão de segurança de 2026-10-28", mais abaixo no mesmo arquivo, está correta. Também cita URLs assinadas de 60 s, mas o código usa 600 s.
 - `docs/ARCHITECTURE.md`: lista as migrations só até `202610150003` e não cita `site_settings`, `user_documents`, o bucket `site-media` nem `proxy.ts`.
-- `docs/DECISIONS.md` nº 3: cita os valores antigos (3.000 / 5 / 2.000).
 - `docs/TESTING.md`: diz que não há Playwright e que vários testes "não foram executados"; hoje há 47 testes de unidade e banco, além das suítes `e2e` e `e2e-flows`.
-- `docs/DIRETRIZES.md`: os critérios (3.000/2.000, 5 evidências) estão desatualizados, como o próprio `CLAUDE.md` avisa.
 
 **Código sem uso ou incompleto**
 - `recovery_phone_hint` (banco) e `maskPhone` (`lib/validation/phone.ts`): sobras da recuperação por celular; nada no site chama.

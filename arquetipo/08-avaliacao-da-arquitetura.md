@@ -112,7 +112,6 @@ Atualizar ou marcar como históricos:
 | `docs/ARCHITECTURE.md` | migrations só até `202610150003`; não cita `proxy`, `site_settings`, `user_documents`, `rate_limit_counters` nem `site-media` |
 | `docs/SECURITY.md` (primeira parte) | diz que não há limite de tentativas nem cabeçalhos; cita `getUser()` e links de 60 s |
 | `docs/TESTING.md` | diz que não há Playwright e que os testes "não foram executados" |
-| `docs/DECISIONS.md` nº 3 | critérios antigos (3.000 / 5 / 2.000) |
 | `QA_REPORT.txt` (raiz; movido para `docs/historico/`) | relatório de 14/10, anterior a quase tudo |
 | `docs/MAPA_DO_CODIGO.md` | ainda cita o limite em memória e a CSP com `'unsafe-inline'` (mudados em 29/10) |
 
