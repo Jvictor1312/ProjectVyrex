@@ -3,7 +3,7 @@
 > Estas diretrizes foram escritas no início do projeto para orientar o desenvolvimento. Elas **não são uma regra absoluta**:
 >
 > - **Muita coisa descrita aqui já foi feita.** Confira o código, o banco e `docs/TASKS.md` antes de assumir que algo falta.
-> - **Algumas coisas foram alteradas depois.** Exemplo: os critérios de elegibilidade iniciais citados na seção 14 (3.000 seguidores e 2.000 visualizações) foram mudados pela migration `202610150004_creator_growth_criteria.sql`. No banco atual, os valores são 0 seguidores e 1.000 visualizações.
+> - **Algumas coisas foram alteradas depois.** Os critérios de elegibilidade da seção 14 foram atualizados em 03/11/2026 para a regra oficial: sem mínimo de seguidores, pelo menos 1.000 visualizações em cada Story enviado como evidência, no mínimo 3 e no máximo 5 evidências.
 > - **Em caso de divergência, vale esta ordem:** (1) o que o usuário pedir na conversa; (2) o estado real do código e do banco; (3) este documento.
 > - **A seção 26 ("Comece imediatamente") não é uma ordem para executar em toda sessão.** Use este documento como contexto do produto e como padrão de qualidade, e trabalhe no que o usuário pedir.
 
@@ -765,7 +765,7 @@ O influenciador deverá conseguir:
 3. Preencher seu perfil.
 4. Informar suas redes sociais.
 5. Informar métricas declaradas.
-6. Enviar cinco evidências de Stories.
+6. Enviar de 3 a 5 evidências de Stories.
 7. Salvar e retomar o cadastro.
 8. Revisar as informações.
 9. Enviar o cadastro.
@@ -781,9 +781,16 @@ O sistema deverá persistir os dados reais.
 
 Não considere métricas declaradas automaticamente verificadas.
 
-Não considere cinco uploads suficientes para aprovar um cadastro.
+Não considere o simples envio das evidências suficiente para aprovar um cadastro.
 
-Os critérios de elegibilidade devem ser configuráveis, com valores iniciais de 3.000 seguidores e 2.000 visualizações por evidência, salvo configuração administrativa válida em contrário.
+Critérios oficiais de elegibilidade (definidos em 03/11/2026):
+
+- Não existe número mínimo de seguidores.
+- Cada Story enviado como evidência deve ter, individualmente, pelo menos 1.000 visualizações. As visualizações não são somadas entre os Stories.
+- O influenciador deve enviar no mínimo 3 evidências.
+- O influenciador pode enviar no máximo 5 evidências.
+
+Os critérios continuam configuráveis na área administrativa, mas os valores acima são os oficiais e só devem mudar com autorização do responsável da Vyrex.
 
 ---
 
