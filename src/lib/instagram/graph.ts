@@ -287,7 +287,10 @@ export async function collectInstagramMetrics(
   const unavailable: Record<string, UnavailableReason> = {};
   if (profile.followersCount === null) unavailable.followers_count = "no_data";
 
-  const hasInsights = options.grantedScopes.includes(insightsScope);
+  // Lista vazia = a Meta não informou as permissões na troca do código: tenta
+  // consultar e deixa a própria API dizer se falta permissão.
+  const hasInsights =
+    options.grantedScopes.length === 0 || options.grantedScopes.includes(insightsScope);
   const metrics: Pick<InstagramMetrics, "accountViews" | "accountReach"> = {
     accountViews: null,
     accountReach: null,

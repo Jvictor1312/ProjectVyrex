@@ -208,9 +208,15 @@ using (
   )
 );
 
--- 6. O criador registra a gravação que já enviou ao Storage. Devolve o
--- caminho da gravação anterior (o servidor remove o arquivo antigo).
-create or replace function public.save_own_metric_recording(
+-- 6. Registro da gravação que o criador já enviou ao Storage. Só o servidor
+-- executa (papel service_role): ele baixa o arquivo e confere formato,
+-- tamanho e duração reais antes de chamar. O criador vem da sessão conferida
+-- no servidor, nunca do navegador; ainda assim o banco confere de novo que a
+-- conta está ativa, que é criador, que o cadastro está em edição e que o
+-- arquivo existe na pasta dele. Devolve o caminho da gravação anterior (o
+-- servidor remove o arquivo antigo).
+create or replace function public.save_creator_metric_recording(
+  target_creator uuid,
   recording_path text,
   recording_content_type text,
   recording_size integer,
@@ -222,21 +228,28 @@ security definer
 set search_path = public, pg_temp
 as $$
 declare
-  actor uuid := auth.uid();
   previous_path text;
 begin
-  if actor is null or not public.has_permission('creators.evidence.own')
-    or not public.account_is_active() then
+  if target_creator is null or not exists (
+    select 1
+    from public.user_roles ur
+    join public.role_permissions rp on rp.role_id = ur.role_id
+    join public.profiles p on p.id = ur.user_id
+    where ur.user_id = target_creator
+      and ur.revoked_at is null
+      and p.is_active
+      and rp.permission_key = 'creators.evidence.own'
+  ) then
     raise exception 'not authorized' using errcode = '42501';
   end if;
   perform 1 from public.creator_profiles
-  where user_id = actor and status in ('incomplete', 'changes_requested')
+  where user_id = target_creator and status in ('incomplete', 'changes_requested')
   for update;
   if not found then
     raise exception 'application is not editable';
   end if;
   if recording_path is null
-    or recording_path !~ ('^' || actor::text || '/[0-9a-f-]{36}\.(mp4|mov)$')
+    or recording_path !~ ('^' || target_creator::text || '/[0-9a-f-]{36}\.(mp4|mov)$')
     or not exists (
       select 1 from storage.objects o
       where o.bucket_id = 'metric-recordings' and o.name = recording_path
@@ -244,10 +257,10 @@ begin
     raise exception 'recording file not found';
   end if;
 
-  select storage_path into previous_path from public.metric_recordings where creator_id = actor;
+  select storage_path into previous_path from public.metric_recordings where creator_id = target_creator;
 
   insert into public.metric_recordings (creator_id, storage_path, content_type, size_bytes, duration_seconds)
-  values (actor, recording_path, recording_content_type, recording_size, round(recording_duration, 1))
+  values (target_creator, recording_path, recording_content_type, recording_size, round(recording_duration, 1))
   on conflict (creator_id) do update set
     storage_path = excluded.storage_path,
     content_type = excluded.content_type,
@@ -258,7 +271,10 @@ begin
     reviewed_by = null,
     reviewed_at = null;
 
-  perform public.write_audit_log('creator.metric_recording.saved', 'metric_recording', actor::text,
+  -- write_audit_log usa auth.uid(), que é nulo no papel do servidor: o autor
+  -- registrado é o próprio criador.
+  insert into public.audit_logs (actor_id, action, entity_type, entity_id, details)
+  values (target_creator, 'creator.metric_recording.saved', 'metric_recording', target_creator::text,
     jsonb_build_object('replaced', previous_path is not null));
   return case when previous_path is distinct from recording_path then previous_path end;
 end;
@@ -317,7 +333,24 @@ begin
 end;
 $$;
 
-revoke all on function public.save_own_metric_recording(text, text, integer, numeric) from public, anon;
+-- Registrar gravação: nem visitante nem usuário logado executam; só o
+-- servidor. Analisar gravação: usuários logados (a função confere a
+-- permissão de validação e o acesso ao criador).
+revoke all on function public.save_creator_metric_recording(uuid, text, text, integer, numeric)
+  from public, anon, authenticated;
 revoke all on function public.review_metric_recording(uuid, text, text) from public, anon;
-grant execute on function public.save_own_metric_recording(text, text, integer, numeric) to authenticated;
 grant execute on function public.review_metric_recording(uuid, text, text) to authenticated;
+do $$
+begin
+  if exists (select 1 from pg_roles where rolname = 'service_role') then
+    grant execute on function public.save_creator_metric_recording(uuid, text, text, integer, numeric)
+      to service_role;
+  end if;
+end;
+$$;
+
+-- A API do Supabase (PostgREST) guarda a lista de tabelas em cache. Ela
+-- costuma recarregar sozinha após mudanças de estrutura; este aviso garante
+-- que as tabelas novas fiquem visíveis logo após a aplicação (sem ele, as
+-- telas poderiam continuar recebendo PGRST205 por um tempo).
+notify pgrst, 'reload schema';

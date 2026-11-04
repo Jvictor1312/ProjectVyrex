@@ -1204,12 +1204,13 @@ export type Database = {
         Args: { decision: string; evidence_id: string; reason?: string }
         Returns: undefined
       }
-      save_own_metric_recording: {
+      save_creator_metric_recording: {
         Args: {
           recording_content_type: string
           recording_duration: number
           recording_path: string
           recording_size: number
+          target_creator: string
         }
         Returns: string
       }

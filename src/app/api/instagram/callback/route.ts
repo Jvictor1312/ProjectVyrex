@@ -23,7 +23,7 @@ export async function GET(request: NextRequest) {
   const saved = cookieStore.get(instagramStateCookie)?.value ?? "";
   cookieStore.delete({ name: instagramStateCookie, path: "/api/instagram" });
 
-  const { user } = await requireSession();
+  const { supabase, user } = await requireSession();
   const [savedState, savedUser] = saved.split(".");
   const state = params.get("state") ?? "";
   if (!savedState || savedUser !== user.id || !sameValue(savedState, state)) {
@@ -37,6 +37,18 @@ export async function GET(request: NextRequest) {
   // parte depois do "#", mas o código é limpo por garantia.
   const code = (params.get("code") ?? "").replace(/#_$/, "");
   if (!code || code.length > 2000) redirect(`${back}?instagram=falhou#redes`);
+
+  // A conexão é gravada com a chave de serviço; a conta ativa e o cadastro
+  // em edição são conferidos de novo com a sessão (a regra do banco só
+  // devolve o cadastro de contas ativas).
+  const { data: profile } = await supabase
+    .from("creator_profiles")
+    .select("status")
+    .eq("user_id", user.id)
+    .maybeSingle();
+  if (!profile || !["incomplete", "changes_requested"].includes(profile.status)) {
+    redirect(`${back}?instagram=bloqueado#redes`);
+  }
 
   const outcome = await connectInstagramAccount(user.id, code);
   revalidatePath(back);

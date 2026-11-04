@@ -7,6 +7,7 @@ import {
 } from "@/lib/labels";
 import { CreatorMetricVerification } from "@/app/components/metric-verification";
 import { isInstagramConfigured } from "@/lib/instagram/service";
+import { isSupabaseAdminConfigured } from "@/lib/supabase/admin";
 import { loadMetricVerification } from "@/lib/instagram/view-data";
 import { CreatorProfileView } from "./creator-profile-view";
 
@@ -170,6 +171,7 @@ export default async function CreatorProfilePage({
         metricVerification={
           <CreatorMetricVerification
             configured={isInstagramConfigured()}
+            recordingEnabled={isSupabaseAdminConfigured()}
             data={verification}
             canEdit={canEdit}
             userId={user.id}

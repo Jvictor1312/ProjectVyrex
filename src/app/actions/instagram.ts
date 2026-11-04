@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { requireSession } from "@/lib/auth";
+import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import {
   disconnectInstagram,
   syncInstagramMetrics,
@@ -51,9 +52,23 @@ function refreshCreatorScreens(creatorId: string) {
   revalidatePath(`/interno/${creatorId}`);
 }
 
+const inactiveAccount: FormState = {
+  message: "Sua conta está desativada. Fale com a equipe da Vyrex.",
+  success: false,
+};
+
+// O serviço grava com a chave de serviço, que ignora as regras do banco;
+// por isso a conta ativa é conferida aqui, com a sessão do próprio usuário.
+async function requireActiveSession() {
+  const session = await requireSession();
+  const { data: active } = await session.supabase.rpc("account_is_active");
+  return { ...session, active: active === true };
+}
+
 // O criador atualiza as próprias métricas.
 export async function refreshOwnInstagramMetricsAction(): Promise<FormState> {
-  const { user } = await requireSession();
+  const { user, active } = await requireActiveSession();
+  if (!active) return inactiveAccount;
   const outcome = await syncInstagramMetrics(user.id, user.id);
   refreshCreatorScreens(user.id);
   return syncMessages[outcome];
@@ -80,7 +95,8 @@ export async function refreshCreatorInstagramMetricsAction(
 }
 
 export async function disconnectInstagramAction(): Promise<FormState> {
-  const { user } = await requireSession();
+  const { user, active } = await requireActiveSession();
+  if (!active) return inactiveAccount;
   const done = await disconnectInstagram(user.id);
   refreshCreatorScreens(user.id);
   return done
@@ -94,18 +110,25 @@ export async function disconnectInstagramAction(): Promise<FormState> {
 
 // Registra a gravação de tela que o navegador já enviou ao Storage. O
 // servidor baixa o arquivo, confere que é mesmo um vídeo MP4/MOV, o tamanho
-// e a duração; se algo não bater, o arquivo enviado é removido.
-export async function saveMetricRecordingAction(path: string): Promise<FormState> {
-  const { supabase, user } = await requireSession();
-  const match = recordingPathPattern.exec(path);
-  if (!match || match[1] !== user.id) {
+// e a duração; se algo não bater, o arquivo enviado é removido. Só então a
+// gravação é registrada, por uma função do banco que apenas o servidor
+// executa, para o criador da sessão (nunca um id vindo do navegador).
+export async function saveMetricRecordingAction(path: unknown): Promise<FormState> {
+  const { supabase, user, active } = await requireActiveSession();
+  if (!active) return inactiveAccount;
+  const match = typeof path === "string" ? recordingPathPattern.exec(path) : null;
+  if (typeof path !== "string" || !match || match[1] !== user.id) {
     return { message: "Arquivo de gravação inválido.", success: false };
   }
-
   const discard = async (message: string): Promise<FormState> => {
     await supabase.storage.from(recordingBucket).remove([path]);
     return { message, success: false };
   };
+
+  // Sem a chave de serviço não há como registrar: o arquivo que o navegador
+  // já enviou é removido para não ficar abandonado no Storage.
+  const admin = createSupabaseAdminClient();
+  if (!admin) return discard("O envio de gravações ainda não está disponível.");
 
   const { data: file, error: downloadError } = await supabase.storage
     .from(recordingBucket)
@@ -132,7 +155,8 @@ export async function saveMetricRecordingAction(path: string): Promise<FormState
     );
   }
 
-  const { data: previous, error } = await supabase.rpc("save_own_metric_recording", {
+  const { data: previous, error } = await admin.rpc("save_creator_metric_recording", {
+    target_creator: user.id,
     recording_path: path,
     recording_content_type: expected,
     recording_size: file.size,

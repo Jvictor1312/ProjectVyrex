@@ -33,6 +33,21 @@ async function expectFailure(userId, sql, params, pattern) {
   );
 }
 
+// Papel do servidor (chave de serviço): sem usuário logado.
+async function asService(operation) {
+  await database.exec("set role service_role");
+  try {
+    await database.query("select set_config('request.jwt.claim.sub', '', false)");
+    return await operation();
+  } finally {
+    await database.exec("reset role");
+  }
+}
+
+async function expectServiceFailure(sql, params, pattern) {
+  await assert.rejects(asService(() => database.query(sql, params)), pattern);
+}
+
 const recordingPath = (userId, name = "11111111-1111-4111-8111-111111111111") =>
   `${userId}/${name}.mp4`;
 
@@ -124,6 +139,37 @@ after(async () => {
   await database.close();
 });
 
+test("a creator submits the application without connecting Instagram or sending a recording", async () => {
+  const account = await database.query(
+    `insert into public.social_accounts (creator_id, platform, handle, profile_url, followers_reported)
+     values ($1, 'instagram', 'pessoal', 'https://www.instagram.com/pessoal', 300) returning id`,
+    [creatorTwo],
+  );
+  for (let position = 1; position <= 3; position += 1) {
+    const path = `${creatorTwo}/story-${position}.webp`;
+    await database.query("insert into storage.objects (bucket_id, name) values ('story-evidence', $1)", [path]);
+    await database.query(
+      `insert into public.metric_evidence (creator_id, social_account_id, position, storage_path, content_type,
+         size_bytes, story_published_on, views_reported)
+       values ($1, $2, $3, $4, 'image/webp', 100, current_date - $5::integer, 1500)`,
+      [creatorTwo, account.rows[0].id, position, path, position - 1],
+    );
+  }
+  await database.query(
+    "update public.creator_profiles set public_name = 'Criadora Dois' where user_id = $1",
+    [creatorTwo],
+  );
+  await asUser(creatorTwo, () => database.query("select public.submit_creator_application()"));
+  const result = await database.query(
+    `select cp.status,
+       (select count(*) from public.instagram_connections where creator_id = cp.user_id)::int as connections,
+       (select count(*) from public.metric_recordings where creator_id = cp.user_id)::int as recordings
+     from public.creator_profiles cp where cp.user_id = $1`,
+    [creatorTwo],
+  );
+  assert.deepEqual(result.rows[0], { status: "submitted", connections: 0, recordings: 0 });
+});
+
 test("signed-in users cannot read or write Instagram tokens, not even their own", async () => {
   await expectFailure(
     creatorOne,
@@ -205,25 +251,62 @@ test("one Instagram account cannot stay connected to two creators", async () => 
   );
 });
 
-test("creator saves a screen recording only from an uploaded file in their own folder", async () => {
-  // Arquivo que não existe no Storage.
+const saveRecording =
+  "select public.save_creator_metric_recording($1, $2, 'video/mp4', $3, $4) as previous";
+
+test("signed-in users and visitors cannot run the recording function directly", async () => {
+  await database.query(
+    "insert into storage.objects (bucket_id, name) values ('metric-recordings', $1)",
+    [recordingPath(creatorOne, "44444444-4444-4444-8444-444444444444")],
+  );
+  // O próprio criador, com arquivo dele e dados plausíveis: recusado.
   await expectFailure(
     creatorOne,
-    "select public.save_own_metric_recording($1, 'video/mp4', 1000, 30)",
-    [recordingPath(creatorOne)],
-    /recording file not found/,
+    saveRecording,
+    [creatorOne, recordingPath(creatorOne, "44444444-4444-4444-8444-444444444444"), 1000, 30],
+    /permission denied for function/,
   );
-  // Arquivo de outra pessoa.
+  // A equipe também não registra gravações por essa função.
+  await expectFailure(
+    administrator,
+    saveRecording,
+    [creatorOne, recordingPath(creatorOne, "44444444-4444-4444-8444-444444444444"), 1000, 30],
+    /permission denied for function/,
+  );
+  await database.exec("set role anon");
+  try {
+    await assert.rejects(
+      database.query(saveRecording, [
+        creatorOne,
+        recordingPath(creatorOne, "44444444-4444-4444-8444-444444444444"),
+        1000,
+        30,
+      ]),
+      /permission denied for function/,
+    );
+  } finally {
+    await database.exec("reset role");
+  }
+  const saved = await database.query(
+    "select count(*)::int as total from public.metric_recordings",
+  );
+  assert.equal(saved.rows[0].total, 0);
+});
+
+test("the server registers a recording only for the creator's own uploaded file", async () => {
+  // Arquivo que não existe no Storage.
+  await expectServiceFailure(saveRecording, [creatorOne, recordingPath(creatorOne), 1000, 30], /recording file not found/);
+  // Arquivo de outra pessoa: o criador da sessão não grava em nome de outro.
   await database.query(
     "insert into storage.objects (bucket_id, name) values ('metric-recordings', $1)",
     [recordingPath(creatorTwo)],
   );
-  await expectFailure(
-    creatorOne,
-    "select public.save_own_metric_recording($1, 'video/mp4', 1000, 30)",
-    [recordingPath(creatorTwo)],
-    /recording file not found/,
-  );
+  await expectServiceFailure(saveRecording, [creatorOne, recordingPath(creatorTwo), 1000, 30], /recording file not found/);
+  // Cadastro já enviado (criador dois): não aceita gravação.
+  await expectServiceFailure(saveRecording, [creatorTwo, recordingPath(creatorTwo), 1000, 30], /not editable/);
+  // Criador inexistente: recusado.
+  const nobody = "30000000-0000-4000-8000-000000000099";
+  await expectServiceFailure(saveRecording, [nobody, `${nobody}/11111111-1111-4111-8111-111111111111.mp4`, 1000, 30], /not authorized/);
 
   // Envio pelo Storage passa pela política (pasta própria e cadastro editável).
   await asUser(creatorOne, () =>
@@ -232,31 +315,29 @@ test("creator saves a screen recording only from an uploaded file in their own f
       [recordingPath(creatorOne)],
     ),
   );
-  const first = await asUser(creatorOne, () =>
-    database.query(
-      "select public.save_own_metric_recording($1, 'video/mp4', 1000, 30) as previous",
-      [recordingPath(creatorOne)],
-    ),
+  // Conta desativada: recusada.
+  await database.query("update public.profiles set is_active = false where id = $1", [creatorOne]);
+  await expectServiceFailure(saveRecording, [creatorOne, recordingPath(creatorOne), 1000, 30], /not authorized/);
+  await database.query("update public.profiles set is_active = true where id = $1", [creatorOne]);
+
+  const first = await asService(() =>
+    database.query(saveRecording, [creatorOne, recordingPath(creatorOne), 1000, 30]),
   );
   assert.equal(first.rows[0].previous, null);
+  const audit = await database.query(
+    "select actor_id from public.audit_logs where action = 'creator.metric_recording.saved' order by created_at desc limit 1",
+  );
+  assert.equal(audit.rows[0].actor_id, creatorOne);
 
   // Duração fora do limite (10 a 180 s) é recusada pelo banco.
   const second = recordingPath(creatorOne, "22222222-2222-4222-8222-222222222222");
   await asUser(creatorOne, () =>
     database.query("insert into storage.objects (bucket_id, name) values ('metric-recordings', $1)", [second]),
   );
-  await expectFailure(
-    creatorOne,
-    "select public.save_own_metric_recording($1, 'video/mp4', 1000, 400)",
-    [second],
-    /check constraint/,
-  );
+  await expectServiceFailure(saveRecording, [creatorOne, second, 1000, 400], /check constraint/);
   // Substituir devolve o caminho anterior para o servidor remover o arquivo.
-  const replaced = await asUser(creatorOne, () =>
-    database.query(
-      "select public.save_own_metric_recording($1, 'video/mp4', 2000, 45) as previous",
-      [second],
-    ),
+  const replaced = await asService(() =>
+    database.query(saveRecording, [creatorOne, second, 2000, 45]),
   );
   assert.equal(replaced.rows[0].previous, recordingPath(creatorOne));
 });

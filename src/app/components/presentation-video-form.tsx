@@ -104,7 +104,6 @@ export function PresentationVideoForm({
         message: `Esse vídeo tem ${size.width}×${size.height} pixels e ficaria borrado na tela de cadastro. Envie em HD (1280×720) ou mais; 1920×1080 é o ideal.`,
         success: false,
       });
-      if (input.current) input.current.value = "";
       return;
     }
 
@@ -127,7 +126,6 @@ export function PresentationVideoForm({
     }
     startTransition(async () => {
       setState(await savePresentationVideoAction(path));
-      if (input.current) input.current.value = "";
     });
   }
 
@@ -147,6 +145,9 @@ export function PresentationVideoForm({
         aria-hidden="true"
         onChange={(event) => {
           const file = event.currentTarget.files?.[0];
+          // Limpa a escolha: escolher o mesmo arquivo de novo (depois de um
+          // erro) volta a disparar o envio.
+          event.currentTarget.value = "";
           if (file) void upload(file);
         }}
       />

@@ -24,6 +24,7 @@ import {
   syncErrorLabels,
   verificationSourceLabels,
 } from "@/lib/instagram/labels";
+import { verificationMigration } from "@/lib/instagram/availability";
 import { loadMetricVerification } from "@/lib/instagram/view-data";
 import { InternalShell } from "../internal-shell";
 import { fetchActiveRoleKeys, requireUserFast } from "@/lib/auth";
@@ -353,84 +354,94 @@ export default async function CreatorInternalDetail({
           {verification.loadError && (
             <Notice tone="warning">Parte da verificação não pôde ser carregada.</Notice>
           )}
-          <h3>API do Instagram</h3>
-          {verification.connection ? (
+          {!verification.available ? (
+            <Notice tone="warning">
+              Verificação de métricas indisponível: as tabelas ainda não existem neste
+              banco (migration {verificationMigration} pendente). O cadastro segue sem
+              ela.
+            </Notice>
+          ) : (
             <>
-              <p>
-                <Badge
-                  tone={verification.connection.status === "active" ? "success" : "warning"}
-                >
-                  {connectionStatusLabels[verification.connection.status] ??
-                    verification.connection.status}
-                </Badge>{" "}
-                @{verification.connection.username} · conectado em{" "}
-                {new Date(verification.connection.connectedAt).toLocaleDateString("pt-BR")}
-                {verification.connection.lastSyncError &&
-                  ` · ${syncErrorLabels[verification.connection.lastSyncError] ?? syncErrorLabels.error}`}
-              </p>
-              {verification.snapshot ? (
-                <InstagramMetricsSummary
-                  snapshot={verification.snapshot}
-                  accountType={verification.connection.accountType}
-                  declaredHandle={
-                    accounts.find((account) => account.platform === "instagram")?.handle ?? null
-                  }
-                  declaredFollowers={
-                    accounts.find((account) => account.platform === "instagram")
-                      ?.followers_reported ?? null
-                  }
-                />
-              ) : (
-                <p>Nenhuma consulta de métricas registrada.</p>
-              )}
-              {canValidate && verification.connection.status === "active" && (
-                <InstagramRefreshButton creatorId={creatorId} />
-              )}
-            </>
-          ) : (
-            <p>O criador não conectou o Instagram pela API.</p>
-          )}
+            <h3>API do Instagram</h3>
+            {verification.connection ? (
+              <>
+                <p>
+                  <Badge
+                    tone={verification.connection.status === "active" ? "success" : "warning"}
+                  >
+                    {connectionStatusLabels[verification.connection.status] ??
+                      verification.connection.status}
+                  </Badge>{" "}
+                  @{verification.connection.username} · conectado em{" "}
+                  {new Date(verification.connection.connectedAt).toLocaleDateString("pt-BR")}
+                  {verification.connection.lastSyncError &&
+                    ` · ${syncErrorLabels[verification.connection.lastSyncError] ?? syncErrorLabels.error}`}
+                </p>
+                {verification.snapshot ? (
+                  <InstagramMetricsSummary
+                    snapshot={verification.snapshot}
+                    accountType={verification.connection.accountType}
+                    declaredHandle={
+                      accounts.find((account) => account.platform === "instagram")?.handle ?? null
+                    }
+                    declaredFollowers={
+                      accounts.find((account) => account.platform === "instagram")
+                        ?.followers_reported ?? null
+                    }
+                  />
+                ) : (
+                  <p>Nenhuma consulta de métricas registrada.</p>
+                )}
+                {canValidate && verification.connection.status === "active" && (
+                  <InstagramRefreshButton creatorId={creatorId} />
+                )}
+              </>
+            ) : (
+              <p>O criador não conectou o Instagram pela API.</p>
+            )}
 
-          <h3>Gravação de tela</h3>
-          {verification.recording ? (
-            <div>
-              {verification.recording.url ? (
-                <video
-                  src={verification.recording.url}
-                  controls
-                  preload="metadata"
-                  playsInline
-                  className={styles.recordingVideo}
-                />
-              ) : (
-                <p>Vídeo indisponível no momento.</p>
-              )}
-              <p>
-                <Badge tone={recordingStatusTones[verification.recording.status] ?? "neutral"}>
-                  {recordingStatusLabels[verification.recording.status] ??
-                    verification.recording.status}
-                </Badge>{" "}
-                {formatDuration(verification.recording.durationSeconds)} ·{" "}
-                {(verification.recording.sizeBytes / (1024 * 1024)).toLocaleString("pt-BR", {
-                  maximumFractionDigits: 1,
-                })}{" "}
-                MB · enviada em{" "}
-                {new Date(verification.recording.createdAt).toLocaleString("pt-BR")}
-              </p>
-              {verification.recording.reason && (
-                <Notice tone={recordingStatusTones[verification.recording.status] ?? "neutral"}>
-                  {verification.recording.reason}
-                </Notice>
-              )}
-              {canReviewNow && (
-                <RecordingReviewForm
-                  recordingId={verification.recording.id}
-                  creatorId={creatorId}
-                />
-              )}
-            </div>
-          ) : (
-            <p>Nenhuma gravação de tela enviada.</p>
+            <h3>Gravação de tela</h3>
+            {verification.recording ? (
+              <div>
+                {verification.recording.url ? (
+                  <video
+                    src={verification.recording.url}
+                    controls
+                    preload="metadata"
+                    playsInline
+                    className={styles.recordingVideo}
+                  />
+                ) : (
+                  <p>Vídeo indisponível no momento.</p>
+                )}
+                <p>
+                  <Badge tone={recordingStatusTones[verification.recording.status] ?? "neutral"}>
+                    {recordingStatusLabels[verification.recording.status] ??
+                      verification.recording.status}
+                  </Badge>{" "}
+                  {formatDuration(verification.recording.durationSeconds)} ·{" "}
+                  {(verification.recording.sizeBytes / (1024 * 1024)).toLocaleString("pt-BR", {
+                    maximumFractionDigits: 1,
+                  })}{" "}
+                  MB · enviada em{" "}
+                  {new Date(verification.recording.createdAt).toLocaleString("pt-BR")}
+                </p>
+                {verification.recording.reason && (
+                  <Notice tone={recordingStatusTones[verification.recording.status] ?? "neutral"}>
+                    {verification.recording.reason}
+                  </Notice>
+                )}
+                {canReviewNow && (
+                  <RecordingReviewForm
+                    recordingId={verification.recording.id}
+                    creatorId={creatorId}
+                  />
+                )}
+              </div>
+            ) : (
+              <p>Nenhuma gravação de tela enviada.</p>
+            )}
+            </>
           )}
         </section>
 

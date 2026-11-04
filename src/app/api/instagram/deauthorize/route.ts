@@ -17,6 +17,6 @@ export async function POST(request: NextRequest) {
       : null;
   if (!data?.user_id) return NextResponse.json({ ok: false }, { status: 400 });
 
-  await revokeInstagramByMetaUserId(data.user_id);
+  await revokeInstagramByMetaUserId(data.user_id, { kind: "deauthorize" });
   return NextResponse.json({ ok: true });
 }

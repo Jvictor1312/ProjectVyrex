@@ -128,15 +128,22 @@ function typeOf(file: File): RecordingType | null {
 }
 
 // Duração lida pelo próprio navegador, antes de enviar. Se não der para
-// ler, o servidor confere depois.
+// ler (ou o navegador não responder em 8 s, como acontece com formatos que
+// ele não decodifica), o servidor confere depois.
 function readDuration(file: File) {
   return new Promise<number | null>((resolve) => {
     const video = document.createElement("video");
     const url = URL.createObjectURL(file);
+    let finished = false;
     const done = (value: number | null) => {
+      if (finished) return;
+      finished = true;
+      window.clearTimeout(timer);
       URL.revokeObjectURL(url);
+      video.removeAttribute("src");
       resolve(value);
     };
+    const timer = window.setTimeout(() => done(null), 8000);
     video.preload = "metadata";
     video.onloadedmetadata = () =>
       done(Number.isFinite(video.duration) ? video.duration : null);
@@ -167,6 +174,10 @@ function uploadWithProgress(
     };
     request.onload = () => resolve(request.status >= 200 && request.status < 300);
     request.onerror = () => resolve(false);
+    // Conexão travada (comum no celular) não deixa a tela em "Enviando…"
+    // para sempre: 10 minutos bastam para 50 MB mesmo em rede lenta.
+    request.timeout = 10 * 60 * 1000;
+    request.ontimeout = () => resolve(false);
     request.send(file);
   });
 }
@@ -239,6 +250,9 @@ function RecordingUpload({ userId, hasRecording }: { userId: string; hasRecordin
         aria-hidden="true"
         onChange={(event) => {
           const file = event.currentTarget.files?.[0];
+          // Limpa a escolha: escolher o mesmo arquivo de novo (depois de um
+          // erro) volta a disparar o envio.
+          event.currentTarget.value = "";
           if (file) void upload(file);
         }}
       />
@@ -269,6 +283,7 @@ function RecordingUpload({ userId, hasRecording }: { userId: string; hasRecordin
 
 export function CreatorMetricVerification({
   configured,
+  recordingEnabled,
   data,
   canEdit,
   userId,
@@ -277,6 +292,9 @@ export function CreatorMetricVerification({
   notice,
 }: {
   configured: boolean;
+  // false: o servidor não tem como registrar gravações (chave de serviço
+  // ausente); o envio não é oferecido.
+  recordingEnabled: boolean;
   data: MetricVerificationData;
   canEdit: boolean;
   userId: string;
@@ -287,6 +305,19 @@ export function CreatorMetricVerification({
   const { connection, snapshot, recording } = data;
   const live = connection && ["active", "reconnect_required"].includes(connection.status);
   const noticeState = notice ? connectionNotices[notice] : undefined;
+
+  // Estrutura do banco ainda não criada: nenhuma ação é oferecida (falharia).
+  if (!data.available) {
+    return (
+      <div className={styles.block} id="metricas">
+        <h3>Comprovar suas métricas do Instagram</h3>
+        <p className={styles.unavailable} role="status">
+          A verificação de métricas ainda não está disponível na Vyrex. Isso não
+          afeta o seu cadastro: você pode preencher e enviar normalmente.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className={styles.block} id="metricas">
@@ -410,7 +441,11 @@ export function CreatorMetricVerification({
               {recording.reason && <p className="decision-reason">{recording.reason}</p>}
             </div>
           )}
-          {canEdit ? (
+          {canEdit && !recordingEnabled ? (
+            <p className={styles.unavailable}>
+              O envio de gravações ainda não está disponível na Vyrex.
+            </p>
+          ) : canEdit ? (
             <RecordingUpload userId={userId} hasRecording={Boolean(recording)} />
           ) : (
             !recording && (

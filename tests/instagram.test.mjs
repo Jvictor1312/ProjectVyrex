@@ -165,6 +165,20 @@ test("without the insights permission only the profile is read", async () => {
   assert.equal(metrics.unavailable.stories, "permission_missing");
 });
 
+test("when Meta does not report the granted permissions, insights are still attempted", async () => {
+  const { fetchImpl } = fakeGraph({
+    "/v26.0/me": [200, { id: "900", user_id: "5", username: "loja", followers_count: 10 }],
+    "/v26.0/5/insights?views": [200, { data: [{ name: "views", total_value: { value: 70 } }] }],
+    "/v26.0/5/insights?reach": [400, { error: { code: 10, message: "Permission denied" } }],
+    "/v26.0/5/stories": [200, { data: [] }],
+  });
+  const metrics = await collectInstagramMetrics({ accessToken: token, grantedScopes: [] }, fetchImpl);
+  assert.equal(metrics.accountViews, 70);
+  assert.equal(metrics.unavailable.account_reach, "permission_missing");
+  assert.equal(metrics.unavailable.stories, undefined);
+  assert.deepEqual(metrics.stories, []);
+});
+
 test("an expired or revoked token stops the collection so the creator reconnects", async () => {
   const { fetchImpl } = fakeGraph({
     "/v26.0/me": [400, { error: { code: 190, message: "Error validating access token" } }],

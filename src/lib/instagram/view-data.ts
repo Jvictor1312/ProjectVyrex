@@ -1,5 +1,12 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { logServer } from "@/lib/log";
 import { recordingBucket } from "@/lib/recordings/video";
+import {
+  isMissingStructureError,
+  isStructureKnownMissing,
+  rememberStructureMissing,
+  verificationMigration,
+} from "./availability";
 
 // Dados da verificação de métricas para as telas (criador e equipe). Lê com
 // a sessão de quem está vendo: as regras do banco decidem o que aparece.
@@ -53,7 +60,18 @@ export type MetricVerificationData = {
   connection: InstagramConnectionView | null;
   snapshot: InstagramSnapshotView | null;
   recording: MetricRecordingView | null;
+  // false: a estrutura do banco ainda não existe (migration pendente).
+  available: boolean;
+  // true: falha inesperada ao ler (registrada no log do servidor).
   loadError: boolean;
+};
+
+const unavailableData: MetricVerificationData = {
+  connection: null,
+  snapshot: null,
+  recording: null,
+  available: false,
+  loadError: false,
 };
 
 function asRecord(value: unknown): Record<string, string> {
@@ -84,6 +102,8 @@ export async function loadMetricVerification(
   supabase: SupabaseClient,
   creatorId: string,
 ): Promise<MetricVerificationData> {
+  if (isStructureKnownMissing()) return unavailableData;
+
   const [connectionResult, snapshotResult, recordingResult] = await Promise.all([
     supabase
       .from("instagram_connections")
@@ -110,6 +130,18 @@ export async function loadMetricVerification(
       .maybeSingle(),
   ]);
 
+  // Tabelas inexistentes: a migration da verificação não foi aplicada neste
+  // banco. Estado próprio, com aviso claro no log; os demais erros seguem
+  // como erro (o fetch dos clientes já registra cada um).
+  const results = [connectionResult, snapshotResult, recordingResult];
+  if (results.some((result) => isMissingStructureError(result.error))) {
+    rememberStructureMissing();
+    logServer("aviso", "instagram verificação de métricas", {
+      mensagem: `Tabelas da verificação de métricas não existem neste banco: a migration ${verificationMigration} não foi aplicada. A verificação fica indisponível nas telas até ela ser aplicada.`,
+    });
+    return unavailableData;
+  }
+
   const recordingRow = recordingResult.data;
   const signed = recordingRow
     ? await supabase.storage.from(recordingBucket).createSignedUrl(recordingRow.storage_path, 600)
@@ -118,6 +150,7 @@ export async function loadMetricVerification(
   const connection = connectionResult.data;
   const snapshot = snapshotResult.data;
   return {
+    available: true,
     loadError: Boolean(connectionResult.error || snapshotResult.error || recordingResult.error),
     connection: connection
       ? {

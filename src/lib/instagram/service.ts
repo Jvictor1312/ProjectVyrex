@@ -227,7 +227,7 @@ export async function syncInstagramMetrics(
   const [{ data: connection }, { data: token }] = await Promise.all([
     client
       .from("instagram_connections")
-      .select("status, granted_scopes, last_synced_at")
+      .select("status, granted_scopes, last_synced_at, last_sync_error, updated_at")
       .eq("creator_id", creatorId)
       .maybeSingle(),
     client
@@ -242,10 +242,12 @@ export async function syncInstagramMetrics(
   if (connection.status === "reconnect_required" || !token?.access_token_ciphertext) {
     return "reconnect_required";
   }
-  if (
-    connection.last_synced_at &&
-    Date.now() - new Date(connection.last_synced_at).getTime() < minimumSyncIntervalMs
-  ) {
+  // O intervalo mínimo vale também para tentativas que falharam (a falha
+  // grava last_sync_error, o que atualiza updated_at).
+  const lastAttempt = connection.last_sync_error
+    ? connection.updated_at
+    : connection.last_synced_at;
+  if (lastAttempt && Date.now() - new Date(lastAttempt).getTime() < minimumSyncIntervalMs) {
     return "too_soon";
   }
   if (token.expires_at && new Date(token.expires_at).getTime() <= Date.now()) {
@@ -328,7 +330,10 @@ export async function disconnectInstagram(creatorId: string) {
 
 // Aviso da Meta de que a pessoa removeu o app (ou pediu exclusão de dados):
 // a conexão passa a "revogada" e o token é apagado do campo.
-export async function revokeInstagramByMetaUserId(metaUserId: string) {
+export async function revokeInstagramByMetaUserId(
+  metaUserId: string,
+  source: { kind: "deauthorize" | "data_deletion"; confirmationCode?: string },
+) {
   if (!/^[0-9]{1,40}$/.test(metaUserId)) return 0;
   const client = admin();
   const { data } = await client
@@ -346,7 +351,13 @@ export async function revokeInstagramByMetaUserId(metaUserId: string) {
       action: "creator.instagram.revoked",
       entity_type: "instagram_connection",
       entity_id: row.creator_id,
-      details: { source: "meta" },
+      details: {
+        source: "meta",
+        kind: source.kind,
+        // Código devolvido à Meta: permite à equipe localizar o pedido de
+        // exclusão de dados quando o titular perguntar por ele.
+        confirmation_code: source.confirmationCode ?? null,
+      },
     });
   }
   return data?.length ?? 0;

@@ -19,8 +19,11 @@ export async function POST(request: NextRequest) {
       : null;
   if (!data?.user_id) return NextResponse.json({ error: "invalid" }, { status: 400 });
 
-  await revokeInstagramByMetaUserId(data.user_id);
   const confirmationCode = randomBytes(9).toString("base64url");
+  await revokeInstagramByMetaUserId(data.user_id, {
+    kind: "data_deletion",
+    confirmationCode,
+  });
   const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL ?? request.nextUrl.origin).replace(/\/$/, "");
   return NextResponse.json({
     url: `${siteUrl}/privacidade?pedido-meta=${confirmationCode}`,

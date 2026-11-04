@@ -12,8 +12,10 @@ const demoStory = `data:image/svg+xml,${encodeURIComponent(
 
 // Verificação de métricas fictícia: ?verificacao=conectado mostra uma conta
 // ligada pela API (com uma métrica indisponível) e uma gravação enviada;
-// ?verificacao=indisponivel mostra a Vyrex sem a conexão configurada.
+// ?verificacao=indisponivel mostra a Vyrex sem a conexão configurada e
+// ?verificacao=pendente, o banco sem a estrutura (migration não aplicada).
 const connectedDemo: MetricVerificationData = {
+  available: true,
   loadError: false,
   connection: {
     username: "marina.demo",
@@ -53,6 +55,7 @@ const connectedDemo: MetricVerificationData = {
   },
 };
 const emptyDemo: MetricVerificationData = {
+  available: true,
   loadError: false,
   connection: null,
   snapshot: null,
@@ -109,7 +112,14 @@ export default async function CreatorProfilePreview({
         metricVerification={
           <CreatorMetricVerification
             configured={verificacao !== "indisponivel"}
-            data={verificacao === "conectado" ? connectedDemo : emptyDemo}
+            recordingEnabled={verificacao !== "indisponivel"}
+            data={
+              verificacao === "conectado"
+                ? connectedDemo
+                : verificacao === "pendente"
+                  ? { ...emptyDemo, available: false }
+                  : emptyDemo
+            }
             canEdit
             userId="00000000-0000-4000-8000-000000000000"
             declaredHandle="marina.demo"

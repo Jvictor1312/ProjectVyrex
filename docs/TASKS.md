@@ -1,6 +1,6 @@
 # Vyrex - acompanhamento de tarefas
 
-Atualizado em: 2026-10-29. Reescrito para mostrar só o estado atual e as pendências reais; o registro detalhado das sessões anteriores está no histórico do git (`git log -- docs/TASKS.md`).
+Atualizado em: 2026-11-04. Reescrito para mostrar só o estado atual e as pendências reais; o registro detalhado das sessões anteriores está no histórico do git (`git log -- docs/TASKS.md`).
 
 ## Estado atual (verificado)
 
@@ -21,7 +21,16 @@ Atualizado em: 2026-10-29. Reescrito para mostrar só o estado atual e as pendê
 - [x] Verificações: typecheck, lint, `npm test` 79/79, build. Telas conferidas no navegador (Chromium do Playwright, janela visível) em 1440 e 390 px pela prévia `/preview/criador/cadastro?verificacao=conectado|vazio|indisponivel`, sem erros no console. `test:e2e` e `test:flows` não rodados (sem Chrome nem credenciais nesta máquina).
 - [ ] **Aplicar a migration `202610310001`** (testes → fluxos → real → `gen-db-types.ps1`). Só com autorização do dono; os tipos foram acrescentados à mão em `database.types.ts`.
 - [ ] **Criar o app na Meta** e as variáveis `INSTAGRAM_*` (passo a passo em `docs/INSTAGRAM.md`, seção 3). App Review e verificação da empresa para abrir a todos os criadores.
-- [ ] O servidor de `localhost:3000` ficou com erro 500 depois do rebase (guardou em cache o `package.json` no meio da resolução de conflito). O arquivo está correto: basta reiniciar a tarefa "Vyrex: servidor local" no VS Code.
+- [x] Erro 500 no `localhost:3000` (`CssSyntaxError: tailwindcss` em `globals.css`): o Tailwind lê o `package.json` e o servidor guardou a versão com marcadores de conflito do rebase (linha 15). Resolvido reiniciando o servidor; nenhum arquivo precisou mudar.
+- [x] Auditoria (2026-10-31, alterações locais, sem commit): permissões não informadas pela Meta não viram mais "sem permissão" falso; o intervalo de 5 min vale também para consultas que falharam; o código de confirmação da exclusão de dados fica na auditoria; teste provando que o cadastro é enviado sem nenhum dos dois métodos. `npm test` 81/81.
+- [x] Auditoria final (2026-10-31, local, sem commit): "Atualizar métricas", "Desconectar" e o retorno da Meta passaram a conferir conta ativa (e, no retorno, cadastro em edição) antes de gravar com a chave de serviço. Tipos manuais conferidos coluna a coluna com a migration.
+- [x] **Corrigido (local, sem commit):** `save_own_metric_recording` virou `save_creator_metric_recording`, executável só pelo servidor (service_role), com o criador da sessão; a migration 202610310001 (ainda não aplicada) foi corrigida no próprio arquivo.
+- [x] **PGRST205 nas telas:** causa é a migration não aplicada no banco do `localhost:3000`. As telas mostram "verificação ainda não disponível" e o log tem um aviso nomeando a migration; outros erros continuam como erro. `npm test` 86/86.
+- [x] **Auditoria geral (2026-10-31, local, sem commit):** confirmado só por leitura que o banco real (`zofxrohoilwjtzbcruse`) não tem as 4 tabelas da migration 202610310001 (PGRST205) e tem as anteriores; a migration passou a pedir a recarga do cache do PostgREST (`notify pgrst`). Todas as tabelas, colunas (190), funções e buckets usados no código existem nas migrations e nos tipos; todas as tabelas com RLS. Corrigido: gravação abandonada no Storage quando falta a chave de serviço, espera sem prazo ao ler a duração do vídeo e no envio, e reenvio do mesmo arquivo depois de erro.
+- [ ] **`SUPABASE_SERVICE_ROLE_KEY` vazia no `.env.local` desta máquina.** Sem ela ficam indisponíveis: recuperação por CPF (o teste e2e dela falha por isso), convites e e-mails da equipe, limite de tentativas compartilhado (usa o contador em memória), conexão com o Instagram e registro de gravações (a tela deixa de oferecer o envio). Preencher com a chave secreta do projeto.
+- [x] Envio do vídeo de apresentação (`presentation-video-form.tsx`): escolher o mesmo arquivo de novo depois de um erro volta a disparar o envio (corrigido em 2026-11-04).
+- [x] **Verificação em 2026-11-04 (retomada):** typecheck, lint, `npm test` 86/86 e build passam. `test:e2e` com o Chromium do Playwright (esta máquina não tem o Chrome nem as senhas das contas de teste): 45 aprovados, 42 pulados (precisam de login) e 1 falha já conhecida (recuperação por CPF, por falta da `SUPABASE_SERVICE_ROLE_KEY`). Prévias de Meu cadastro (`?verificacao=conectado|indisponivel`) e da equipe conferidas em janela visível, 1440 e 390 px, sem erros no console. `test:flows` não rodado (sem `.env.test.local`).
+- [ ] Sem ambiente de testes nesta máquina (sem `SUPABASE_ACCESS_TOKEN`, sem `.env.test.local`, sem credenciais `VYREX_TEST_*`): migration testada só no PGlite.
 
 ### Feito em 2026-10-29 (arquétipo, acessibilidade e avaliação da arquitetura)
 - [x] **Arquétipo do sistema** em `arquetipo/` (8 capítulos): o que foi feito, telas, como funciona, testes, acessibilidade, segurança e avaliação da arquitetura. Documentos antigos de `docs/` ganharam um aviso apontando para ele.
